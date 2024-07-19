@@ -100,11 +100,11 @@
 // export default Home;
 
 import type { NextPage, Metadata } from 'next';
-import HeroSection from '@/components/hero';
-import Banner from '@/components/banner';
+import HeroSection from '@/components/HeroSection';
+import Banner from '@/components/Banner';
 import { DiscogsSDK, StorageService } from '@crate.ai/discogs-sdk';
 import { UserDetails, DiscogsCollectionResponse, Release, MasterRelease } from '@/types/discogs';
-import AlbumList from '@/components/albumList';
+import AlbumList from '@/components/AlbumList';
 
 const discogs = new DiscogsSDK({
   DiscogsConsumerKey: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_KEY as string,
@@ -124,7 +124,7 @@ const fetchUserDetails = async (resourceUrl: string): Promise<UserDetails> => {
 };
 
 const fetchUserCollection = async (username: string): Promise<DiscogsCollectionResponse> => {
-  const PER_PAGE = 3; // Limit the number of releases per page for testing
+  const PER_PAGE = 1; // Limit the number of releases per page for testing
 
   const fetchCollection = async (page = 1) => {
     const response = await discogs.collection.getCollection({
@@ -150,6 +150,7 @@ const fetchUserCollection = async (username: string): Promise<DiscogsCollectionR
 
 const fetchMasterRelease = async (masterUrl: string): Promise<MasterRelease> => {
   const masterRelease = await fetch(masterUrl).then((res) => res.json());
+//  console.log('masterRelease', masterRelease);
   return masterRelease;
 };
 
@@ -157,7 +158,7 @@ const processReleases = async (releases: Release[]): Promise<any[]> => {
   const processedReleases = await Promise.all(releases.map(async (release) => {
     const { id, title, year, artists, labels, genres, styles, master_url } = release.basic_information;
     let masterData = null;
-
+  //  console.log(id, title, year, artists, labels, genres, styles, master_url);
     if (master_url) {
       masterData = await fetchMasterRelease(master_url);
     }
@@ -180,8 +181,8 @@ const processReleases = async (releases: Release[]): Promise<any[]> => {
 const Home: NextPage = async () => {
   const { username, resource_url } = StorageService.getItem('userIdentity');
   const userDetails = await fetchUserDetails(resource_url);
-  const userCollection = await fetchUserCollection(username);
-  const processedReleases = await processReleases(userCollection.releases);
+  // const userCollection = await fetchUserCollection(username);
+  // const processedReleases = await processReleases(userCollection.releases);
 
   return (
     <div>
@@ -192,7 +193,7 @@ const Home: NextPage = async () => {
           <Banner avatarUrl="/default-avatar.png" username="Guest" />
         )}
         <HeroSection />
-        <AlbumList releases={processedReleases} />
+        {/* <AlbumList releases={processedReleases} /> */}
       </main>
     </div>
   );
