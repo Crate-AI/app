@@ -91,6 +91,7 @@ const Home: NextPage = async () => {
         ) : (
           <Banner avatarUrl="/default-avatar.png" username="Guest" />
         )} */}
+        <p>Hello</p>
         <HeroSection />
         {/* <AlbumList releases={processedReleases} /> */}
       </main>
