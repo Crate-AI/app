@@ -1,6 +1,6 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
-import CrateLogo from '@/components/CrateLogo';
+import CrateLogo from '../CrateLogo';
 
 const WaitlistForm = dynamic(() => import('@/components/WaitListForm'), { ssr: false });
 
