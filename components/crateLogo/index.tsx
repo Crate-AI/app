@@ -11,7 +11,6 @@ const CrateLogo: React.FC = () => {
         <div className="absolute w-full h-full bg-gray-900 opacity-75 animate-fadeIn"></div> {/* Optional front face */}
       </div>
     </div>
-
   );
 };
 

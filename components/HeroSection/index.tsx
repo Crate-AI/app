@@ -1,6 +1,6 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
-import CrateLogo from '../CrateLogo';
+// import CrateLogo from '../CrateLogo';
 
 const WaitlistForm = dynamic(() => import('@/components/WaitListForm'), { ssr: false });
 
@@ -10,7 +10,8 @@ const HeroSection: React.FC = () => {
            <div className="absolute inset-0 bg-gradient-radial from-transparent via-white/10 to-transparent">
        <div className="flex flex-col items-center mt-20">
           <div className="mb-6">
-            <CrateLogo />
+            
+            {/* <CrateLogo /> */}
           </div>
           <h1 className="text-6xl font-bold mb-4 drop-shadow-lg transition-transform duration-300 hover:scale-110">Crate</h1>
           <p className="text-xl mb-6 drop-shadow-lg">Smart digging 💿</p>
