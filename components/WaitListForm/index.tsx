@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,13 +11,15 @@ import {
   FormItem,
   FormLabel,
   FormControl,
-  FormDescription,
   FormMessage,
 } from '@/components/ui/form';
 import { waitlistSchema } from '@/app/schemas/waitlistSchema';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 const WaitListForm: React.FC = () => {
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
   const form = useForm({
     resolver: zodResolver(waitlistSchema),
     mode: 'onChange',
@@ -26,9 +28,6 @@ const WaitListForm: React.FC = () => {
       user_type: 'DJ',
     },
   });
-
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (data: any) => {
     try {
@@ -48,6 +47,7 @@ const WaitListForm: React.FC = () => {
       setError(null);
 
       setTimeout(() => setMessage(null), 3000); // Clear message after 3 seconds
+      form.reset(); // Reset the form after successful submission
     } catch (error) {
       setMessage(null);
       setError('Failed to add to waitlist');
@@ -87,16 +87,25 @@ const WaitListForm: React.FC = () => {
               <FormItem>
                 <FormLabel>What kind of digger are you?</FormLabel>
                 <FormControl>
-                  <Select {...field}>
-                    <SelectTrigger className="w-full px-4 py-2 rounded-lg border border-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white bg-white/90 text-gray-900 placeholder-gray-500 transition-transform duration-300 hover:scale-105">
-                      <SelectValue placeholder="Select your role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="DJ">DJ</SelectItem>
-                      <SelectItem value="Vinyl Collector">Vinyl Collector</SelectItem>
-                      <SelectItem value="Record Store">Record Store</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Controller
+                    name="user_type"
+                    control={form.control}
+                    render={({ field }) => (
+                      <Select
+                        onValueChange={(value) => field.onChange(value)}
+                        value={field.value}
+                      >
+                        <SelectTrigger className="w-full px-4 py-2 rounded-lg border border-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white bg-white/90 text-gray-900 placeholder-gray-500 transition-transform duration-300 hover:scale-105">
+                          <SelectValue placeholder="Select your role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="DJ">DJ</SelectItem>
+                          <SelectItem value="Vinyl Collector">Vinyl Collector</SelectItem>
+                          <SelectItem value="Record Store">Record Store</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
