@@ -1,6 +1,5 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { DiscogsSDK, StorageService } from '@crate.ai/discogs-sdk';
-// import StorageService from '@/utils/storageService'; // Adjust the import path as needed
 import path from 'path';
 
 // Initialize StorageService storage path
@@ -11,9 +10,9 @@ const discogs = new DiscogsSDK({
   DiscogsConsumerSecret: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET || "",
 });
 
-export async function GET(callbackUrl: string) {
+export async function GET(request: NextRequest) {
   try {
-    callbackUrl= 'http://localhost:3000/api/auth/discogs/callback'
+    const callbackUrl = 'http://localhost:3000/api/auth/discogs/callback';
     console.log('Requesting token from Discogs API...');
     const requestTokenResponse = await discogs.auth.getRequestToken(callbackUrl);
     return NextResponse.json({ authUrl: requestTokenResponse.verificationURL });
