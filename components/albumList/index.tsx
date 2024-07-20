@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import Image from 'next/image';
 
 interface AlbumListProps {
   releases: {
@@ -48,16 +49,20 @@ const AlbumList: React.FC<AlbumListProps> = ({ releases }) => {
                 <>
                   <TableCell rowSpan={release?.masterData?.tracklist?.length}>
                     {release?.masterData?.images && release?.masterData?.images.length > 0 && release.masterData.images[0].uri150 ? (
-                      <img 
+                      <Image 
                         src={release.masterData.images[0].uri150} 
                         alt={`${release.title} cover`} 
-                        className="w-24 h-24 object-cover"
+                        width={96}
+                        height={96}
+                        className="object-cover"
                       />
                     ) : (
-                      <img 
+                      <Image 
                         src="https://via.placeholder.com/150" 
                         alt="Placeholder cover" 
-                        className="w-24 h-24 object-cover"
+                        width={96}
+                        height={96}
+                        className="object-cover"
                       />
                     )}
                   </TableCell>
