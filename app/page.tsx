@@ -187,11 +187,11 @@ const Home: NextPage = async () => {
   return (
     <div>
       <main>
-        {username ? (
+        {/* {username ? (
           <Banner avatarUrl={userDetails.avatar_url} username={userDetails.username} />
         ) : (
           <Banner avatarUrl="/default-avatar.png" username="Guest" />
-        )}
+        )} */}
         <HeroSection />
         {/* <AlbumList releases={processedReleases} /> */}
       </main>
