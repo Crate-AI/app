@@ -3,6 +3,7 @@ import HeroSection from '@/components/HeroSection';
 import Banner from '@/components/Banner';
 import { DiscogsSDK, StorageService } from '@crate.ai/discogs-sdk';
 import { UserDetails, DiscogsCollectionResponse, Release, MasterRelease } from '@/types/discogs';
+import Waitlist from '@/components/Waitlist';
 // import AlbumList from '@/components/AlbumList';
 
 // const discogs = new DiscogsSDK({
@@ -86,13 +87,14 @@ const Home: NextPage = async () => {
   return (
     <div>
       <main>
-          <Banner />
+        <Waitlist />
+          {/* <Banner /> */}
           {/* {username ? (
             <Banner avatarUrl={userDetails.avatar_url} username={userDetails.username} />
           ) : (
             <Banner avatarUrl="/default-avatar.png" username="Guest" />
           )} */}
-          <HeroSection />
+          {/* <HeroSection /> */}
           {/* <AlbumList releases={processedReleases} /> */}
 
       </main>
