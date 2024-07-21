@@ -1,8 +1,9 @@
 import type { NextPage, Metadata } from 'next';
-import HeroSection from '@/components/HeroSection';
+// import HeroSection from '@/components/HeroSection';
 // import Banner from '@/components/Banner';
 import { DiscogsSDK, StorageService } from '@crate.ai/discogs-sdk';
 import { UserDetails, DiscogsCollectionResponse, Release, MasterRelease } from '@/types/discogs';
+import Waitlist from '@/components/Waitlist';
 // import AlbumList from '@/components/AlbumList';
 
 // const discogs = new DiscogsSDK({
@@ -10,11 +11,11 @@ import { UserDetails, DiscogsCollectionResponse, Release, MasterRelease } from '
 //   DiscogsConsumerSecret: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET as string,
 // });
 
-StorageService.storagePath = process.env.NEXT_PUBLIC_STORAGE_PATH as string;
+// StorageService.storagePath = process.env.NEXT_PUBLIC_STORAGE_PATH as string;
 
 export const metadata: Metadata = {
-  title: 'Home',
-  description: 'Home',
+  title: 'Crate',
+  description: 'Smart digging 💿',
 };
 
 // const fetchUserDetails = async (resourceUrl: string): Promise<UserDetails> => {
@@ -86,13 +87,16 @@ const Home: NextPage = async () => {
   return (
     <div>
       <main>
-        {/* {username ? (
-          <Banner avatarUrl={userDetails.avatar_url} username={userDetails.username} />
-        ) : (
-          <Banner avatarUrl="/default-avatar.png" username="Guest" />
-        )} */}
-        <HeroSection />
-        {/* <AlbumList releases={processedReleases} /> */}
+        <Waitlist />
+          {/* <Banner /> */}
+          {/* {username ? (
+            <Banner avatarUrl={userDetails.avatar_url} username={userDetails.username} />
+          ) : (
+            <Banner avatarUrl="/default-avatar.png" username="Guest" />
+          )} */}
+          {/* <HeroSection /> */}
+          {/* <AlbumList releases={processedReleases} /> */}
+
       </main>
     </div>
   );
