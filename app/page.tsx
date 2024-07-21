@@ -11,17 +11,17 @@ import Waitlist from '@/components/Waitlist';
 //   DiscogsConsumerSecret: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET as string,
 // });
 
-StorageService.storagePath = process.env.NEXT_PUBLIC_STORAGE_PATH as string;
+// StorageService.storagePath = process.env.NEXT_PUBLIC_STORAGE_PATH as string;
 
 export const metadata: Metadata = {
   title: 'Crate',
   description: 'Smart digging 💿',
 };
 
-const fetchUserDetails = async (resourceUrl: string): Promise<UserDetails> => {
-  const userDetails: UserDetails = await fetch(resourceUrl).then((res) => res.json());
-  return userDetails;
-};
+// const fetchUserDetails = async (resourceUrl: string): Promise<UserDetails> => {
+//   const userDetails: UserDetails = await fetch(resourceUrl).then((res) => res.json());
+//   return userDetails;
+// };
 
 // const fetchUserCollection = async (username: string): Promise<DiscogsCollectionResponse> => {
 //   const PER_PAGE = 1; // Limit the number of releases per page for testing
@@ -79,8 +79,8 @@ const fetchUserDetails = async (resourceUrl: string): Promise<UserDetails> => {
 // };
 
 const Home: NextPage = async () => {
-  const { username, resource_url } = StorageService.getItem('userIdentity');
-  const userDetails = await fetchUserDetails(resource_url);
+  // const { username, resource_url } = StorageService.getItem('userIdentity');
+  // const userDetails = await fetchUserDetails(resource_url);
   // const userCollection = await fetchUserCollection(username);
   // const processedReleases = await processReleases(userCollection.releases);
 
