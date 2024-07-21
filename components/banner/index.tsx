@@ -13,7 +13,7 @@ const Banner: React.FC<BannerProps> = ({ avatarUrl, username }) => {
         <Image src="/logo.svg" alt="Crate Logo" width={50} height={50} className="transition-transform duration-300 hover:scale-110" />
         {/* <h1 className="text-2xl font-bold text-white ml-4">Welcome to Crate</h1> */}
       </div>
-      <div className="flex items-center">
+      {/* <div className="flex items-center">
         {username !== "Guest" ? (
           <>
             <Image src={avatarUrl} alt={`${username}'s avatar`} width={50} height={50} className="rounded-full transition-transform duration-300 hover:scale-110" />
@@ -22,7 +22,7 @@ const Banner: React.FC<BannerProps> = ({ avatarUrl, username }) => {
         ) : (
           <SignIn />
         )}
-      </div>
+      </div> */}
     </header>
   );
 };

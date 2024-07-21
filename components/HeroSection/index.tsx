@@ -15,6 +15,7 @@ const HeroSection: React.FC = () => {
           </div>
           <h1 className="text-6xl font-bold mb-4 drop-shadow-lg transition-transform duration-300 hover:scale-110">Crate</h1>
           <p className="text-xl mb-6 drop-shadow-lg">Smart digging 💿</p>
+          <p className="text-xl mb-6 drop-shadow-lg">Join our beta waitlist for a sneak peek!</p>
         <div className="w-full max-w-lg px-8 py-6 bg-gradient-to-r from-indigo-700 to-purple-700 shadow-lg rounded-lg transition-transform duration-300 hover:scale-105">
           <WaitlistForm />
         </div>

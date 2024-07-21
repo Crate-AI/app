@@ -1,6 +1,6 @@
 import type { NextPage, Metadata } from 'next';
 import HeroSection from '@/components/HeroSection';
-// import Banner from '@/components/Banner';
+import Banner from '@/components/Banner';
 import { DiscogsSDK, StorageService } from '@crate.ai/discogs-sdk';
 import { UserDetails, DiscogsCollectionResponse, Release, MasterRelease } from '@/types/discogs';
 // import AlbumList from '@/components/AlbumList';
@@ -13,14 +13,14 @@ import { UserDetails, DiscogsCollectionResponse, Release, MasterRelease } from '
 StorageService.storagePath = process.env.NEXT_PUBLIC_STORAGE_PATH as string;
 
 export const metadata: Metadata = {
-  title: 'Home',
-  description: 'Home',
+  title: 'Crate',
+  description: 'Smart digging 💿',
 };
 
-// const fetchUserDetails = async (resourceUrl: string): Promise<UserDetails> => {
-//   const userDetails: UserDetails = await fetch(resourceUrl).then((res) => res.json());
-//   return userDetails;
-// };
+const fetchUserDetails = async (resourceUrl: string): Promise<UserDetails> => {
+  const userDetails: UserDetails = await fetch(resourceUrl).then((res) => res.json());
+  return userDetails;
+};
 
 // const fetchUserCollection = async (username: string): Promise<DiscogsCollectionResponse> => {
 //   const PER_PAGE = 1; // Limit the number of releases per page for testing
@@ -78,19 +78,19 @@ export const metadata: Metadata = {
 // };
 
 const Home: NextPage = async () => {
-  // const { username, resource_url } = StorageService.getItem('userIdentity');
-  // const userDetails = await fetchUserDetails(resource_url);
+  const { username, resource_url } = StorageService.getItem('userIdentity');
+  const userDetails = await fetchUserDetails(resource_url);
   // const userCollection = await fetchUserCollection(username);
   // const processedReleases = await processReleases(userCollection.releases);
 
   return (
     <div>
       <main>
-        {/* {username ? (
+        {username ? (
           <Banner avatarUrl={userDetails.avatar_url} username={userDetails.username} />
         ) : (
           <Banner avatarUrl="/default-avatar.png" username="Guest" />
-        )} */}
+        )}
         <HeroSection />
         {/* <AlbumList releases={processedReleases} /> */}
       </main>
