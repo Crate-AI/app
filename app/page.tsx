@@ -1,6 +1,6 @@
 import type { NextPage, Metadata } from 'next';
-import HeroSection from '@/components/HeroSection';
-import Banner from '@/components/Banner';
+// import HeroSection from '@/components/HeroSection';
+// import Banner from '@/components/Banner';
 import { DiscogsSDK, StorageService } from '@crate.ai/discogs-sdk';
 import { UserDetails, DiscogsCollectionResponse, Release, MasterRelease } from '@/types/discogs';
 import Waitlist from '@/components/Waitlist';
