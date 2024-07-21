@@ -15,6 +15,8 @@ import {
 } from '@/components/ui/form';
 import { waitlistSchema } from '@/app/schemas/waitlistSchema';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import Image from 'next/image';
 
 const WaitListForm: React.FC = () => {
   const [message, setMessage] = useState<string | null>(null);
@@ -58,7 +60,7 @@ const WaitListForm: React.FC = () => {
   };
 
   return (
-    <div className="max-w-lg mx-auto p-8 bg-gradient-to-r from-indigo-500 to-purple-500 shadow-lg rounded-lg">
+    <div className="max-w-lg mx-auto p-8 bg-white text-black rounded-lg" style={{ backgroundImage: 'radial-gradient(#FFDC58 1px, transparent 1px)', backgroundSize: '10px 10px' }}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
           <FormField
@@ -73,7 +75,7 @@ const WaitListForm: React.FC = () => {
                     placeholder="Enter your email"
                     {...field}
                     required
-                    className="w-full px-4 py-2 rounded-lg border border-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white bg-white/90 text-gray-900 placeholder-gray-500 transition-transform duration-300 hover:scale-105"
+                    className="w-full"
                   />
                 </FormControl>
                 <FormMessage />
@@ -95,7 +97,7 @@ const WaitListForm: React.FC = () => {
                         onValueChange={(value) => field.onChange(value)}
                         value={field.value}
                       >
-                        <SelectTrigger className="w-full px-4 py-2 rounded-lg border border-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white bg-white/90 text-gray-900 placeholder-gray-500 transition-transform duration-300 hover:scale-105">
+                        <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select your role" />
                         </SelectTrigger>
                         <SelectContent>
@@ -113,13 +115,19 @@ const WaitListForm: React.FC = () => {
           />
           <Button 
             type="submit" 
-            className="w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-lg text-white font-semibold transition-transform duration-300 hover:scale-105 disabled:bg-gray-400"
+            variant="default"
+            className="w-full font-mono text-small-title"
             disabled={!form.formState.isValid}
           >
             Join Waitlist
           </Button>
-          {message && <p className="text-center text-green-200 mt-4 animate-pulse">{message}</p>}
-          {error && <p className="text-center text-red-200 mt-4 animate-pulse">{error}</p>}
+          {message && (
+            <div className="text-center text-green-600 mt-4 animate-pulse font-mono text-small-subtitle">
+              <p>{message}</p>
+              <Image src="/Brut164.svg" alt="Success Icon" width={50} height={50} className="mx-auto mt-2" />
+            </div>
+          )}
+          {error && <p className="text-center text-red-600 mt-4 animate-pulse font-mono text-small-subtitle">{error}</p>}
         </form>
       </Form>
     </div>
