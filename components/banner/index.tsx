@@ -27,7 +27,7 @@ import Image from 'next/image';
 import { Github, X } from 'lucide-react';
 import Link from 'next/link';
 
-const Header: React.FC = () => {
+const Banner: React.FC = () => {
   return (
     <header className="bg-white text-black p-6 flex justify-between items-center shadow-lg" style={{ backgroundImage: 'radial-gradient(#FFDC58 1px, transparent 1px)', backgroundSize: '10px 10px' }}>
       <div className="flex items-center">
@@ -50,4 +50,4 @@ const Header: React.FC = () => {
   );
 };
 
-export default Header;
+export default Banner;
