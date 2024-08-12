@@ -58,7 +58,7 @@ const AlbumList: React.FC<AlbumListProps> = ({ releases }) => {
                       />
                     ) : (
                       <Image 
-                        src="https://via.placeholder.com/150" 
+                        src="/logo.svg" 
                         alt="Placeholder cover" 
                         width={96}
                         height={96}
