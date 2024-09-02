@@ -102,8 +102,9 @@ const WaitListForm: React.FC = () => {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="DJ">DJ</SelectItem>
-                          <SelectItem value="Vinyl Collector">Vinyl Collector</SelectItem>
                           <SelectItem value="Record Store">Record Store</SelectItem>
+                          <SelectItem value="Record Collector">Record Collector</SelectItem>
+                          <SelectItem value="Other">Other</SelectItem>
                         </SelectContent>
                       </Select>
                     )}
