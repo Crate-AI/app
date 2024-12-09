@@ -1,5 +1,5 @@
-import type { NextPage, Metadata } from 'next';
-// import HeroSection from '@/components/HeroSection';
+import type { Metadata } from 'next';
+import HeroSection from '@/components/HeroSection';
 import Banner from '@/components/Banner';
 import { DiscogsSDK, StorageService } from '@crate.ai/discogs-sdk';
 import { UserDetails, DiscogsCollectionResponse, Release, MasterRelease } from '@/types/discogs';
@@ -77,9 +77,9 @@ const processReleases = async (releases: Release[]): Promise<any[]> => {
   return processedReleases;
 };
 
-const Home: NextPage = async () => {
+export default async function Home() {
   const { username, resource_url } = StorageService.getItem('userIdentity');
-  // const userDetails = await fetchUserDetails(resource_url);
+  const userDetails = await fetchUserDetails(resource_url);
   const userCollection = await fetchUserCollection(username);
   const processedReleases = await processReleases(userCollection.releases);
 
@@ -87,18 +87,16 @@ const Home: NextPage = async () => {
     <div>
       <main>
         {/* <Waitlist /> */}
-          <Banner />
-            {/* {username ? (
+          {/* <Banner /> */}
+            {username ? (
             <Banner avatarUrl={userDetails.avatar_url} username={userDetails.username} />
           ) : (
             <Banner avatarUrl="/default-avatar.png" username="Guest" />
-          )} */}
-          {/* <HeroSection /> */}
-          <AlbumList releases={processedReleases} />
+          )}
+           {/* <HeroSection /> */}
+          {/* // <AlbumList releases={processedReleases} /> */}
 
       </main>
     </div>
   );
-};
-
-export default Home;
+}
