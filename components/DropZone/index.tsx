@@ -1,13 +1,11 @@
-import React from 'react';
-import { DropzoneOptions, useDropzone } from 'react-dropzone';
+import React from "react";
+import { DropzoneOptions, useDropzone } from "react-dropzone";
 
-const Dropzone: React.FC<Pick<DropzoneOptions, 'onDrop'>> = ({
-  onDrop,
-}) => {
+const Dropzone: React.FC<Pick<DropzoneOptions, "onDrop">> = ({ onDrop }) => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'audio/*': ['.wav', '.mp3', '.flac'],
+      "audio/*": [".wav", ".mp3", ".flac"],
     },
   });
 
@@ -18,9 +16,7 @@ const Dropzone: React.FC<Pick<DropzoneOptions, 'onDrop'>> = ({
     >
       <input className="" {...getInputProps()} />
       {isDragActive ? (
-        <p className="dropzone-content">
-          Release to drop the files here
-        </p>
+        <p className="dropzone-content">Release to drop the files here</p>
       ) : (
         <p className="dropzone-content">
           Drag &amp; drop some files here, or click to select files
