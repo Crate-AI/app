@@ -10,7 +10,19 @@ const discogs = new DiscogsSDK({
   DiscogsConsumerSecret: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET || "",
 });
 
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const oauthToken = searchParams.get("oauth_token");
+  const oauthVerifier = searchParams.get("oauth_verifier");
+  const requestTokenSecret = StorageService.getItem("oauthRequestTokenSecret");
+  if (!oauthToken || !oauthVerifier || !requestTokenSecret) {
+    console.error("Missing OAuth parameters.");
+    return NextResponse.json(
+      { error: "Missing OAuth parameters." },
+      { status: 400 },
+    );
+  }
+
   try {
     const callbackUrl = "http://localhost:3000/api/auth/discogs/callback";
     console.log("Requesting token from Discogs API...");
@@ -26,22 +38,30 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// export async function POST(request: NextRequest) {
-//   const { searchParams } = new URL(request.url);
-//   const oauthToken = searchParams.get('oauth_token') || '';
-//   const oauthVerifier = searchParams.get('oauth_verifier') || '';
+export async function POST(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const oauthToken = searchParams.get("oauth_token") || "";
+  const oauthVerifier = searchParams.get("oauth_verifier") || "";
 
-//   StorageService.setItem('oauthAccessToken', oauthToken);
-//   StorageService.setItem('oauthVerifier', oauthVerifier);
+  StorageService.setItem("oauthAccessToken", oauthToken);
+  StorageService.setItem("oauthVerifier", oauthVerifier);
 
-//   const oauthTokenSecret: string = StorageService.getItem('oauthAccessTokenSecret');
+  const oauthTokenSecret: string = StorageService.getItem(
+    "oauthAccessTokenSecret",
+  );
 
-//   try {
-//     const userIdentity = await discogs.auth.getUserIdentity(oauthToken, oauthTokenSecret);
-//     console.log('userIdentity:', userIdentity);
-//     return NextResponse.json({ userIdentity });
-//   } catch (error: any) {
-//     console.error('Error getting user identity:', error.message || error);
-//     return NextResponse.json({ error: error.message || 'Unknown error occurred' }, { status: 500 });
-//   }
-// }
+  try {
+    const userIdentity = await discogs.auth.getUserIdentity({
+      oauthToken,
+      oauthTokenSecret,
+    });
+    console.log("userIdentity:", userIdentity);
+    return NextResponse.json({ userIdentity });
+  } catch (error: any) {
+    console.error("Error getting user identity:", error.message || error);
+    return NextResponse.json(
+      { error: error.message || "Unknown error occurred" },
+      { status: 500 },
+    );
+  }
+}
