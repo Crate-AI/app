@@ -1,0 +1,14 @@
+{
+  "oauthRequestTokenSecret": "iAHTRLrOqWpfGRvjRODGHEdIiNYsyPQMkUgTmYfE",
+  "oauthToken": "aMygqPHDukxWPaQuuknEZBlCrWgtRlBZEczlHFdP",
+  "oauthVerifier": "mQQzXVJODB",
+  "requestTokenSecret": "JorncbdTRPmBGCsSWvDftAlTFZAJgfgcBXeYjUGr",
+  "oauthAccessToken": "RTRksWMamyGcgQqdQwzIztUPTViBDssxAbSCgufJ",
+  "oauthAccessTokenSecret": "MwabvuLCGxriupArNkGAbIKfQSrNiwqwKgimVhLM",
+  "userIdentity": {
+    "id": 6652785,
+    "username": "Baston2rue",
+    "resource_url": "https://api.discogs.com/users/Baston2rue",
+    "consumer_name": "Crate"
+  }
+}

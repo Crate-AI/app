@@ -1,5 +1,5 @@
-import { findYtVideo, getYtAudio } from "@/lib/youtubeDl";
-import { NextResponse } from "next/server";
+import { findYtVideo, getYtAudio } from '@/lib/youtubeDl';
+import { NextResponse } from 'next/server';
 
 // Define the POST handler
 export async function POST(request: Request) {
@@ -10,7 +10,7 @@ export async function POST(request: Request) {
 
     if (!search_query) {
       return NextResponse.json(
-        { error: "search_query is required" },
+        { error: 'search_query is required' },
         { status: 400 },
       );
     }
@@ -20,9 +20,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json(info, { status: 200 });
   } catch (error) {
-    console.error("Video fetch error: ", error);
+    console.error('Video fetch error: ', error);
     return NextResponse.json(
-      { error: "Failed to fetch video" },
+      { error: 'Failed to fetch video' },
       { status: 500 },
     );
   }

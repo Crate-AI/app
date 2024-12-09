@@ -1,11 +1,11 @@
-import React from "react";
+import React from 'react';
 
 const FileIcon: React.FC = () => (
   <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" width={120}>
     <g>
       <path
         d="M330.7 6H87.9v500h361.3V122.8z"
-        style={{ stroke: "black", strokeWidth: 2, fill: "none" }}
+        style={{ stroke: 'black', strokeWidth: 2, fill: 'none' }}
       />
       <path d="m330.7 6 118.5 116.8H330.7z" />
     </g>

@@ -1,5 +1,5 @@
-import React from "react";
-import { MasterRelease } from "@/types/discogs";
+import React from 'react';
+import { MasterRelease } from '@/types/discogs';
 import {
   Table,
   TableBody,
@@ -8,8 +8,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import Image from "next/image";
+} from '@/components/ui/table';
+import Image from 'next/image';
 
 interface AlbumListProps {
   releases: {
@@ -78,16 +78,16 @@ const AlbumList: React.FC<AlbumListProps> = ({ releases }) => {
                     {release.year}
                   </TableCell>
                   <TableCell rowSpan={release.masterData?.tracklist?.length}>
-                    {release.artists.join(", ")}
+                    {release.artists.join(', ')}
                   </TableCell>
                   <TableCell rowSpan={release.masterData?.tracklist?.length}>
-                    {release.labels.join(", ")}
+                    {release.labels.join(', ')}
                   </TableCell>
                   <TableCell rowSpan={release.masterData?.tracklist?.length}>
-                    {release.genres.join(", ")}
+                    {release.genres.join(', ')}
                   </TableCell>
                   <TableCell rowSpan={release.masterData?.tracklist?.length}>
-                    {release.styles.join(", ")}
+                    {release.styles.join(', ')}
                   </TableCell>
                 </>
               )}
@@ -95,9 +95,9 @@ const AlbumList: React.FC<AlbumListProps> = ({ releases }) => {
                 {track.position} - {track.title}
                 {track.extraartists && (
                   <span>
-                    {" "}
-                    (feat.{" "}
-                    {track.extraartists.map((artist) => artist.name).join(", ")}
+                    {' '}
+                    (feat.{' '}
+                    {track.extraartists.map((artist) => artist.name).join(', ')}
                     )
                   </span>
                 )}
@@ -107,7 +107,7 @@ const AlbumList: React.FC<AlbumListProps> = ({ releases }) => {
                   release.masterData.videos.length > trackIndex && (
                     <iframe
                       className="iframe"
-                      src={`https://www.youtube.com/embed/${release.masterData.videos[trackIndex].uri.split("v=")[1]}`}
+                      src={`https://www.youtube.com/embed/${release.masterData.videos[trackIndex].uri.split('v=')[1]}`}
                       title={release.masterData.videos[trackIndex].title}
                       frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

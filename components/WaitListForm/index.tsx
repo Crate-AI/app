@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import React, { useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Form,
   FormField,
@@ -12,17 +12,17 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
-} from "@/components/ui/form";
-import { waitlistSchema } from "@/app/schemas/waitlistSchema";
+} from '@/components/ui/form';
+import { waitlistSchema } from '@/app/schemas/waitlistSchema';
 import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
   SelectItem,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import Image from "next/image";
+} from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import Image from 'next/image';
 
 const WaitListForm: React.FC = () => {
   const [message, setMessage] = useState<string | null>(null);
@@ -30,19 +30,19 @@ const WaitListForm: React.FC = () => {
 
   const form = useForm({
     resolver: zodResolver(waitlistSchema),
-    mode: "onChange",
+    mode: 'onChange',
     defaultValues: {
-      email: "",
-      user_type: "DJ",
+      email: '',
+      user_type: 'DJ',
     },
   });
 
   const handleSubmit = async (data: any) => {
     try {
-      const response = await fetch("/api/waitlist", {
-        method: "POST",
+      const response = await fetch('/api/waitlist', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
       });
@@ -51,15 +51,15 @@ const WaitListForm: React.FC = () => {
         throw new Error(await response.text());
       }
 
-      setMessage("Successfully added to waitlist!");
+      setMessage('Successfully added to waitlist!');
       setError(null);
 
       setTimeout(() => setMessage(null), 3000); // Clear message after 3 seconds
       form.reset(); // Reset the form after successful submission
     } catch (error) {
       setMessage(null);
-      setError("Failed to add to waitlist");
-      console.error("Error submitting form", error);
+      setError('Failed to add to waitlist');
+      console.error('Error submitting form', error);
 
       setTimeout(() => setError(null), 3000); // Clear error after 3 seconds
     }
@@ -69,8 +69,8 @@ const WaitListForm: React.FC = () => {
     <div
       className="max-w-lg mx-auto p-8 bg-white text-black rounded-lg"
       style={{
-        backgroundImage: "radial-gradient(#FFDC58 1px, transparent 1px)",
-        backgroundSize: "10px 10px",
+        backgroundImage: 'radial-gradient(#FFDC58 1px, transparent 1px)',
+        backgroundSize: '10px 10px',
       }}
     >
       <Form {...form}>
