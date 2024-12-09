@@ -1,6 +1,7 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
+
 - Install [yt-dlp](https://github.com/yt-dlp/yt-dlp/wiki/Installation#third-party-package-managers) with the appropriate version for your OS
 
 - Install dependencies with `pnpm i`

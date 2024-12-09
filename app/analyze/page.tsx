@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import type { NextPage } from 'next';
-import React, { useState } from 'react';
-import * as realtimeBpm from 'realtime-bpm-analyzer';
-import SubmitTrackForm from '@/components/SubmitTrackForm';
+import type { NextPage } from "next";
+import React, { useState } from "react";
+import * as realtimeBpm from "realtime-bpm-analyzer";
+import SubmitTrackForm from "@/components/SubmitTrackForm";
 
 const Home: NextPage = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -15,13 +15,14 @@ const Home: NextPage = () => {
     const audioContext = new AudioContext();
     const reader = new FileReader();
 
-    reader.addEventListener('load', () => {
+    reader.addEventListener("load", () => {
       audioContext.decodeAudioData(
         reader.result as ArrayBuffer,
         async (audioBuffer) => {
-          const topCandidates = await realtimeBpm.analyzeFullBuffer(audioBuffer);
-          console.log('topCandidates', topCandidates);
-        }
+          const topCandidates =
+            await realtimeBpm.analyzeFullBuffer(audioBuffer);
+          console.log("topCandidates", topCandidates);
+        },
       );
     });
 
@@ -34,7 +35,7 @@ const Home: NextPage = () => {
 
     // Simulate upload or processing logic
     setTimeout(() => {
-      console.log('File uploaded:', file?.name);
+      console.log("File uploaded:", file?.name);
       setUploadPending(false);
     }, 2000);
   };

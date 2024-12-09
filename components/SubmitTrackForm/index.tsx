@@ -1,7 +1,7 @@
-import React from 'react';
-import DropZoneComponent from '@/components/DropZone';
-import FileIcon from '@/components/FileIcon';
-import { DropzoneOptions } from 'react-dropzone';
+import React from "react";
+import DropZoneComponent from "@/components/DropZone";
+import FileIcon from "@/components/FileIcon";
+import { DropzoneOptions } from "react-dropzone";
 
 interface SubmitFormProps {
   file: File | null;
@@ -16,7 +16,7 @@ const SubmitFormComponent: React.FC<SubmitFormProps> = ({
   uploadPending,
   onSubmit,
 }) => {
-  const onDrop: DropzoneOptions['onDrop'] = (acceptedFiles) => {
+  const onDrop: DropzoneOptions["onDrop"] = (acceptedFiles) => {
     if (acceptedFiles.length > 0) {
       onFileChange(acceptedFiles[0]);
     }

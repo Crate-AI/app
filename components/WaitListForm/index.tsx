@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import React, { useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Form,
   FormField,
@@ -12,11 +12,17 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
-} from '@/components/ui/form';
-import { waitlistSchema } from '@/app/schemas/waitlistSchema';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
-import Image from 'next/image';
+} from "@/components/ui/form";
+import { waitlistSchema } from "@/app/schemas/waitlistSchema";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import Image from "next/image";
 
 const WaitListForm: React.FC = () => {
   const [message, setMessage] = useState<string | null>(null);
@@ -24,19 +30,19 @@ const WaitListForm: React.FC = () => {
 
   const form = useForm({
     resolver: zodResolver(waitlistSchema),
-    mode: 'onChange',
+    mode: "onChange",
     defaultValues: {
-      email: '',
-      user_type: 'DJ',
+      email: "",
+      user_type: "DJ",
     },
   });
 
   const handleSubmit = async (data: any) => {
     try {
-      const response = await fetch('/api/waitlist', {
-        method: 'POST',
+      const response = await fetch("/api/waitlist", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
@@ -45,22 +51,28 @@ const WaitListForm: React.FC = () => {
         throw new Error(await response.text());
       }
 
-      setMessage('Successfully added to waitlist!');
+      setMessage("Successfully added to waitlist!");
       setError(null);
 
       setTimeout(() => setMessage(null), 3000); // Clear message after 3 seconds
       form.reset(); // Reset the form after successful submission
     } catch (error) {
       setMessage(null);
-      setError('Failed to add to waitlist');
-      console.error('Error submitting form', error);
+      setError("Failed to add to waitlist");
+      console.error("Error submitting form", error);
 
       setTimeout(() => setError(null), 3000); // Clear error after 3 seconds
     }
   };
 
   return (
-    <div className="max-w-lg mx-auto p-8 bg-white text-black rounded-lg" style={{ backgroundImage: 'radial-gradient(#FFDC58 1px, transparent 1px)', backgroundSize: '10px 10px' }}>
+    <div
+      className="max-w-lg mx-auto p-8 bg-white text-black rounded-lg"
+      style={{
+        backgroundImage: "radial-gradient(#FFDC58 1px, transparent 1px)",
+        backgroundSize: "10px 10px",
+      }}
+    >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
           <FormField
@@ -102,8 +114,12 @@ const WaitListForm: React.FC = () => {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="DJ">DJ</SelectItem>
-                          <SelectItem value="Record Store">Record Store</SelectItem>
-                          <SelectItem value="Record Collector">Record Collector</SelectItem>
+                          <SelectItem value="Record Store">
+                            Record Store
+                          </SelectItem>
+                          <SelectItem value="Record Collector">
+                            Record Collector
+                          </SelectItem>
                           <SelectItem value="Other">Other</SelectItem>
                         </SelectContent>
                       </Select>
@@ -114,8 +130,8 @@ const WaitListForm: React.FC = () => {
               </FormItem>
             )}
           />
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             variant="default"
             className="w-full font-mono text-small-title"
             disabled={!form.formState.isValid}
@@ -125,10 +141,20 @@ const WaitListForm: React.FC = () => {
           {message && (
             <div className="text-center text-green-600 mt-4 animate-pulse font-mono text-small-subtitle">
               <p>{message}</p>
-              <Image src="/Brut164.svg" alt="Success Icon" width={50} height={50} className="mx-auto mt-2" />
+              <Image
+                src="/Brut164.svg"
+                alt="Success Icon"
+                width={50}
+                height={50}
+                className="mx-auto mt-2"
+              />
             </div>
           )}
-          {error && <p className="text-center text-red-600 mt-4 animate-pulse font-mono text-small-subtitle">{error}</p>}
+          {error && (
+            <p className="text-center text-red-600 mt-4 animate-pulse font-mono text-small-subtitle">
+              {error}
+            </p>
+          )}
         </form>
       </Form>
     </div>
