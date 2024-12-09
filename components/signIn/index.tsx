@@ -1,13 +1,14 @@
 'use client';
+
 import { useState, useEffect } from 'react';
 import { fetchRequestToken } from './serverActions'; // adjust the path as needed
+import { Button } from '@/components/ui/button'; // Update this import path as per your project structure
 
 export default function SignInButton() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const handleMessage = (event: any) => {
-      console.log('Message received:', event.data);
       if (event.data === 'oauth_verifier_saved') {
         alert('OAuth verifier has been saved.');
         // Additional logic if needed
@@ -42,8 +43,13 @@ export default function SignInButton() {
   };
 
   return (
-    <button onClick={handleSignIn} disabled={loading}>
+    <Button
+      onClick={handleSignIn}
+      disabled={loading}
+      variant="default" // You can customize this as per your design
+      size="default" // Change size if needed (e.g., 'lg' or 'sm')
+    >
       {loading ? 'Signing In...' : 'Sign In with Discogs'}
-    </button>
+    </Button>
   );
 }
