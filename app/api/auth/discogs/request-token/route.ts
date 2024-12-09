@@ -13,7 +13,6 @@ const discogs = new DiscogsSDK({
 export async function GET(request: NextRequest) {
   try {
     const callbackUrl = 'http://localhost:3000/api/auth/discogs/callback';
-    console.log('Requesting token from Discogs API...');
     const requestTokenResponse =
       await discogs.auth.getRequestToken(callbackUrl);
     return NextResponse.json({ authUrl: requestTokenResponse.verificationURL });
