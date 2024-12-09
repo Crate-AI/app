@@ -1,15 +1,14 @@
-import type { NextPage, Metadata } from "next";
+import type { Metadata } from 'next';
 // import HeroSection from '@/components/HeroSection';
-import Banner from "@/components/Banner";
-import { DiscogsSDK, StorageService } from "@crate.ai/discogs-sdk";
+import Banner from '@/components/Banner';
+import { DiscogsSDK, StorageService } from '@crate.ai/discogs-sdk';
 import {
   UserDetails,
   DiscogsCollectionResponse,
   Release,
   MasterRelease,
-} from "@/types/discogs";
-import AlbumList from "@/components/AlbumList";
-
+} from '@/types/discogs';
+import AlbumList from '@/components/AlbumList';
 
 const discogs = new DiscogsSDK({
   DiscogsConsumerKey: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_KEY as string,
@@ -20,8 +19,8 @@ const discogs = new DiscogsSDK({
 StorageService.storagePath = process.env.NEXT_PUBLIC_STORAGE_PATH as string;
 
 export const metadata: Metadata = {
-  title: "Crate",
-  description: "Smart digging 💿",
+  title: 'Crate',
+  description: 'Smart digging 💿',
 };
 
 const fetchUserDetails = async (resourceUrl: string): Promise<UserDetails> => {
@@ -56,7 +55,22 @@ const fetchUserCollection = async (
     allReleases = [...allReleases, ...pageData.releases];
   }
 
-  return { ...firstPageData, releases: allReleases };
+  const mappedReleases = allReleases.map((release) => ({
+    title: release.basic_information.title,
+    year: release.basic_information.year,
+    artists: release.basic_information.artists,
+    labels: release.basic_information.labels.map((label) => label.name),
+    genres: release.basic_information.genres,
+    styles: release.basic_information.styles,
+    id: release.basic_information.id,
+    master_url: `https://api.discogs.com/masters/${release.basic_information.id}`,
+    basic_information: {
+      ...release.basic_information,
+      master_url: `https://api.discogs.com/masters/${release.basic_information.id}`,
+    },
+  }));
+
+  return { ...firstPageData, releases: mappedReleases };
 };
 
 const fetchMasterRelease = async (
@@ -94,19 +108,17 @@ const processReleases = async (releases: Release[]): Promise<any[]> => {
   return processedReleases;
 };
 
-
-const Home: NextPage = async () => {
+export default async function Home() {
   /* const { username, resource_url } = StorageService.getItem('userIdentity'); */
   // const userDetails = await fetchUserDetails(resource_url);
   /* const userCollection = await fetchUserCollection(username); */
   /* const processedReleases = await processReleases(userCollection.releases); */
 
-
   return (
     <div>
       <main>
         {/* <Waitlist /> */}
-        <Banner />
+        <Banner username="Guest" avatarUrl="/default-avatar.png" />
         {/* {username ? (
             <Banner avatarUrl={userDetails.avatar_url} username={userDetails.username} />
           ) : (
@@ -117,6 +129,4 @@ const Home: NextPage = async () => {
       </main>
     </div>
   );
-};
-
-export default Home;
+}

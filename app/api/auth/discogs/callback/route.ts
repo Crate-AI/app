@@ -1,38 +1,38 @@
-import { NextResponse, NextRequest } from "next/server";
-import { DiscogsSDK, StorageService } from "@crate.ai/discogs-sdk";
-import path from "path";
+import { NextResponse, NextRequest } from 'next/server';
+import { DiscogsSDK, StorageService } from '@crate.ai/discogs-sdk';
+import path from 'path';
 
 // Initialize StorageService storage path
-StorageService.storagePath = path.join(process.cwd(), "storage.json");
+StorageService.storagePath = path.join(process.cwd(), 'storage.json');
 
 const discogs = new DiscogsSDK({
-  DiscogsConsumerKey: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_KEY || "",
-  DiscogsConsumerSecret: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET || "",
+  DiscogsConsumerKey: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_KEY || '',
+  DiscogsConsumerSecret: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET || '',
 });
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const oauthToken = searchParams.get("oauth_token");
-  const oauthVerifier = searchParams.get("oauth_verifier");
-  const requestTokenSecret = StorageService.getItem("oauthRequestTokenSecret");
+  const oauthToken = searchParams.get('oauth_token');
+  const oauthVerifier = searchParams.get('oauth_verifier');
+  const requestTokenSecret = StorageService.getItem('oauthRequestTokenSecret');
   if (!oauthToken || !oauthVerifier || !requestTokenSecret) {
-    console.error("Missing OAuth parameters.");
+    console.error('Missing OAuth parameters.');
     return NextResponse.json(
-      { error: "Missing OAuth parameters." },
+      { error: 'Missing OAuth parameters.' },
       { status: 400 },
     );
   }
 
   try {
-    const callbackUrl = "http://localhost:3000/api/auth/discogs/callback";
-    console.log("Requesting token from Discogs API...");
+    const callbackUrl = 'http://localhost:3000/api/auth/discogs/callback';
+    console.log('Requesting token from Discogs API...');
     const requestTokenResponse =
       await discogs.auth.getRequestToken(callbackUrl);
     return NextResponse.json({ authUrl: requestTokenResponse.verificationURL });
   } catch (error: any) {
-    console.error("Error obtaining request token:", error.message || error);
+    console.error('Error obtaining request token:', error.message || error);
     return NextResponse.json(
-      { error: error.message || "Unknown error occurred" },
+      { error: error.message || 'Unknown error occurred' },
       { status: 500 },
     );
   }
@@ -40,14 +40,14 @@ export async function GET(request: Request) {
 
 export async function POST(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const oauthToken = searchParams.get("oauth_token") || "";
-  const oauthVerifier = searchParams.get("oauth_verifier") || "";
+  const oauthToken = searchParams.get('oauth_token') || '';
+  const oauthVerifier = searchParams.get('oauth_verifier') || '';
 
-  StorageService.setItem("oauthAccessToken", oauthToken);
-  StorageService.setItem("oauthVerifier", oauthVerifier);
+  StorageService.setItem('oauthAccessToken', oauthToken);
+  StorageService.setItem('oauthVerifier', oauthVerifier);
 
   const oauthTokenSecret: string = StorageService.getItem(
-    "oauthAccessTokenSecret",
+    'oauthAccessTokenSecret',
   );
 
   try {
@@ -55,12 +55,12 @@ export async function POST(request: NextRequest) {
       oauthToken,
       oauthTokenSecret,
     });
-    console.log("userIdentity:", userIdentity);
+    console.log('userIdentity:', userIdentity);
     return NextResponse.json({ userIdentity });
   } catch (error: any) {
-    console.error("Error getting user identity:", error.message || error);
+    console.error('Error getting user identity:', error.message || error);
     return NextResponse.json(
-      { error: error.message || "Unknown error occurred" },
+      { error: error.message || 'Unknown error occurred' },
       { status: 500 },
     );
   }

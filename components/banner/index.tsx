@@ -1,8 +1,6 @@
-import Image from "next/image";
-import { Github, X } from "lucide-react";
-import Link from "next/link";
-=======
 import Image from 'next/image';
+import { Github, X } from 'lucide-react';
+import Link from 'next/link';
 import SignIn from '../SignIn';
 
 interface BannerProps {
@@ -15,8 +13,8 @@ const Header: React.FC<BannerProps> = ({ username, avatarUrl }) => {
     <header
       className="bg-white text-black p-6 flex justify-between items-center shadow-lg"
       style={{
-        backgroundImage: "radial-gradient(#FFDC58 1px, transparent 1px)",
-        backgroundSize: "10px 10px",
+        backgroundImage: 'radial-gradient(#FFDC58 1px, transparent 1px)',
+        backgroundSize: '10px 10px',
       }}
     >
       <div className="flex items-center">
@@ -30,9 +28,15 @@ const Header: React.FC<BannerProps> = ({ username, avatarUrl }) => {
         {/* <h1 className="text-2xl font-heading text-black ml-4">Welcome to Crate</h1> */}
       </div>
       <div className="flex items-center">
-        {username !== "Guest" ? (
+        {username !== 'Guest' ? (
           <>
-            <Image src={avatarUrl} alt={`${username}'s avatar`} width={50} height={50} className="rounded-full transition-transform duration-300 hover:scale-110" />
+            <Image
+              src={avatarUrl}
+              alt={`${username}'s avatar`}
+              width={50}
+              height={50}
+              className="rounded-full transition-transform duration-300 hover:scale-110"
+            />
             <span className="ml-2 text-black font-heading">{username}</span>
           </>
         ) : (

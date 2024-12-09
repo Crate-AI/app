@@ -1,9 +1,9 @@
-import React from "react";
+import React from 'react';
 // import Banner from '@/components/Banner';
-import HeroSection from "@/components/HeroSection";
-import Image from "next/image";
-import Link from "next/link";
-import { Github, X } from "lucide-react";
+import HeroSection from '@/components/HeroSection';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Github, X } from 'lucide-react';
 
 const Waitlist: React.FC = () => {
   return (
@@ -11,8 +11,8 @@ const Waitlist: React.FC = () => {
       <header
         className="bg-white text-black p-6 flex justify-between items-center shadow-lg"
         style={{
-          backgroundImage: "radial-gradient(#FFDC58 1px, transparent 1px)",
-          backgroundSize: "10px 10px",
+          backgroundImage: 'radial-gradient(#FFDC58 1px, transparent 1px)',
+          backgroundSize: '10px 10px',
         }}
       >
         <div className="flex items-center">
