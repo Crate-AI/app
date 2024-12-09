@@ -10,6 +10,7 @@ import {
 } from "@/types/discogs";
 import AlbumList from "@/components/AlbumList";
 
+
 const discogs = new DiscogsSDK({
   DiscogsConsumerKey: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_KEY as string,
   DiscogsConsumerSecret: process.env
@@ -93,11 +94,13 @@ const processReleases = async (releases: Release[]): Promise<any[]> => {
   return processedReleases;
 };
 
+
 const Home: NextPage = async () => {
   /* const { username, resource_url } = StorageService.getItem('userIdentity'); */
   // const userDetails = await fetchUserDetails(resource_url);
   /* const userCollection = await fetchUserCollection(username); */
   /* const processedReleases = await processReleases(userCollection.releases); */
+
 
   return (
     <div>
