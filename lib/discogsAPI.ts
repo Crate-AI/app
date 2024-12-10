@@ -36,3 +36,16 @@ export const fetchMasterRelease = async (masterUrl: string) => {
 
   return response.json();
 };
+
+export async function getGenres(username: string): Promise<{ [genre: string]: number }> {
+  const collection = await fetchUserCollection(username);
+
+  const genreCounts: { [genre: string]: number } = {};
+  collection.releases.forEach((release) => {
+    release.basic_information.genres.forEach((genre) => {
+      genreCounts[genre] = (genreCounts[genre] || 0) + 1;
+    });
+  });
+
+  return genreCounts;
+}
