@@ -1,8 +1,9 @@
 import fs from 'fs';
 import path from 'path';
+import { redirect } from 'next/navigation';
 import Banner from '@/components/Banner';
 
-export default async function Home() {
+const Home = async () => {
   let username = 'Guest';
   let avatarUrl = '/default-avatar.png';
   const storagePath = path.join(process.cwd(), 'storage.json');
@@ -10,9 +11,11 @@ export default async function Home() {
   try {
     const storageData = JSON.parse(fs.readFileSync(storagePath, 'utf-8'));
 
-    if (storageData.userIdentity) {
+    if (storageData.userIdentity?.username) {
       username = storageData.userIdentity.username || username;
       avatarUrl = storageData.userIdentity.avatar_url || avatarUrl;
+
+      redirect(`/${username}`);
     }
   } catch (error: any) {
     console.error('Error reading storage.json:', error.message);
@@ -26,3 +29,5 @@ export default async function Home() {
     </div>
   );
 }
+
+export default Home;

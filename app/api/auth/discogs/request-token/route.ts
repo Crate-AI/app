@@ -2,7 +2,6 @@ import { NextResponse, NextRequest } from 'next/server';
 import { DiscogsSDK, StorageService } from '@crate.ai/discogs-sdk';
 import path from 'path';
 
-// Initialize StorageService storage path
 StorageService.storagePath = path.join(process.cwd(), 'storage.json');
 
 const discogs = new DiscogsSDK({

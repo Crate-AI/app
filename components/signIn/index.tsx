@@ -1,24 +1,24 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { fetchRequestToken } from './serverActions'; // adjust the path as needed
-import { Button } from '@/components/ui/button'; // Update this import path as per your project structure
+import { useEffect, useState } from 'react';
+import { fetchRequestToken } from './serverActions';
+import { Button } from '@/components/ui/button';
 
 export default function SignInButton() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const handleMessage = (event: any) => {
-      if (event.data === 'oauth_verifier_saved') {
-        alert('OAuth verifier has been saved.');
-        // Additional logic if needed
+    const handleLoginSuccess = (event: MessageEvent) => {
+      if (event.data.type === 'LOGIN_SUCCESS') {
+        console.log(`User logged in as ${event.data.username}`);
+        window.location.href = `/${event.data.username}`;
       }
     };
 
-    window.addEventListener('message', handleMessage);
+    window.addEventListener('message', handleLoginSuccess);
 
     return () => {
-      window.removeEventListener('message', handleMessage);
+      window.removeEventListener('message', handleLoginSuccess);
     };
   }, []);
 
@@ -27,8 +27,7 @@ export default function SignInButton() {
     try {
       const data = await fetchRequestToken();
       if (data.authUrl) {
-        const popupFeatures = 'width=600,height=400,left=100,top=100,noopener';
-        const popup = window.open(data.authUrl, 'DiscogsAuth', popupFeatures);
+        const popup = window.open(data.authUrl, 'DiscogsAuth', 'width=600,height=400');
         if (!popup) {
           alert('Popup blocked! Please allow popups and try again.');
           setLoading(false);
@@ -43,12 +42,7 @@ export default function SignInButton() {
   };
 
   return (
-    <Button
-      onClick={handleSignIn}
-      disabled={loading}
-      variant="default" // You can customize this as per your design
-      size="default" // Change size if needed (e.g., 'lg' or 'sm')
-    >
+    <Button onClick={handleSignIn} disabled={loading}>
       {loading ? 'Signing In...' : 'Sign In with Discogs'}
     </Button>
   );
