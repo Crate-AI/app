@@ -1,33 +1,37 @@
-import fs from 'fs';
-import path from 'path';
-import { redirect } from 'next/navigation';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useUserStore } from '@/lib/store/userStore';
 import Banner from '@/components/Banner';
 
-const Home = async () => {
-  let username = 'Guest';
-  let avatarUrl = '/default-avatar.png';
-  const storagePath = path.join(process.cwd(), 'storage.json');
+const Home = () => {
+  const userIdentity = useUserStore((state) => state.userIdentity);
+  const router = useRouter();
+  const [isHydrated, setIsHydrated] = useState(false);
 
-  try {
-    const storageData = JSON.parse(fs.readFileSync(storagePath, 'utf-8'));
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
-    if (storageData.userIdentity?.username) {
-      username = storageData.userIdentity.username || username;
-      avatarUrl = storageData.userIdentity.avatar_url || avatarUrl;
-
-      redirect(`/${username}`);
+  useEffect(() => {
+    if (isHydrated && userIdentity?.username) {
+      router.replace(`/${userIdentity.username}`);
     }
-  } catch (error: any) {
-    console.error('Error reading storage.json:', error.message);
+  }, [isHydrated, userIdentity, router]);
+
+  if (!isHydrated) {
+    return null;
   }
 
   return (
-    <div>
-      <main>
-        <Banner username={username} avatarUrl={avatarUrl} />
-      </main>
-    </div>
+    <main>
+      <Banner 
+        username={userIdentity?.username || 'Guest'} 
+        avatarUrl={userIdentity?.avatar_url || '/default-avatar.png'} 
+      />
+    </main>
   );
-}
+};
 
 export default Home;

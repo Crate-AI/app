@@ -1,38 +1,43 @@
-import fs from 'fs';
-import path from 'path';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useUserStore } from '@/lib/store/userStore';
 import Banner from '@/components/Banner';
-import { redirect } from 'next/navigation';
 
-const UserPage = async ({ params }: { params: { username: string } }) => {
-  const { username } = params;
-  let avatarUrl = '/default-avatar.png';
-  const storagePath = path.join(process.cwd(), 'storage.json');
+export default function UserPage({ params }: { params: { username: string } }) {
+  const userIdentity = useUserStore((state) => state.userIdentity);
+  const router = useRouter();
+  const [isHydrated, setIsHydrated] = useState(false);
 
-  try {
-    const storageData = JSON.parse(fs.readFileSync(storagePath, 'utf-8'));
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
-    if (!storageData.userIdentity) {
-      redirect('/');
+  useEffect(() => {
+    if (isHydrated && (!userIdentity || userIdentity.username.toLowerCase() !== params.username.toLowerCase())) {
+      router.replace('/');
     }
+  }, [isHydrated, userIdentity, params.username, router]);
 
-    const storedUsername = storageData.userIdentity.username;
-    if (storedUsername.toLowerCase() === username.toLowerCase()) {
-      avatarUrl = storageData.userIdentity.avatar_url || avatarUrl;
-    } else {
-      redirect('/');
-    }
-  } catch (error: any) {
-    console.error('Error reading storage.json:', error.message);
-    redirect('/');
+  // Show nothing until hydration is complete
+  if (!isHydrated) {
     return null;
   }
+
+  // After hydration, check if we have valid user data
+  if (!userIdentity || userIdentity.username.toLowerCase() !== params.username.toLowerCase()) {
+    return null;
+  }
+
   return (
     <div>
       <main>
-        <Banner username={username} avatarUrl={avatarUrl} />
+        <Banner
+          username={userIdentity.username}
+          avatarUrl={userIdentity.avatar_url}
+        />
       </main>
     </div>
   );
-};
-
-export default UserPage;
+}
