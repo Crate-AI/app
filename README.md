@@ -28,3 +28,26 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+# Supabase
+
+## Local environment setup
+n.b. most of the documentation comes from [here](https://supabase.com/docs/guides/cli/local-development)
+- Make sure you have [docker](https://docs.docker.com/get-docker/) installed and running
+- Install the [supabase-cli](https://supabase.com/docs/guides/cli) and run the following:
+```
+supabase login # you'll need a PAT which this command will tell you how to generate
+supabase init
+supabase start
+```
+- That's pretty much it! The Studio app for your local deployment will be exposed at `http://127.0.0.1:54321` or something similar (will be displayed when `supabase start` completes)
+
+## Deploying changes
+- Link the staging environment: `supabase link --project-ref ehteilvmdxqtdyusvrlo` (ping @paprikaf for the db password)
+- Pull the database to check for updates: `supabase db pull`
+- Apply the migration, and push to the db:
+```
+supabase migration up
+supabase db push
+```
+- You can generate the types for your changes using `npx supabase gen types typescript --local > types/supabase.ts`. This allows them to be used in the frontend code with type safety
