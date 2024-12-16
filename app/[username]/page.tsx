@@ -1,38 +1,23 @@
-import fs from 'fs';
-import path from 'path';
-import Banner from '@/components/Banner';
-import { redirect } from 'next/navigation';
+import { Suspense } from 'react';
+import UserProfileClient from './components/UserProfileClient';
+import { LoadingSpinner } from '@/components/ui/loading';
 
-const UserPage = async ({ params }: { params: { username: string } }) => {
+interface UserProfilePageProps {
+  params: {
+    username: string;
+  };
+}
+
+const UserProfilePage = ({ params }: UserProfilePageProps) => {
   const { username } = params;
-  let avatarUrl = '/default-avatar.png';
-  const storagePath = path.join(process.cwd(), 'storage.json');
 
-  try {
-    const storageData = JSON.parse(fs.readFileSync(storagePath, 'utf-8'));
-
-    if (!storageData.userIdentity) {
-      redirect('/');
-    }
-
-    const storedUsername = storageData.userIdentity.username;
-    if (storedUsername.toLowerCase() === username.toLowerCase()) {
-      avatarUrl = storageData.userIdentity.avatar_url || avatarUrl;
-    } else {
-      redirect('/');
-    }
-  } catch (error: any) {
-    console.error('Error reading storage.json:', error.message);
-    redirect('/');
-    return null;
-  }
   return (
-    <div>
-      <main>
-        <Banner username={username} avatarUrl={avatarUrl} />
-      </main>
-    </div>
+    <main>
+      <Suspense fallback={<LoadingSpinner />}>
+        <UserProfileClient username={username} />
+      </Suspense>
+    </main>
   );
 };
 
-export default UserPage;
+export default UserProfilePage;
