@@ -1,24 +1,43 @@
-import { NextResponse, NextRequest } from 'next/server';
-import { DiscogsSDK, StorageService } from '@crate.ai/discogs-sdk';
-import path from 'path';
+import { NextResponse } from 'next/server';
+import { DiscogsSDK } from '@crate.ai/discogs-sdk';
+import { cookies } from 'next/headers';
 
-StorageService.storagePath = path.join(process.cwd(), 'storage.json');
-
-const discogs = new DiscogsSDK({
+const sdk = new DiscogsSDK({
   DiscogsConsumerKey: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_KEY || '',
   DiscogsConsumerSecret: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET || '',
+  callbackUrl: 'http://localhost:3000/api/auth/discogs/callback',
 });
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const callbackUrl = 'http://localhost:3000/api/auth/discogs/callback';
-    const requestTokenResponse =
-      await discogs.auth.getRequestToken(callbackUrl);
-    return NextResponse.json({ authUrl: requestTokenResponse.verificationURL });
+    const requestTokenResponse = await sdk.auth.getRequestToken();
+    const { token, secret } = requestTokenResponse.requestTokens;
+
+    // Store both token and secret
+    const cookieStore = cookies();
+    cookieStore.set('request_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
+
+    cookieStore.set('request_token_secret', secret, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
+
+    return NextResponse.json({
+      authUrl: requestTokenResponse.verificationURL,
+      requestToken: token,
+      requestTokenSecret: secret,
+    });
   } catch (error: any) {
-    console.error('Error obtaining request token:', error.message || error);
+    console.error('Error getting request token:', error);
     return NextResponse.json(
-      { error: error.message || 'Unknown error occurred' },
+      { error: error.message || 'Error getting authorization URL' },
       { status: 500 },
     );
   }
