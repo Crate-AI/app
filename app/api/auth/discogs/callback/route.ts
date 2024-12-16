@@ -3,57 +3,80 @@ import { DiscogsSDK } from '@crate.ai/discogs-sdk';
 import { cookies } from 'next/headers';
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const oauthVerifier = searchParams.get('oauth_verifier');
-  const oauthToken = searchParams.get('oauth_token');
-  const requestTokenSecret = cookies().get('request_token_secret')?.value;
-
-  if (!oauthToken || !oauthVerifier || !requestTokenSecret) {
-    return NextResponse.json(
-      { error: 'Missing OAuth parameters.' },
-      { status: 400 }
-    );
-  }
-
   try {
+    const { searchParams } = new URL(request.url);
+    const oauthVerifier = searchParams.get('oauth_verifier');
+    const oauthToken = searchParams.get('oauth_token');
+
+    const requestToken = cookies().get('request_token')?.value;
+    const requestTokenSecret = cookies().get('request_token_secret')?.value;
+
+    if (!oauthToken || !oauthVerifier || !requestToken || !requestTokenSecret) {
+      console.error('Missing OAuth parameters:', {
+        oauthToken,
+        oauthVerifier,
+        hasRequestToken: !!requestToken,
+        hasRequestTokenSecret: !!requestTokenSecret,
+      });
+      return NextResponse.redirect(
+        new URL('/?error=missing_oauth', request.url),
+      );
+    }
+
     const sdk = new DiscogsSDK({
       DiscogsConsumerKey: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_KEY || '',
-      DiscogsConsumerSecret: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET || '',
-      callbackUrl: 'http://localhost:3000/api/auth/discogs/callback'
+      DiscogsConsumerSecret:
+        process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET || '',
+      callbackUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/discogs/callback`,
     });
 
     const tokenManager = sdk.auth.base.getTokenManager();
-    await tokenManager.setRequestToken(oauthToken);
+    await tokenManager.setRequestToken(requestToken);
     await tokenManager.setRequestTokenSecret(requestTokenSecret);
 
-    await sdk.auth.handleCallback({
+    const tokens = await sdk.auth.handleCallback({
       oauthVerifier,
-      oauthToken
+      oauthToken,
     });
 
     const userIdentity = await sdk.auth.getUserIdentity();
-    const userProfile = await fetch(userIdentity.resource_url).then(res => res.json());
+    const userProfile = await fetch(userIdentity.resource_url).then((res) =>
+      res.json(),
+    );
+
+    cookies().delete('request_token');
     cookies().delete('request_token_secret');
 
-    const redirectScript = `
-      <script>
-        window.opener.postMessage({ 
-          type: 'LOGIN_SUCCESS', 
-          username: '${userIdentity.username}',
-          avatar_url: '${userProfile.avatar_url || '/default-avatar.png'}'
-        }, '*');
-        setTimeout(() => window.close(), 1000);
-      </script>
-    `;
-
-    return new Response(redirectScript, {
-      headers: { 'Content-Type': 'text/html' }
+    cookies().set('access_token', tokens.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
     });
-  } catch (error: any) {
-    console.error('Error during OAuth callback:', error.message || error);
-    return NextResponse.json(
-      { error: error.message || 'Authentication failed' },
-      { status: 500 }
+
+    cookies().set('access_token_secret', tokens.secret, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+    });
+
+    cookies().set(
+      'user_data',
+      JSON.stringify({
+        username: userIdentity.username,
+        avatar_url: userProfile.avatar_url || '/default-avatar.png',
+      }),
+      {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+      },
     );
+
+    return NextResponse.redirect(
+      new URL(`/${userIdentity.username}`, request.url),
+    );
+  } catch (error) {
+    console.error('Error during OAuth callback:', error);
+    return NextResponse.redirect(new URL('/?error=auth_failed', request.url));
   }
 }

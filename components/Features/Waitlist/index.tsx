@@ -1,6 +1,6 @@
 import React from 'react';
 // import Banner from '@/components/Banner';
-import HeroSection from '@/components/HeroSection';
+// import HeroSection from '@/src/components/Features/Waitlist/HeroSection';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Github, X } from 'lucide-react';
@@ -44,7 +44,7 @@ const Waitlist: React.FC = () => {
           </Link>
         </div>
       </header>
-      <HeroSection />
+      {/* <HeroSection /> */}
     </div>
   );
 };

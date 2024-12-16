@@ -1,35 +1,15 @@
-'use client';
+import { Suspense } from 'react';
+import HomeClient from './components/HomeClient';
+import { LoadingSpinner } from '@/components/ui/loading';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useUserStore } from '@/lib/store/userStore';
-import Banner from '@/components/Banner';
+interface HomeProps {}
 
-const Home = () => {
-  const userIdentity = useUserStore((state) => state.userIdentity);
-  const router = useRouter();
-  const [isHydrated, setIsHydrated] = useState(false);
-
-  useEffect(() => {
-    setIsHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    if (isHydrated && userIdentity?.username) {
-      router.replace(`/${userIdentity.username}`);
-    }
-  }, [isHydrated, userIdentity, router]);
-
-  if (!isHydrated) {
-    return null;
-  }
-
+const Home = ({}: HomeProps) => {
   return (
-    <main>
-      <Banner 
-        username={userIdentity?.username || 'Guest'} 
-        avatarUrl={userIdentity?.avatar_url || '/default-avatar.png'} 
-      />
+    <main className="min-h-screen">
+      <Suspense fallback={<LoadingSpinner />}>
+        <HomeClient />
+      </Suspense>
     </main>
   );
 };

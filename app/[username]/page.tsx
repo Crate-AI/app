@@ -1,43 +1,23 @@
-'use client';
+import { Suspense } from 'react';
+import UserProfileClient from './components/UserProfileClient';
+import { LoadingSpinner } from '@/components/ui/loading';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useUserStore } from '@/lib/store/userStore';
-import Banner from '@/components/Banner';
+interface UserProfilePageProps {
+  params: {
+    username: string;
+  };
+}
 
-export default function UserPage({ params }: { params: { username: string } }) {
-  const userIdentity = useUserStore((state) => state.userIdentity);
-  const router = useRouter();
-  const [isHydrated, setIsHydrated] = useState(false);
-
-  useEffect(() => {
-    setIsHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    if (isHydrated && (!userIdentity || userIdentity.username.toLowerCase() !== params.username.toLowerCase())) {
-      router.replace('/');
-    }
-  }, [isHydrated, userIdentity, params.username, router]);
-
-  // Show nothing until hydration is complete
-  if (!isHydrated) {
-    return null;
-  }
-
-  // After hydration, check if we have valid user data
-  if (!userIdentity || userIdentity.username.toLowerCase() !== params.username.toLowerCase()) {
-    return null;
-  }
+const UserProfilePage = ({ params }: UserProfilePageProps) => {
+  const { username } = params;
 
   return (
-    <div>
-      <main>
-        <Banner
-          username={userIdentity.username}
-          avatarUrl={userIdentity.avatar_url}
-        />
-      </main>
-    </div>
+    <main>
+      <Suspense fallback={<LoadingSpinner />}>
+        <UserProfileClient username={username} />
+      </Suspense>
+    </main>
   );
-}
+};
+
+export default UserProfilePage;

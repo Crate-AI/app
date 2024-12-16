@@ -3,7 +3,7 @@
 import type { NextPage } from 'next';
 import React, { useState } from 'react';
 import * as realtimeBpm from 'realtime-bpm-analyzer';
-import SubmitTrackForm from '@/components/SubmitTrackForm';
+import SubmitTrackForm from '@/components/Features/Analyze/SubmitTrackForm';
 
 const Home: NextPage = () => {
   const [file, setFile] = useState<File | null>(null);
