@@ -1,49 +1,54 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { fetchRequestToken } from './serverActions';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { useAuthStore } from '@/lib/store/authStore';
+import { requestDiscogsAuth } from '@/app/actions/auth/discogs';
+import { LoaderCircle } from 'lucide-react';
 
-export default function SignInButton() {
-  const [loading, setLoading] = useState(false);
+interface SignInButtonProps {}
 
-  useEffect(() => {
-    const handleLoginSuccess = (event: MessageEvent) => {
-      if (event.data.type === 'LOGIN_SUCCESS') {
-        console.log(`User logged in as ${event.data.username}`);
-        window.location.href = `/${event.data.username}`;
-      }
-    };
-
-    window.addEventListener('message', handleLoginSuccess);
-
-    return () => {
-      window.removeEventListener('message', handleLoginSuccess);
-    };
-  }, []);
+const SignInButton = ({}: SignInButtonProps) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const { setError } = useAuthStore();
 
   const handleSignIn = async () => {
-    setLoading(true);
+    setIsLoading(true);
+    setError(null);
+
     try {
-      const data = await fetchRequestToken();
-      if (data.authUrl) {
-        const popup = window.open(data.authUrl, 'DiscogsAuth', 'width=600,height=400');
-        if (!popup) {
-          alert('Popup blocked! Please allow popups and try again.');
-          setLoading(false);
-          return;
-        }
+      const redirectUrl = window.location.pathname;
+      if (redirectUrl !== '/') {
+        await fetch('/api/auth/set-redirect', {
+          method: 'POST',
+          body: JSON.stringify({ redirectUrl }),
+        });
       }
+
+      const { authorizationUrl } = await requestDiscogsAuth();
+
+      window.location.href = authorizationUrl;
     } catch (error) {
-      console.error('Error during authentication:', error);
-    } finally {
-      setLoading(false);
+      console.error('Authentication error:', error);
+      setError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to start authentication',
+      );
+      setIsLoading(false);
     }
   };
 
   return (
-    <Button onClick={handleSignIn} disabled={loading}>
-      {loading ? 'Signing In...' : 'Sign In with Discogs'}
+    <Button
+      onClick={handleSignIn}
+      disabled={isLoading}
+      className="w-full sm:w-auto flex items-center gap-2"
+    >
+      {isLoading && <LoaderCircle className="h-4 w-4 animate-spin" />}
+      {isLoading ? 'Connecting to Discogs...' : 'Sign In with Discogs'}
     </Button>
   );
-}
+};
+
+export default SignInButton;
