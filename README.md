@@ -43,11 +43,5 @@ supabase start
 - That's pretty much it! The Studio app for your local deployment will be exposed at `http://127.0.0.1:54321` or something similar (will be displayed when `supabase start` completes)
 
 ## Deploying changes
-- Link the staging environment: `supabase link --project-ref ehteilvmdxqtdyusvrlo` (ping @paprikaf for the db password)
-- Pull the database to check for updates: `supabase db pull`
-- Apply the migration, and push to the db:
-```
-supabase migration up
-supabase db push
-```
+- Apply the migration locally so that the types are updated. `supabase migration up --include-all`
 - You can generate the types for your changes using `npx supabase gen types typescript --local > types/supabase.ts`. This allows them to be used in the frontend code with type safety
