@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import type { UserIdentity } from '../types/auth';
+import type { UserIdentity } from '@/types/auth';
 
 const COOKIE_KEYS = {
   REQUEST_TOKEN: 'discogs_request_token',

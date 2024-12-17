@@ -26,9 +26,6 @@ dependencies:
   '@supabase/supabase-js':
     specifier: ^2.44.4
     version: 2.47.7
-  app:
-    specifier: 'link:'
-    version: 'link:'
   class-variance-authority:
     specifier: ^0.7.0
     version: 0.7.1
