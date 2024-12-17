@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@crate.ai/discogs-sdk':
-    specifier: ^2.1.3
-    version: 2.1.3
+    specifier: ^2.1.5
+    version: 2.1.5
   '@hookform/resolvers':
     specifier: ^3.9.0
     version: 3.9.1(react-hook-form@7.54.1)
@@ -120,8 +120,8 @@ packages:
       regenerator-runtime: 0.14.1
     dev: false
 
-  /@crate.ai/discogs-sdk@2.1.3:
-    resolution: {integrity: sha512-QHm3tcFdyj8mGuLf1TVR6ueahSKpr4TBv+oCEBB2KsMbGUp/OKQ4eqJwc+FF93ROeOXpxk7dkC5cEtrAcGs9AQ==}
+  /@crate.ai/discogs-sdk@2.1.5:
+    resolution: {integrity: sha512-2JXLD+g7ZFa05YZ7rs8cyC4ksuFd/PoH+3HesQ8h/xKBgFCcdigs2nTLNfUaWedzUa65cDXmE2FpFu2VStaG9w==}
     engines: {node: '>=18.0.0'}
     dev: false
 
