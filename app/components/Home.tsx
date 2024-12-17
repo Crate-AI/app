@@ -7,14 +7,12 @@ import { useAuthStore } from '@/lib/store/authStore';
 interface HomeClientProps {}
 
 const HomeClient = ({}: HomeClientProps) => {
-  const { userIdentity, isAuthenticated } = useAuthStore();
+  const { userIdentity } = useAuthStore();
   const router = useRouter();
 
-  useEffect(() => {
-    if (isAuthenticated && userIdentity?.username) {
+    if (userIdentity?.username) {
       router.replace(`/${userIdentity.username}`);
     }
-  }, [isAuthenticated, userIdentity, router]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-4">
