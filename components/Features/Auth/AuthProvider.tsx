@@ -43,7 +43,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     };
 
     initAuth();
-  }, [userIdentity]);
+  }, []);
 
   return (
     <>
