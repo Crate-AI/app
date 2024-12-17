@@ -20,7 +20,7 @@ interface AuthProviderProps {
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { setUserIdentity, setError } = useAuthStore();
+  const { setUserIdentity, userIdentity } = useAuthStore();
 
   useEffect(() => {
     const initAuth = async () => {
@@ -31,22 +31,19 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         }
 
         const error = searchParams.get('error');
-        if (error && ERROR_MESSAGES[error as keyof typeof ERROR_MESSAGES]) {
-          setError(ERROR_MESSAGES[error as keyof typeof ERROR_MESSAGES]);
-
-          const newUrl = new URL(window.location.href);
-          newUrl.searchParams.delete('error');
-          router.replace(newUrl.pathname);
+        if (error) {
+          throw error
         }
       } catch (error) {
-        setError(
-          error instanceof Error ? error.message : 'Failed to initialize auth',
-        );
+        console.error('Error initializing auth:', error);
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.delete('error');
+        router.replace(newUrl.pathname);
       }
     };
 
     initAuth();
-  }, [setUserIdentity, setError, searchParams, router]);
+  }, [userIdentity]);
 
   return (
     <>

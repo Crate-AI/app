@@ -10,11 +10,8 @@ interface SignInButtonProps {}
 
 const SignInButton = ({}: SignInButtonProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { setError } = useAuthStore();
-
   const handleSignIn = async () => {
     setIsLoading(true);
-    setError(null);
 
     try {
       const redirectUrl = window.location.pathname;
@@ -30,12 +27,12 @@ const SignInButton = ({}: SignInButtonProps) => {
       window.location.href = authorizationUrl;
     } catch (error) {
       console.error('Authentication error:', error);
-      setError(
-        error instanceof Error
-          ? error.message
-          : 'Failed to start authentication',
-      );
       setIsLoading(false);
+      throw error instanceof Error
+        ? error.message
+        : 'Failed to start authentication';
+
+     
     }
   };
 
