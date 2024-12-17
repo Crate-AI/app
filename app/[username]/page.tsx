@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import UserProfileClient from './components/UserProfile';
+import UserProfile from './userProfile';
 import { LoadingSpinner } from '@/components/ui/loading';
 
 interface UserProfilePageProps {
@@ -13,7 +13,7 @@ const UserProfilePage = ({ params }: UserProfilePageProps) => {
   return (
     <main>
       <Suspense fallback={<LoadingSpinner />}>
-        <UserProfileClient username={username} />
+        <UserProfile username={username} />
       </Suspense>
     </main>
   );

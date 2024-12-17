@@ -1,18 +1,14 @@
 'use client';
-
-import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/authStore';
-import { LoadingSpinner } from '@/components/ui/loading';
 
-interface UserProfileClientProps {
+interface ClientPageProps {
   username: string;
 }
 
-const UserProfileClient = ({ username }: UserProfileClientProps) => {
+const UserProfile = ({ username }: ClientPageProps) => {
   const { userIdentity } = useAuthStore();
   const router = useRouter();
-
     const isValidUser = userIdentity?.username && 
       userIdentity.username.toLowerCase() === username.toLowerCase();
 
@@ -28,4 +24,4 @@ const UserProfileClient = ({ username }: UserProfileClientProps) => {
   );
 };
 
-export default UserProfileClient;
+export default UserProfile;
