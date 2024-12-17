@@ -10,7 +10,6 @@ interface UserProfilePageProps {
 
 const UserProfilePage = ({ params }: UserProfilePageProps) => {
   const { username } = params;
-  console.log('u crazy?')
   return (
     <main>
       <Suspense fallback={<LoadingSpinner />}>
