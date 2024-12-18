@@ -26,13 +26,15 @@ interface GenresPieChartProps {
 
 export default function GenresPieChart({ username }: GenresPieChartProps) {
   const id = 'pie-genres';
-  const [genresData, setGenresData] = React.useState<{ genre: string; count: number; fill: string }[]>([]);
+  const [genresData, setGenresData] = React.useState<
+    { genre: string; count: number; fill: string }[]
+  >([]);
   const [activeGenre, setActiveGenre] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(true);
 
   const activeIndex = React.useMemo(
     () => genresData.findIndex((item) => item.genre === activeGenre),
-    [activeGenre, genresData]
+    [activeGenre, genresData],
   );
 
   React.useEffect(() => {
@@ -43,7 +45,7 @@ export default function GenresPieChart({ username }: GenresPieChartProps) {
         const formattedData = Object.keys(genres).map((genre, index) => ({
           genre,
           count: genres[genre],
-          fill: `var(--chart-${index % 5 + 1})`, // Use cyclic colors
+          fill: `var(--chart-${(index % 5) + 1})`, // Use cyclic colors
         }));
 
         setGenresData(formattedData);
@@ -99,7 +101,10 @@ export default function GenresPieChart({ username }: GenresPieChartProps) {
               innerRadius={60}
               strokeWidth={5}
               activeIndex={activeIndex}
-              activeShape={({ outerRadius = 0, ...props }: PieSectorDataItem) => (
+              activeShape={({
+                outerRadius = 0,
+                ...props
+              }: PieSectorDataItem) => (
                 <g>
                   <Sector {...props} outerRadius={outerRadius + 10} />
                   <Sector

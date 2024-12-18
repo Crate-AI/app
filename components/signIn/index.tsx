@@ -31,8 +31,6 @@ const SignInButton = ({}: SignInButtonProps) => {
       throw error instanceof Error
         ? error.message
         : 'Failed to start authentication';
-
-     
     }
   };
 

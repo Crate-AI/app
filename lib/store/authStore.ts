@@ -8,7 +8,7 @@ interface AuthStore {
 }
 
 const initialState = {
-  userIdentity: null
+  userIdentity: null,
 };
 
 export const useAuthStore = create<AuthStore>()(
@@ -18,7 +18,7 @@ export const useAuthStore = create<AuthStore>()(
       setUserIdentity: (identity) =>
         set({
           userIdentity: identity,
-        }), 
+        }),
     }),
     {
       name: 'auth-storage',
@@ -28,4 +28,3 @@ export const useAuthStore = create<AuthStore>()(
     },
   ),
 );
-

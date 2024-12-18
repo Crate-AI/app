@@ -15,13 +15,7 @@ export default function Banner({
   authElement,
 }: BannerProps) {
   return (
-    <header
-      className="bg-white text-black p-6 flex justify-between items-center shadow-lg"
-      style={{
-        backgroundImage: 'radial-gradient(#FFDC58 1px, transparent 1px)',
-        backgroundSize: '10px 10px',
-      }}
-    >
+    <header className="text-black p-6 flex justify-between items-center">
       <div className="flex items-center">
         <Link href="/">
           <Image
