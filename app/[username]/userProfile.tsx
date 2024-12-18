@@ -2,7 +2,8 @@
 
 import { useAuthStore } from '@/lib/store/authStore';
 import { LoadingSpinner } from '@/components/ui/loading';
-import DiscogsSearch from '@/components/Features/Search/DiscogsSearch';
+import { useRouter } from 'next/navigation';
+import TrackList from '@/components/Features/TrackList/TrackList';
 
 interface UserProfileProps {
   username: string;
@@ -10,14 +11,16 @@ interface UserProfileProps {
 
 const UserProfile = ({ username }: UserProfileProps) => {
   const { userIdentity } = useAuthStore();
+  const router = useRouter();
 
-  if (!userIdentity) {
-    return <LoadingSpinner />;
+  if (!userIdentity || userIdentity.username !== username) {
+    router.replace('/');
+    return !userIdentity ? <LoadingSpinner /> : null;
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <DiscogsSearch />
+      <TrackList />
     </div>
   );
 };
