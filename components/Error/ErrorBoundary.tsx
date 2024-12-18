@@ -1,18 +1,21 @@
-"use client";
+'use client';
 
-import React, { ReactNode, useState, useEffect } from "react";
+import React, { ReactNode, useState, useEffect } from 'react';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
   fallback?: ReactNode;
 }
 
-const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({ children, fallback }) => {
+const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({
+  children,
+  fallback,
+}) => {
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     const handleError = (error: Error, errorInfo: any) => {
-      console.error("ErrorBoundary caught an error:", error, errorInfo);
+      console.error('ErrorBoundary caught an error:', error, errorInfo);
       setHasError(true);
     };
 
@@ -21,18 +24,18 @@ const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({ children, fallback }) => 
         new Error(
           errorEvent instanceof ErrorEvent
             ? errorEvent.message
-            : "Unhandled promise rejection"
+            : 'Unhandled promise rejection',
         ),
-        errorEvent
+        errorEvent,
       );
     };
 
-    window.addEventListener("error", errorListener);
-    window.addEventListener("unhandledrejection", errorListener);
+    window.addEventListener('error', errorListener);
+    window.addEventListener('unhandledrejection', errorListener);
 
     return () => {
-      window.removeEventListener("error", errorListener);
-      window.removeEventListener("unhandledrejection", errorListener);
+      window.removeEventListener('error', errorListener);
+      window.removeEventListener('unhandledrejection', errorListener);
     };
   }, []);
 

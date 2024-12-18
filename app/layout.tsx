@@ -35,7 +35,13 @@ interface RootLayoutProps {
 const RootLayout = ({ children }: Readonly<RootLayoutProps>) => {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body
+        className={inter.className}
+        style={{
+          backgroundImage: 'radial-gradient(#FFDC58 1px, transparent 1px)',
+          backgroundSize: '10px 10px',
+        }}
+      >
         <ErrorBoundary fallback={<GlobalError />}>
           <AuthProvider>
             <Suspense fallback={<LoadingSpinner />}>

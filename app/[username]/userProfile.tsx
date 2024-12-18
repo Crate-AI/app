@@ -1,25 +1,23 @@
 'use client';
-import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/lib/store/authStore';
 
-interface ClientPageProps {
+import { useAuthStore } from '@/lib/store/authStore';
+import { LoadingSpinner } from '@/components/ui/loading';
+import DiscogsSearch from '@/components/Features/Search/DiscogsSearch';
+
+interface UserProfileProps {
   username: string;
 }
 
-const UserProfile = ({ username }: ClientPageProps) => {
+const UserProfile = ({ username }: UserProfileProps) => {
   const { userIdentity } = useAuthStore();
-  const router = useRouter();
-    const isValidUser = userIdentity?.username && 
-      userIdentity.username.toLowerCase() === username.toLowerCase();
 
-    if (!isValidUser) {
-      router.replace('/');
-    }
-
+  if (!userIdentity) {
+    return <LoadingSpinner />;
+  }
 
   return (
-    <div>
-      <h1>Welcome, {userIdentity?.username}!</h1>
+    <div className="container mx-auto px-4 py-8">
+      <DiscogsSearch />
     </div>
   );
 };

@@ -8,9 +8,9 @@ const HomeClient = ({}: HomeClientProps) => {
   const { userIdentity } = useAuthStore();
   const router = useRouter();
 
-    if (userIdentity?.username) {
-      router.replace(`/${userIdentity.username}`);
-    }
+  if (userIdentity?.username) {
+    router.replace(`/${userIdentity.username}`);
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-4">

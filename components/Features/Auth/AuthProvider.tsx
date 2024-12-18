@@ -32,7 +32,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
         const error = searchParams.get('error');
         if (error) {
-          throw error
+          throw error;
         }
       } catch (error) {
         console.error('Error initializing auth:', error);

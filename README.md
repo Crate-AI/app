@@ -32,16 +32,21 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 # Supabase
 
 ## Local environment setup
+
 n.b. most of the documentation comes from [here](https://supabase.com/docs/guides/cli/local-development)
+
 - Make sure you have [docker](https://docs.docker.com/get-docker/) installed and running
 - Install the [supabase-cli](https://supabase.com/docs/guides/cli) and run the following:
+
 ```
 supabase login # you'll need a PAT which this command will tell you how to generate
 supabase init
 supabase start
 ```
+
 - That's pretty much it! The Studio app for your local deployment will be exposed at `http://127.0.0.1:54321` or something similar (will be displayed when `supabase start` completes)
 
 ## Deploying changes
+
 - Apply the migration locally so that the types are updated. `supabase migration up --include-all`
 - You can generate the types for your changes using `npx supabase gen types typescript --local > types/supabase.ts`. This allows them to be used in the frontend code with type safety
