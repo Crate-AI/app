@@ -103,4 +103,4 @@ const DiscogsSearch = ({}: DiscogsSearchProps) => {
   );
 };
 
-export default DiscogsSearch; 
+export default DiscogsSearch;

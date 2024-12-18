@@ -16,7 +16,11 @@ export const fetchUserDetails = async (username: string) => {
   return response.json();
 };
 
-export const fetchUserCollection = async (username: string, perPage = 50, folderId = 0) => {
+export const fetchUserCollection = async (
+  username: string,
+  perPage = 50,
+  folderId = 0,
+) => {
   const collection = await discogs.collection.getCollection({
     username,
     page: 1, // Fetch the first page for now
@@ -37,7 +41,9 @@ export const fetchMasterRelease = async (masterUrl: string) => {
   return response.json();
 };
 
-export async function getGenres(username: string): Promise<{ [genre: string]: number }> {
+export async function getGenres(
+  username: string,
+): Promise<{ [genre: string]: number }> {
   const collection = await fetchUserCollection(username);
 
   const genreCounts: { [genre: string]: number } = {};
