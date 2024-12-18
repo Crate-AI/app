@@ -7,23 +7,10 @@ export interface SessionAPI {
     user: User | null;
     session: Session | null;
   } | null>;
-  sendMagicLink(email: string, redirectTo: string): Promise<void>;
   signOut(): Promise<void>;
 }
 
 export function getSessionAPI(supabase: SupabaseClient<Database>): SessionAPI {
-  async function sendMagicLink(email: string, redirectTo: string) {
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: redirectTo,
-      },
-    });
-    if (error) {
-      throw error;
-    }
-  }
-
   async function createSessionFromURL(url: string): Promise<{
     user: User | null;
     session: Session | null;
@@ -56,7 +43,6 @@ export function getSessionAPI(supabase: SupabaseClient<Database>): SessionAPI {
   }
 
   return {
-    sendMagicLink,
     createSessionFromURL,
     signOut,
   };
