@@ -63,7 +63,6 @@ export async function POST(request: Request) {
     await tokenManager.setAccessTokenSecret(accessTokenSecret);
 
     const searchParams = buildSearchParams(originalQuery);
-    console.log('Search params:', searchParams);
 
     const response = await sdk.search.getSearchResults(searchParams) as unknown as SearchResponse;
 

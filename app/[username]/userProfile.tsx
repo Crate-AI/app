@@ -1,8 +1,8 @@
 'use client';
 
 import { useAuthStore } from '@/lib/store/authStore';
-import { LoadingSpinner } from '@/components/ui/loading';
-import DiscogsSearch from '@/components/Features/Search/DiscogsSearch';
+import CrateExplorer from '@/components/Features/CrateExplorer/CrateExplorer';
+import { redirect } from 'next/navigation';
 
 interface UserProfileProps {
   username: string;
@@ -12,12 +12,12 @@ const UserProfile = ({ username }: UserProfileProps) => {
   const { userIdentity } = useAuthStore();
 
   if (!userIdentity) {
-    return <LoadingSpinner />;
+    redirect('/');
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <DiscogsSearch />
+      <CrateExplorer />
     </div>
   );
 };
