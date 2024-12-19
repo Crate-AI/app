@@ -150,11 +150,7 @@ export interface DiscogsSearchResult {
   label?: string[];
   genre?: string[];
   style?: string[];
-  barcode?: string[];
-  catno?: string;
-  community?: Community;
-  format_quantity?: number;
-  formats?: Format[];
+  date_added?: string;
 }
 
 export interface DiscogsCollectionResponse {
@@ -200,6 +196,7 @@ export interface TrackDisplayProps {
   isPlaying: boolean;
   onPlayToggle: () => void;
   viewMode: 'grid' | 'list';
+  dateAdded: string;
 }
 
 export interface ViewToggleProps {
@@ -300,4 +297,106 @@ export interface SearchResponse {
     per_page: number;
     items: number;
   };
+}
+export interface PaginationUrls {
+  next: string;
+  last: string;
+}
+
+export interface Pagination {
+  per_page: number;
+  pages: number;
+  page: number; 
+  items: number;
+  urls: PaginationUrls;
+}
+
+export interface BasicInformation {
+  id: number;
+  title: string;
+  year: number;
+  resource_url: string;
+  thumb: string;
+  cover_image: string;
+  formats: Format[];
+  labels: Label[];
+  artists: Artist[];
+  genres: string[];
+  styles: string[];
+}
+
+export interface Note {
+  field_id: number;
+  value: string;
+}
+
+export type CollectionSortField = 'label' | 'artist' | 'title' | 'catno' | 'format' | 'rating' | 'added' | 'year';
+
+export const CollectionSortFields = {
+  LABEL: 'label' as const,
+  ARTIST: 'artist' as const,
+  TITLE: 'title' as const,
+  CATALOG_NUMBER: 'catno' as const,
+  FORMAT: 'format' as const,
+  RATING: 'rating' as const,
+  ADDED: 'added' as const,
+  YEAR: 'year' as const
+} as const;
+
+export interface CollectionParams {
+  username?: string;
+  folderId?: number | 0;
+  page?: number;
+  perPage?: number;
+  sort?: CollectionSortField;
+  sortOrder?: 'asc' | 'desc';
+  format?: string;
+  status?: 'All' | 'Available' | 'For Trade' | 'Not For Sale';
+  yearRange?: {
+    from?: number;
+    to?: number;
+  };
+}
+
+export interface FoldersResponse {
+  folders: Folder[];
+}
+
+export interface Folder {
+  id: number;
+  name: string;
+  count: number;
+  resource_url: string;
+}
+
+export interface CollectionModificationResponse {
+  instance_id: number;
+  resource_url: string;
+}
+
+export type CollectionResponse = {
+  pagination: Pagination;
+  releases: Release[];
+};
+
+export interface CollectionRelease {
+  id: number;
+  basic_information: {
+    id: number;
+    title: string;
+    year: number;
+    thumb: string;
+    cover_image: string;
+    artists: Array<{ name: string; id: number }>;
+    labels: Array<{ name: string; id: number }>;
+    formats: Array<{
+      name: string;
+      qty: string;
+      descriptions: string[];
+    }>;
+    genres: string[];
+    styles: string[];
+  };
+  date_added: string;
+  instance_id: number;
 }
