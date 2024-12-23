@@ -1,14 +1,13 @@
 import { useState } from 'react';
-import { TrackDisplayProps } from '@/types/discogs';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, Heart, MoreHorizontal, ChevronUp, ChevronDown } from 'lucide-react';
 import ReleaseTracks from './ReleaseTracks';
+import { useTrackContext } from './TrackDisplay';
 
-type TrackDisplayListProps = Omit<TrackDisplayProps, 'viewMode'>;
-
-const TrackDisplayList = ({ result, isPlaying, onPlayToggle }: TrackDisplayListProps) => {
+const TrackDisplayList = () => {
+  const { result: trackResult, isPlaying: trackIsPlaying, onPlayToggle: trackOnPlayToggle, dateAdded } = useTrackContext();
   const [showTracks, setShowTracks] = useState(false);
-  if (!result) return null;
+  if (!trackResult) return null;
 
   return (
     <div className="space-y-2">
@@ -16,15 +15,15 @@ const TrackDisplayList = ({ result, isPlaying, onPlayToggle }: TrackDisplayListP
         <div className="flex items-center gap-3">
           <div className="relative">
             <img
-              src={result.thumb || '/api/placeholder/50/50'}
-              alt={result.title}
+              src={trackResult.thumb || '/api/placeholder/50/50'}
+              alt={trackResult.title}
               className="w-12 h-12 rounded-base object-cover"
             />
             <button
-              onClick={onPlayToggle}
+              onClick={trackOnPlayToggle}
               className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-base"
             >
-              {isPlaying ? (
+              {trackIsPlaying ? (
                 <Pause className="w-5 h-5 text-white" />
               ) : (
                 <Play className="w-5 h-5 text-white" />
@@ -33,17 +32,17 @@ const TrackDisplayList = ({ result, isPlaying, onPlayToggle }: TrackDisplayListP
           </div>
           <div>
             <div className="font-medium text-text dark:text-darkText">
-              {result.title}
+              {trackResult.title}
             </div>
             <div className="text-sm text-text/60 dark:text-darkText/60">
-              {result.year} · {result.country || 'Unknown'}
+              {trackResult.year} · {trackResult.country || 'Unknown'}
             </div>
           </div>
         </div>
 
         <div className="text-sm text-text/60 dark:text-darkText/60">
-          <div>{result.genre?.join(', ') || 'No Genre'}</div>
-          <div>{result.style?.join(', ') || 'No Style'}</div>
+          <div>{trackResult.genre?.join(', ') || 'No Genre'}</div>
+          <div>{trackResult.style?.join(', ') || 'No Style'}</div>
         </div>
 
         <div className="flex items-center gap-2">
@@ -69,7 +68,7 @@ const TrackDisplayList = ({ result, isPlaying, onPlayToggle }: TrackDisplayListP
 
       {showTracks && (
         <div className="ml-16">
-          <ReleaseTracks releaseId={result.id} />
+          <ReleaseTracks releaseId={trackResult.id} />
         </div>
       )}
     </div>
