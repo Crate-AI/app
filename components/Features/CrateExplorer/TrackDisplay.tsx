@@ -20,9 +20,10 @@ export const useTrackContext = () => {
   return context;
 };
 
+
 const TrackDisplay = ({ result, isPlaying, onPlayToggle, viewMode, dateAdded }: TrackDisplayProps) => {
   if (!result) return null;
-
+  
   return (
     <TrackContext.Provider value={{ result, isPlaying, onPlayToggle, dateAdded }}>
       {viewMode === 'list' ? <TrackDisplayList /> : <TrackDisplayGrid />}
