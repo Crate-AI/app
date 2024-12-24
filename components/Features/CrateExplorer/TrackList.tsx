@@ -24,50 +24,52 @@ const TrackListItem = ({
   isPlaying: boolean; 
   onPlayToggle: () => void; 
   isPlayerReady: boolean; 
-}) => (
-  <div
-    key={track.position}
-    className="grid grid-cols-[auto_1fr_auto_auto] gap-4 p-3 border-2 border-border dark:border-darkBorder rounded-base group items-center hover:bg-border/10"
-  >
-    <div className="w-8 flex items-center justify-center">
-      <Button
-        variant="noShadow"
-        size="icon"
-        className="w-8 h-8"
-        onClick={onPlayToggle}
-        disabled={!track.videoId || !isPlayerReady}
-      >
-        {isPlaying ? (
-          <Pause className="w-4 h-4" />
-        ) : (
-          <Play className="w-4 h-4" />
-        )}
-      </Button>
-    </div>
-
-    <div>
-      <div className="font-medium text-text dark:text-darkText">
-        {track.title}
+}) => {
+  return (
+    <div
+      key={track.position}
+      className="grid grid-cols-[auto_1fr_auto_auto] gap-4 p-3 border-2 border-border dark:border-darkBorder rounded-base group items-center hover:bg-border/10"
+    >
+      <div className="w-8 flex items-center justify-center">
+        <Button
+          variant="noShadow"
+          size="icon"
+          className="w-8 h-8"
+          onClick={onPlayToggle}
+          disabled={!track.videoId || !isPlayerReady}
+        >
+          {isPlaying ? (
+            <Pause className="w-4 h-4" />
+          ) : (
+            <Play className="w-4 h-4" />
+          )}
+        </Button>
       </div>
-      {track.extraartists && (
-        <div className="text-sm text-text/60 dark:text-darkText/60">
-          {track.extraartists.map(artist => artist.name).join(', ')}
+
+      <div>
+        <div className="font-medium text-text dark:text-darkText">
+          {track.title}
         </div>
-      )}
-    </div>
+        {track.extraartists && (
+          <div className="text-sm text-text/60 dark:text-darkText/60">
+            {track.extraartists.map(artist => artist.name).join(', ')}
+          </div>
+        )}
+      </div>
 
-    <div className="text-text/60 dark:text-darkText/60">
-      {track.duration}
-    </div>
+      <div className="text-text/60 dark:text-darkText/60">
+        {track.duration}
+      </div>
 
-    <div className="text-text/60 dark:text-darkText/60 flex items-center gap-2">
-      <span>{track.bpm || '---'}</span>
-      {track.bpm && (
-        <Music className="w-4 h-4 text-text/40 dark:text-darkText/40" />
-      )}
+      <div className="text-text/60 dark:text-darkText/60 flex items-center gap-2">
+        <span>{track.bpm || '---'}</span>
+        {track.bpm && (
+          <Music className="w-4 h-4 text-text/40 dark:text-darkText/40" />
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export function TrackList({ tracks, playingTrackId, onPlayToggle, isPlayerReady }: TrackListProps) {
   return (
