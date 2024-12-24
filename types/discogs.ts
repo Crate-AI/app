@@ -400,3 +400,8 @@ export interface CollectionRelease {
   date_added: string;
   instance_id: number;
 }
+export interface TrackWithMetadata extends Track {
+  bpm?: number;
+  videoId?: string | null;
+  error?: string | null;
+}

@@ -14,9 +14,7 @@ export async function GET(
     const videoResponse = await fetch(
       `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${YOUTUBE_API_KEY}&part=contentDetails,snippet`
     );
-    console.log('videoResponse', videoResponse);
     const videoData = await videoResponse.json();
-    console.log('videoData', videoData);
     
     if (!videoData.items?.length) {
       return NextResponse.json(
@@ -29,7 +27,6 @@ export async function GET(
       title: videoData.items[0].snippet.title,
       duration: videoData.items[0].contentDetails.duration
     }
-    console.log('response', response);
     // Return a signed URL for the iframe player API
     return NextResponse.json(response);
 
