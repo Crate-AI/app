@@ -1,4 +1,3 @@
-// app/api/youtube/[videoId]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
@@ -10,7 +9,6 @@ export async function GET(
   try {
     const videoId = params.videoId;
     
-    // First get video details to ensure it exists and is playable
     const videoResponse = await fetch(
       `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${YOUTUBE_API_KEY}&part=contentDetails,snippet`
     );
