@@ -20,7 +20,7 @@ interface AuthProviderProps {
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { setUserIdentity, userIdentity } = useAuthStore();
+  const { setUserIdentity } = useAuthStore();
 
   useEffect(() => {
     const initAuth = async () => {
