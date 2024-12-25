@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { DiscogsSDK } from '@crate.ai/discogs-sdk';
 import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
 
 export async function GET(request: Request) {
   try {
@@ -59,19 +60,72 @@ export async function GET(request: Request) {
       sameSite: 'lax',
     });
 
-    cookies().set(
-      'user_data',
-      JSON.stringify({
-        username: userIdentity.username,
-        avatar_url: userProfile.avatar_url || '/default-avatar.png',
-      }),
-      {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-      },
-    );
+    // sync state with supabase auth
+    const supabase = await createClient();
+    const user = await sdk.user.getUser({ username: userIdentity.username });
 
+    // set deterministic password based on some Discogs data
+    // FIXME: make this more secure; this relies on the assumption
+    // that this route is only accessible after a successful OAuth flow
+    const password = `discogs_${userIdentity.id}`;
+
+    // Try to sign in with email first
+    const { data: signInData, error: signInError } =
+      await supabase.auth.signInWithPassword({
+        email: user.email,
+        password,
+      });
+
+    // If user doesn't exist, create new account
+    if (signInError?.message.includes('Invalid login credentials')) {
+      const { data: signUpData, error: signUpError } =
+        await supabase.auth.signUp({
+          email: user.email,
+          password,
+          options: {
+            data: {
+              discogs_username: userIdentity.username,
+              discogs_id: userIdentity.id,
+            },
+          },
+        });
+
+      if (signUpError || !signUpData.user) {
+        console.error('Failed to create user:', signUpError);
+        return NextResponse.redirect(
+          new URL('/?error=signup_failed', request.url),
+        );
+      }
+
+      cookies().set(
+        'user_data',
+        JSON.stringify({
+          userId: signUpData.user.id,
+          username: userIdentity.username,
+          avatarUrl: userProfile.avatarUrl || '/default-avatar.png',
+        }),
+        {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+        },
+      );
+    } else if (signInData?.user) {
+      // Existing user signed in successfully
+      cookies().set(
+        'user_data',
+        JSON.stringify({
+          userId: signInData.user.id,
+          username: userIdentity.username,
+          avatarUrl: userProfile.avatarUrl || '/default-avatar.png',
+        }),
+        {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+        },
+      );
+    }
     return NextResponse.redirect(
       new URL(`/${userIdentity.username}`, request.url),
     );
