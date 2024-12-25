@@ -1,6 +1,6 @@
 export interface UserIdentity {
   username: string;
-  avatar_url: string;
+  avatarUrl: string;
 }
 
 export interface AuthState {

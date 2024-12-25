@@ -11,7 +11,7 @@ export default function Navigation() {
   return (
     <Banner
       username={userIdentity?.username || 'Guest'}
-      avatarUrl={userIdentity?.avatar_url || '/default-avatar.png'}
+      avatarUrl={userIdentity?.avatarUrl || '/default-avatar.png'}
       authElement={!userIdentity ? <SignInButton /> : null}
     />
   );
