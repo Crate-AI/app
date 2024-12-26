@@ -77,6 +77,7 @@ export async function GET(request: Request) {
       });
 
     // If user doesn't exist, create new account
+    // TODO: is there a better check?
     if (signInError?.message.includes('Invalid login credentials')) {
       const { data: signUpData, error: signUpError } =
         await supabase.auth.signUp({
@@ -96,7 +97,15 @@ export async function GET(request: Request) {
           new URL('/?error=signup_failed', request.url),
         );
       }
-
+      const { error: createError } = await supabase
+        .from('user_discogs_profile')
+        .upsert({
+          user_id: signUpData.user.id,
+          username: userIdentity.username,
+        });
+      if (createError) {
+        throw createError;
+      }
       cookies().set(
         'user_data',
         JSON.stringify({
@@ -111,6 +120,15 @@ export async function GET(request: Request) {
         },
       );
     } else if (signInData?.user) {
+      const { error: createError } = await supabase
+        .from('user_discogs_profile')
+        .upsert({
+          user_id: signInData.user.id,
+          username: userIdentity.username,
+        });
+      if (createError) {
+        throw createError;
+      }
       // Existing user signed in successfully
       cookies().set(
         'user_data',
@@ -126,6 +144,7 @@ export async function GET(request: Request) {
         },
       );
     }
+
     return NextResponse.redirect(
       new URL(`/${userIdentity.username}`, request.url),
     );
