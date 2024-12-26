@@ -1,26 +1,25 @@
-import { PlaybackError } from "@/types/youtube";
-import { TrackList } from "./TrackList";
-import { Release } from "@/types/discogs";
-import { useState, useEffect } from "react";
-import { TrackWithMetadata } from "@/types/discogs";
-import { findTrackVideo } from "@/lib/services/youtube";
-import { usePlayerStore } from "@/lib/store/usePlayerStore";
+import { PlaybackError } from '@/types/youtube';
+import { TrackList } from './TrackList';
+import { useState, useEffect } from 'react';
+import { TrackWithMetadata } from '@/types/discogs';
+import { usePlayerStore } from '@/lib/store/usePlayerStore';
+import { CrateTrack } from '@/app/api/tracks/[discogsReleaseId]/route';
 
 interface Props {
   releaseId: number;
 }
 
 const ReleaseTracks = ({ releaseId }: Props) => {
-  const [tracks, setTracks] = useState<TrackWithMetadata[]>([]);
+  const [tracks, setTracks] = useState<CrateTrack[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<PlaybackError | null>(null);
-  
-  const { 
-    player, 
-    isReady, 
-    playingTrackId, 
-    setPlayingTrackId, 
-    initializePlayer 
+
+  const {
+    player,
+    isReady,
+    playingTrackId,
+    setPlayingTrackId,
+    initializePlayer,
   } = usePlayerStore();
 
   useEffect(() => {
@@ -29,15 +28,15 @@ const ReleaseTracks = ({ releaseId }: Props) => {
 
   const handlePlayToggle = async (track: TrackWithMetadata) => {
     if (!track.videoId || !player || !isReady) {
-      const reason = !track.videoId 
+      const reason = !track.videoId
         ? 'No video ID available'
-        : !player 
+        : !player
           ? 'YouTube player not initialized'
           : 'Player not ready';
       setError({
         message: 'Cannot play track',
         details: reason,
-        trackPosition: track.position
+        trackPosition: track.position,
       });
       return;
     }
@@ -53,7 +52,7 @@ const ReleaseTracks = ({ releaseId }: Props) => {
 
         player.loadVideoById({
           videoId: track.videoId,
-          suggestedQuality: 'small'
+          suggestedQuality: 'small',
         });
 
         player.playVideo();
@@ -63,7 +62,7 @@ const ReleaseTracks = ({ releaseId }: Props) => {
       setError({
         message: 'Failed to play track',
         details: err instanceof Error ? err.message : 'Unknown error',
-        trackPosition: track.position
+        trackPosition: track.position,
       });
     }
   };
@@ -72,43 +71,25 @@ const ReleaseTracks = ({ releaseId }: Props) => {
     const fetchTracks = async () => {
       setLoading(true);
       setError(null);
- 
+
       try {
-        const response = await fetch(`/api/discogs/release/${releaseId}`);
+        const response = await fetch(`/api/tracks/${releaseId}`);
         if (!response.ok) throw new Error('Failed to fetch release');
-        
-        const release: Release = await response.json();
-        const tracksWithMetadata = await Promise.all(
-          release.tracklist.map(async track => {
-            try {
-              return {
-                ...track,
-                bpm: Math.floor(Math.random() * (140 - 115) + 115),
-                videoId: await findTrackVideo(track, release)
-              };
-            } catch {
-              return {
-                ...track,
-                bpm: Math.floor(Math.random() * (140 - 115) + 115),
-                videoId: null
-              };
-            }
-          })
-        );
-        
+
+        const tracksWithMetadata: CrateTrack[] = await response.json();
         setTracks(tracksWithMetadata);
       } catch (err) {
         setError({
-          message: err instanceof Error ? err.message : 'Failed to load tracks'
+          message: err instanceof Error ? err.message : 'Failed to load tracks',
         });
       } finally {
         setLoading(false);
       }
     };
- 
+
     fetchTracks();
   }, [releaseId]);
- 
+
   if (loading) {
     return (
       <div className="animate-pulse space-y-2">
@@ -118,7 +99,7 @@ const ReleaseTracks = ({ releaseId }: Props) => {
       </div>
     );
   }
- 
+
   if (error) {
     return (
       <div className="text-red-500 dark:text-red-400 p-4 text-center">
@@ -132,7 +113,7 @@ const ReleaseTracks = ({ releaseId }: Props) => {
       </div>
     );
   }
- 
+
   return (
     <>
       <TrackList
