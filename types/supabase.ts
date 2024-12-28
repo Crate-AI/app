@@ -51,24 +51,39 @@ export type Database = {
       }
       tracks: {
         Row: {
+          artist: string
           bpm: number | null
           created_at: string | null
           discogs_release_id: string
+          duration: string
+          extra_artists: string | null
           id: string
+          position: string
+          title: string
           youtube_video_id: string | null
         }
         Insert: {
+          artist: string
           bpm?: number | null
           created_at?: string | null
           discogs_release_id: string
+          duration: string
+          extra_artists?: string | null
           id?: string
+          position: string
+          title: string
           youtube_video_id?: string | null
         }
         Update: {
+          artist?: string
           bpm?: number | null
           created_at?: string | null
           discogs_release_id?: string
+          duration?: string
+          extra_artists?: string | null
           id?: string
+          position?: string
+          title?: string
           youtube_video_id?: string | null
         }
         Relationships: []

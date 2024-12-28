@@ -5,6 +5,7 @@ import { getDiscogsRelease } from '../../discogs/release/[id]/route';
 import { findTrackVideo } from '@/lib/services/youtube';
 import { Database } from '@/types/supabase';
 
+export type InsertCrateTrack = Database['public']['Tables']['tracks']['Insert'];
 export type CrateTrack = Database['public']['Tables']['tracks']['Row'];
 
 export async function GET(
@@ -81,26 +82,36 @@ export async function GET(
       );
 
       // Insert tracks and release into the database
-      const { data: releaseData, error: releaseError } = await supabase
+      const { error: releaseError } = await supabase
         .from('discogs_releases')
-        .insert({
+        .upsert({
           discogs_release_id: params.discogsReleaseId,
-          discogs_release_data: release,
+          discogs_release_data: release as any,
         });
 
       if (releaseError) {
+        console.error('Could not insert release', releaseError);
         throw releaseError;
       }
 
-      const fetchedTracks = tracksWithMetadata.map((track) => ({
-        discogs_release_id: params.discogsReleaseId,
-        bpm: track.bpm,
-        youtube_video_id: track.videoId,
-      }));
+      const fetchedTracks: InsertCrateTrack[] = tracksWithMetadata.map(
+        (track) => ({
+          discogs_release_id: params.discogsReleaseId,
+          bpm: track.bpm,
+          youtube_video_id: track.videoId,
+          title: track.title,
+          position: track.position,
+          extra_artists: track.extraartists
+            ?.map((artist) => artist.name)
+            .join(', '),
+          artist: release.artists.map((artist) => artist.name).join(', '),
+          duration: track.duration,
+        }),
+      );
 
       const { data: newTrackData, error: newTrackError } = await supabase
         .from('tracks')
-        .insert(fetchedTracks)
+        .upsert(fetchedTracks)
         .select();
 
       if (newTrackError) {
@@ -118,9 +129,9 @@ export async function GET(
 
     return NextResponse.json(tracks);
   } catch (error) {
-    console.error('Could not fetch track', error);
+    console.error('Could not fetch release', error);
     return NextResponse.json(
-      { error: 'Could not fetch track' },
+      { error: 'Could not fetch release' },
       { status: 500 },
     );
   }
