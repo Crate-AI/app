@@ -1,8 +1,12 @@
 import { Release, Track } from '@/types/discogs';
 
+
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 export async function searchVideo(query: string): Promise<string | null> {
     try {
-      const response = await fetch(`/api/youtube/search?q=${encodeURIComponent(query)}`);
+      
+      const response = await fetch(`${baseUrl}/api/youtube/search?q=${encodeURIComponent(query)}`);
+      
       if (!response.ok) throw new Error('YouTube search failed');
       const data = await response.json();
       return data.videoId;
@@ -10,7 +14,7 @@ export async function searchVideo(query: string): Promise<string | null> {
       console.error('YouTube search failed:', err);
       return null;
     }
-  }
+}
 
 export async function findTrackVideo(track: Track, release: Release): Promise<string | null> {
   const matchingVideo = release.videos?.find(video => 
