@@ -1,6 +1,7 @@
 import { Track } from '@/types/discogs';
 import { Clock, Music, BarChart2, Play, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { CrateTrack } from '@/app/api/tracks/[discogsReleaseId]/route';
 
 interface TrackWithMetadata extends Track {
   videoId?: string | null;
@@ -8,22 +9,22 @@ interface TrackWithMetadata extends Track {
 }
 
 interface TrackListProps {
-  tracks: TrackWithMetadata[];
+  tracks: CrateTrack[];
   playingTrackId: string | null;
   onPlayToggle: (track: TrackWithMetadata) => void;
   isPlayerReady: boolean;
 }
 
-const TrackListItem = ({ 
-  track, 
-  isPlaying, 
-  onPlayToggle, 
-  isPlayerReady 
-}: { 
-  track: TrackWithMetadata; 
-  isPlaying: boolean; 
-  onPlayToggle: () => void; 
-  isPlayerReady: boolean; 
+const TrackListItem = ({
+  track,
+  isPlaying,
+  onPlayToggle,
+  isPlayerReady,
+}: {
+  track: CrateTrack;
+  isPlaying: boolean;
+  onPlayToggle: () => void;
+  isPlayerReady: boolean;
 }) => {
   return (
     <div
@@ -36,7 +37,7 @@ const TrackListItem = ({
           size="icon"
           className="w-8 h-8"
           onClick={onPlayToggle}
-          disabled={!track.videoId || !isPlayerReady}
+          disabled={!track.youtube_video_id || !isPlayerReady}
         >
           {isPlaying ? (
             <Pause className="w-4 h-4" />
@@ -50,16 +51,14 @@ const TrackListItem = ({
         <div className="font-medium text-text dark:text-darkText">
           {track.title}
         </div>
-        {track.extraartists && (
+        {track.extra_artists && (
           <div className="text-sm text-text/60 dark:text-darkText/60">
-            {track.extraartists.map(artist => artist.name).join(', ')}
+            {track.extra_artists}
           </div>
         )}
       </div>
 
-      <div className="text-text/60 dark:text-darkText/60">
-        {track.duration}
-      </div>
+      <div className="text-text/60 dark:text-darkText/60">{track.duration}</div>
 
       <div className="text-text/60 dark:text-darkText/60 flex items-center gap-2">
         <span>{track.bpm || '---'}</span>
@@ -71,7 +70,12 @@ const TrackListItem = ({
   );
 };
 
-export function TrackList({ tracks, playingTrackId, onPlayToggle, isPlayerReady }: TrackListProps) {
+export function TrackList({
+  tracks,
+  playingTrackId,
+  onPlayToggle,
+  isPlayerReady,
+}: TrackListProps) {
   return (
     <div className="space-y-2">
       <div className="grid grid-cols-[auto_1fr_auto_auto] gap-4 p-2 text-sm text-text/60 dark:text-darkText/60">
@@ -98,4 +102,4 @@ export function TrackList({ tracks, playingTrackId, onPlayToggle, isPlayerReady 
       ))}
     </div>
   );
-} 
+}
