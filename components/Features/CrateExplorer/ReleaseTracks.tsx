@@ -26,9 +26,9 @@ const ReleaseTracks = ({ releaseId }: Props) => {
     initializePlayer();
   }, [initializePlayer]);
 
-  const handlePlayToggle = async (track: TrackWithMetadata) => {
-    if (!track.videoId || !player || !isReady) {
-      const reason = !track.videoId
+  const handlePlayToggle = async (track: CrateTrack) => {
+    if (!track.youtube_video_id || !player || !isReady) {
+      const reason = !track.youtube_video_id
         ? 'No video ID available'
         : !player
           ? 'YouTube player not initialized'
@@ -51,7 +51,7 @@ const ReleaseTracks = ({ releaseId }: Props) => {
         }
 
         player.loadVideoById({
-          videoId: track.videoId,
+          videoId: track.youtube_video_id,
           suggestedQuality: 'small',
         });
 
