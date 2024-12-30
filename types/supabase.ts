@@ -36,14 +36,17 @@ export type Database = {
     Tables: {
       discogs_releases: {
         Row: {
+          basic_release_data: Json | null
           discogs_release_data: Json
           discogs_release_id: string
         }
         Insert: {
+          basic_release_data?: Json | null
           discogs_release_data: Json
           discogs_release_id: string
         }
         Update: {
+          basic_release_data?: Json | null
           discogs_release_data?: Json
           discogs_release_id?: string
         }
