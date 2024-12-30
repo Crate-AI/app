@@ -33,7 +33,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 
       const container = document.createElement('div');
       container.id = 'youtube-player';
-      container.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;';
+      container.style.cssText =
+        'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;';
       document.body.appendChild(container);
 
       const ytPlayer = new window.YT.Player('youtube-player', {
@@ -49,7 +50,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
           enablejsapi: 1,
           playsinline: 1,
           rel: 0,
-          iv_load_policy: 3
+          iv_load_policy: 3,
         },
         events: {
           onReady: () => {
@@ -64,8 +65,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
             if ([2, 5, 100, 101, 150].includes(event.data)) {
               set({ isReady: false, player: null });
             }
-          }
-        }
+          },
+        },
       });
     } catch (error) {
       set({ isReady: false, player: null });
@@ -75,5 +76,5 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   setPlayer: (player) => set({ player }),
   setIsReady: (ready) => set({ isReady: ready }),
   setPlayingTrackId: (trackId) => set({ playingTrackId: trackId }),
-  reset: () => set({ player: null, isReady: false, playingTrackId: null })
-})); 
+  reset: () => set({ player: null, isReady: false, playingTrackId: null }),
+}));

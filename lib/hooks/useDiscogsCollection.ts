@@ -11,7 +11,9 @@ interface CollectionData {
 }
 
 export function useDiscogsCollection() {
-  const [collectionData, setCollectionData] = useState<CollectionData>({ collection: [] });
+  const [collectionData, setCollectionData] = useState<CollectionData>({
+    collection: [],
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,11 +23,11 @@ export function useDiscogsCollection() {
       setError(null);
       const response = await fetch('/api/discogs/collection');
       if (!response.ok) throw new Error('Failed to fetch collection');
-      
+
       const data = await response.json();
       setCollectionData({
         collection: data.releases,
-        pagination: data.pagination
+        pagination: data.pagination,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -38,11 +40,11 @@ export function useDiscogsCollection() {
     fetchCollection();
   }, []);
 
-  return { 
-    collection: collectionData.collection, 
+  return {
+    collection: collectionData.collection,
     pagination: collectionData.pagination,
-    loading, 
-    error, 
-    refetch: fetchCollection 
+    loading,
+    error,
+    refetch: fetchCollection,
   };
-} 
+}

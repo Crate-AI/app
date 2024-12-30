@@ -14,11 +14,7 @@ const SearchBar = ({ query, isLoading, onQueryChange }: SearchBarProps) => {
         onChange={(e) => onQueryChange(e.target.value)}
         className="flex-1"
       />
-      <Button 
-        type="button"
-        disabled={isLoading}
-        variant="default"
-      >
+      <Button type="button" disabled={isLoading} variant="default">
         {isLoading ? (
           <LoadingSpinner className="w-4 h-4" />
         ) : (

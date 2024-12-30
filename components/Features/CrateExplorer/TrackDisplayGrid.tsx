@@ -1,12 +1,23 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, Heart, MoreHorizontal, ChevronDown, ListMusic } from 'lucide-react';
+import {
+  Play,
+  Pause,
+  Heart,
+  MoreHorizontal,
+  ChevronDown,
+  ListMusic,
+} from 'lucide-react';
 import ReleaseTracks from './ReleaseTracks';
 import { useTrackContext } from './TrackDisplay';
 
-
 const TrackDisplayGrid = () => {
-  const { result: trackResult, isPlaying: trackIsPlaying, onPlayToggle: trackOnPlayToggle, dateAdded } = useTrackContext();
+  const {
+    result: trackResult,
+    isPlaying: trackIsPlaying,
+    onPlayToggle: trackOnPlayToggle,
+    dateAdded,
+  } = useTrackContext();
   const [showTracks, setShowTracks] = useState(false);
   if (!trackResult) return null;
 
@@ -16,9 +27,11 @@ const TrackDisplayGrid = () => {
         <div className="absolute inset-0 z-10 bg-background/95 dark:bg-darkBg/95 backdrop-blur-sm rounded-base overflow-y-auto">
           <div className="p-4">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="font-medium text-text dark:text-darkText">{trackResult.title}</h3>
-              <Button 
-                variant="noShadow" 
+              <h3 className="font-medium text-text dark:text-darkText">
+                {trackResult.title}
+              </h3>
+              <Button
+                variant="noShadow"
                 size="icon"
                 onClick={() => setShowTracks(false)}
               >
@@ -60,7 +73,9 @@ const TrackDisplayGrid = () => {
 
       <div className="flex justify-between items-start">
         <div>
-          <h3 className="font-medium text-text dark:text-darkText mb-1">{trackResult.title}</h3>
+          <h3 className="font-medium text-text dark:text-darkText mb-1">
+            {trackResult.title}
+          </h3>
           <div className="text-sm text-text/60 dark:text-darkText/60 mb-2">
             {trackResult.year} · {trackResult.country || 'Unknown'}
           </div>
@@ -81,4 +96,4 @@ const TrackDisplayGrid = () => {
   );
 };
 
-export default TrackDisplayGrid; 
+export default TrackDisplayGrid;

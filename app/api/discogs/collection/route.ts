@@ -11,7 +11,7 @@ export async function GET(request: Request) {
     if (!accessToken || !accessTokenSecret || !userData) {
       return NextResponse.json(
         { error: 'Authentication required' },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -20,7 +20,8 @@ export async function GET(request: Request) {
 
     const sdk = new DiscogsSDK({
       DiscogsConsumerKey: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_KEY || '',
-      DiscogsConsumerSecret: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET || '',
+      DiscogsConsumerSecret:
+        process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET || '',
       userAgent: 'CrateApp/1.0 +https://crate.ai',
     });
 
@@ -39,7 +40,7 @@ export async function GET(request: Request) {
     console.error('Error fetching collection:', error);
     return NextResponse.json(
       { error: 'Failed to fetch collection' },
-      { status: 500 }
+      { status: 500 },
     );
   }
-} 
+}

@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
-import { Search, Disc } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { Search, Disc } from 'lucide-react';
 
 interface ViewToggleButtonsProps {
   view: 'search' | 'collection';
@@ -7,7 +7,11 @@ interface ViewToggleButtonsProps {
   collectionCount?: number;
 }
 
-const ViewToggleButtons = ({ view, onViewChange, collectionCount }: ViewToggleButtonsProps) => {
+const ViewToggleButtons = ({
+  view,
+  onViewChange,
+  collectionCount,
+}: ViewToggleButtonsProps) => {
   const buttonClass = (buttonView: 'search' | 'collection') => `
     px-4 py-2 rounded transition-colors flex items-center gap-2
     ${view === buttonView ? 'bg-yellow-400 text-black' : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'}
@@ -15,14 +19,14 @@ const ViewToggleButtons = ({ view, onViewChange, collectionCount }: ViewToggleBu
 
   return (
     <div className="flex gap-4">
-      <Button 
+      <Button
         onClick={() => onViewChange('search')}
         className={buttonClass('search')}
       >
         <Search size={18} />
         Search
       </Button>
-      <Button 
+      <Button
         onClick={() => onViewChange('collection')}
         className={buttonClass('collection')}
       >
@@ -33,4 +37,4 @@ const ViewToggleButtons = ({ view, onViewChange, collectionCount }: ViewToggleBu
   );
 };
 
-export default ViewToggleButtons; 
+export default ViewToggleButtons;
