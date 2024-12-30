@@ -1,9 +1,14 @@
 import { NextResponse } from 'next/server';
 import { DiscogsSDK } from '@crate.ai/discogs-sdk';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
+import { CollectionUtils } from '@/lib/supabase/serverUtils/collection';
+import { createClient } from '@/lib/supabase/server';
+import { getDiscogsRelease } from '@/lib/discogsAPI';
 
 export async function GET(request: Request) {
   try {
+    const headersList = headers();
+    const ip = headersList.get('x-forwarded-for') || 'unknown';
     const accessToken = cookies().get('access_token')?.value;
     const accessTokenSecret = cookies().get('access_token_secret')?.value;
     const userData = cookies().get('user_data')?.value;
@@ -34,6 +39,28 @@ export async function GET(request: Request) {
       page: 1,
       perPage: 100,
     });
+
+    const releases = await Promise.all(
+      collection.releases.map(async (release) => {
+        const { isLimited, release: releaseDetails } = await getDiscogsRelease(
+          accessToken,
+          accessTokenSecret,
+          ip,
+          release.id.toString(),
+        );
+
+        if (isLimited) {
+          throw new Error('Rate limit reached while fetching release details');
+        }
+
+        return releaseDetails;
+      }),
+    );
+
+    const supabase = await createClient();
+    const { ingestCollection } = CollectionUtils(supabase);
+
+    await ingestCollection(releases);
 
     return NextResponse.json(collection);
   } catch (error) {
