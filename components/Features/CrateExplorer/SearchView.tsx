@@ -1,6 +1,6 @@
-import { DiscogsSearchResult } from "@/types/discogs";
-import SearchBar from "./SearchBar";
-import TrackGrid from "./TrackGrid";
+import { DiscogsSearchResult } from '@/types/discogs';
+import SearchBar from './SearchBar';
+import TrackGrid from './TrackGrid';
 
 interface SearchViewProps {
   query: string;
@@ -25,7 +25,7 @@ const SearchView = ({
 }: SearchViewProps) => {
   return (
     <>
-      <SearchBar 
+      <SearchBar
         query={query}
         isLoading={isLoading}
         onQueryChange={onQueryChange}
@@ -47,4 +47,4 @@ const SearchView = ({
   );
 };
 
-export default SearchView; 
+export default SearchView;

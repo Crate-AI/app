@@ -1,5 +1,5 @@
-import { DiscogsSearchResult } from "@/types/discogs";
-import TrackDisplay from "./TrackDisplay";
+import { DiscogsSearchResult } from '@/types/discogs';
+import TrackDisplay from './TrackDisplay';
 
 interface TrackGridProps {
   viewMode: 'grid' | 'list';
@@ -8,9 +8,20 @@ interface TrackGridProps {
   onPlayToggle: (id: number) => void;
 }
 
-const TrackGrid = ({ viewMode, items, playingTrackId, onPlayToggle }: TrackGridProps) => {
+const TrackGrid = ({
+  viewMode,
+  items,
+  playingTrackId,
+  onPlayToggle,
+}: TrackGridProps) => {
   return (
-    <div className={viewMode === 'list' ? 'space-y-2' : 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'}>
+    <div
+      className={
+        viewMode === 'list'
+          ? 'space-y-2'
+          : 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'
+      }
+    >
       {items.map((item) => (
         <TrackDisplay
           key={item.id}
@@ -25,4 +36,4 @@ const TrackGrid = ({ viewMode, items, playingTrackId, onPlayToggle }: TrackGridP
   );
 };
 
-export default TrackGrid; 
+export default TrackGrid;

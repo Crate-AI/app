@@ -306,7 +306,7 @@ export interface PaginationUrls {
 export interface Pagination {
   per_page: number;
   pages: number;
-  page: number; 
+  page: number;
   items: number;
   urls: PaginationUrls;
 }
@@ -330,7 +330,15 @@ export interface Note {
   value: string;
 }
 
-export type CollectionSortField = 'label' | 'artist' | 'title' | 'catno' | 'format' | 'rating' | 'added' | 'year';
+export type CollectionSortField =
+  | 'label'
+  | 'artist'
+  | 'title'
+  | 'catno'
+  | 'format'
+  | 'rating'
+  | 'added'
+  | 'year';
 
 export const CollectionSortFields = {
   LABEL: 'label' as const,
@@ -340,7 +348,7 @@ export const CollectionSortFields = {
   FORMAT: 'format' as const,
   RATING: 'rating' as const,
   ADDED: 'added' as const,
-  YEAR: 'year' as const
+  YEAR: 'year' as const,
 } as const;
 
 export interface CollectionParams {

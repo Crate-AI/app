@@ -1,11 +1,23 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, Heart, MoreHorizontal, ChevronUp, ChevronDown } from 'lucide-react';
+import {
+  Play,
+  Pause,
+  Heart,
+  MoreHorizontal,
+  ChevronUp,
+  ChevronDown,
+} from 'lucide-react';
 import ReleaseTracks from './ReleaseTracks';
 import { useTrackContext } from './TrackDisplay';
 
 const TrackDisplayList = () => {
-  const { result: trackResult, isPlaying: trackIsPlaying, onPlayToggle: trackOnPlayToggle, dateAdded } = useTrackContext();
+  const {
+    result: trackResult,
+    isPlaying: trackIsPlaying,
+    onPlayToggle: trackOnPlayToggle,
+    dateAdded,
+  } = useTrackContext();
   const [showTracks, setShowTracks] = useState(false);
   if (!trackResult) return null;
 
@@ -46,8 +58,8 @@ const TrackDisplayList = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button 
-            variant="noShadow" 
+          <Button
+            variant="noShadow"
             size="icon"
             onClick={() => setShowTracks(!showTracks)}
           >
@@ -75,4 +87,4 @@ const TrackDisplayList = () => {
   );
 };
 
-export default TrackDisplayList; 
+export default TrackDisplayList;

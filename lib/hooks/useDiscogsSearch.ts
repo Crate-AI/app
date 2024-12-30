@@ -49,7 +49,11 @@ const useDiscogsSearch = (): UseDiscogsSearchReturn => {
         const data = await response.json();
         setResults(data.results);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred during search');
+        setError(
+          err instanceof Error
+            ? err.message
+            : 'An error occurred during search',
+        );
         setResults([]);
       } finally {
         setIsLoading(false);

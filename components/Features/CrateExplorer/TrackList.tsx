@@ -1,17 +1,11 @@
-import { Track } from '@/types/discogs';
 import { Clock, Music, BarChart2, Play, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CrateTrack } from '@/app/api/tracks/[discogsReleaseId]/route';
 
-interface TrackWithMetadata extends Track {
-  videoId?: string | null;
-  bpm?: number;
-}
-
 interface TrackListProps {
   tracks: CrateTrack[];
   playingTrackId: string | null;
-  onPlayToggle: (track: TrackWithMetadata) => void;
+  onPlayToggle: (track: CrateTrack) => void;
   isPlayerReady: boolean;
 }
 

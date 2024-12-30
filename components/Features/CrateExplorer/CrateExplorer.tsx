@@ -4,7 +4,11 @@ import { useDiscogsCollection } from '@/lib/hooks/useDiscogsCollection';
 import SearchBar from './SearchBar';
 import ViewToggle from './ViewToggle';
 import TrackDisplay from './TrackDisplay';
-import type { CrateExplorerProps, DiscogsSearchResult, CollectionRelease } from '@/types/discogs';
+import type {
+  CrateExplorerProps,
+  DiscogsSearchResult,
+  CollectionRelease,
+} from '@/types/discogs';
 import ViewToggleButtons from './ViewToggleButtons';
 import SearchView from './SearchView';
 import CollectionView from './CollectionView';
@@ -15,18 +19,32 @@ interface CollectionStats {
 }
 
 const CrateExplorer = ({}: CrateExplorerProps) => {
-  const { query, setQuery, results, isLoading: searchLoading, error: searchError } = useDiscogsSearch();
-  const { collection, pagination, loading: collectionLoading, error: collectionError } = useDiscogsCollection();
+  const {
+    query,
+    setQuery,
+    results,
+    isLoading: searchLoading,
+    error: searchError,
+  } = useDiscogsSearch();
+  const {
+    collection,
+    pagination,
+    loading: collectionLoading,
+    error: collectionError,
+  } = useDiscogsCollection();
   const [playingTrackId, setPlayingTrackId] = useState<number | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [view, setView] = useState<'search' | 'collection'>('search');
-  const [collectionStats, setCollectionStats] = useState<CollectionStats>({ total: 0, loaded: 0 });
+  const [collectionStats, setCollectionStats] = useState<CollectionStats>({
+    total: 0,
+    loaded: 0,
+  });
 
   useEffect(() => {
     if (pagination) {
       setCollectionStats({
         total: pagination.items,
-        loaded: collection.length
+        loaded: collection.length,
       });
     }
   }, [collection, pagination]);
@@ -39,10 +57,7 @@ const CrateExplorer = ({}: CrateExplorerProps) => {
           onViewChange={setView}
           collectionCount={collectionStats.total}
         />
-        <ViewToggle 
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-        />
+        <ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} />
       </div>
 
       {view === 'search' ? (
@@ -54,7 +69,9 @@ const CrateExplorer = ({}: CrateExplorerProps) => {
           onQueryChange={setQuery}
           viewMode={viewMode}
           playingTrackId={playingTrackId}
-          onPlayToggle={(id) => setPlayingTrackId(playingTrackId === id ? null : id)}
+          onPlayToggle={(id) =>
+            setPlayingTrackId(playingTrackId === id ? null : id)
+          }
         />
       ) : (
         <CollectionView
@@ -63,7 +80,9 @@ const CrateExplorer = ({}: CrateExplorerProps) => {
           collection={collection}
           viewMode={viewMode}
           playingTrackId={playingTrackId}
-          onPlayToggle={(id) => setPlayingTrackId(playingTrackId === id ? null : id)}
+          onPlayToggle={(id) =>
+            setPlayingTrackId(playingTrackId === id ? null : id)
+          }
         />
       )}
     </div>
