@@ -1,32 +1,55 @@
 import { InsertCrateTrack } from '@/app/api/tracks/[discogsReleaseId]/route';
 import { findTrackVideo } from '@/lib/services/youtube';
-import { Release } from '@/types/discogs';
+import { CollectionResponse, Release } from '@/types/discogs';
+import { Database } from '@/types/supabase';
 import { SupabaseClient } from '@supabase/supabase-js';
 
-export const CollectionUtils = (supabase: SupabaseClient) => {
-  const getCollection = async (discogsReleaseId: string) => {
+export const CollectionUtils = (supabase: SupabaseClient<Database>) => {
+  const getCollection = async () => {
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (userError) {
+      throw new Error(userError.message);
+    }
+
     const { data, error } = await supabase
-      .from('discogs_releases')
-      .select('*')
-      .eq('discogs_release_id', discogsReleaseId)
-      .single();
+      .from('user_releases')
+      .select(`discogs_release_id`)
+      .eq('user_id', userData.user.id);
 
     if (error) {
       throw new Error(error.message);
     }
 
-    return data;
+    const { data: releases, error: releaseError } = await supabase
+      .from('discogs_releases')
+      .select()
+      .in(
+        'discogs_release_id',
+        data.map((r) => r.discogs_release_id),
+      );
+
+    if (releaseError) {
+      throw new Error(releaseError.message);
+    }
+
+    return releases;
   };
 
-  const ingestCollection = async (releases: Release[]) => {
+  const ingestCollection = async (
+    collection: CollectionResponse,
+    releases: Release[],
+  ) => {
+    const combinedReleaseInfo = [];
+    for (let i = 0; i < collection.releases.length; i++) {
+      combinedReleaseInfo.push({
+        discogs_release_id: collection.releases[i].id,
+        discogs_release_data: releases[i],
+        basic_release_data: collection.releases[i],
+      });
+    }
     const { error: releaseError } = await supabase
       .from('discogs_releases')
-      .upsert(
-        releases.map((r) => ({
-          discogs_release_id: r.id,
-          discogs_release_data: r as any,
-        })),
-      );
+      .upsert(combinedReleaseInfo);
 
     if (releaseError) {
       throw new Error(releaseError.message);

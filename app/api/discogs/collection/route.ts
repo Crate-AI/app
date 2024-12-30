@@ -4,6 +4,8 @@ import { cookies, headers } from 'next/headers';
 import { CollectionUtils } from '@/lib/supabase/serverUtils/collection';
 import { createClient } from '@/lib/supabase/server';
 import { getDiscogsRelease } from '@/lib/discogsAPI';
+import { CollectionResponse } from '@crate.ai/discogs-sdk/dist/collection/types';
+import { Release } from '@/types/discogs';
 
 export async function GET(request: Request) {
   try {
@@ -12,6 +14,8 @@ export async function GET(request: Request) {
     const accessToken = cookies().get('access_token')?.value;
     const accessTokenSecret = cookies().get('access_token_secret')?.value;
     const userData = cookies().get('user_data')?.value;
+    const supabase = await createClient();
+    const { ingestCollection, getCollection } = CollectionUtils(supabase);
 
     if (!accessToken || !accessTokenSecret || !userData) {
       return NextResponse.json(
@@ -33,6 +37,31 @@ export async function GET(request: Request) {
     const tokenManager = sdk.auth.base.getTokenManager();
     await tokenManager.setAccessToken(accessToken);
     await tokenManager.setAccessTokenSecret(accessTokenSecret);
+
+    // check if collection is already in the database
+    const existingCollection = await getCollection();
+
+    if (existingCollection && existingCollection.length > 0) {
+      const collectionResponse: CollectionResponse = {
+        pagination: {
+          page: 1,
+          pages: 1,
+          per_page: existingCollection.length,
+          items: existingCollection.length,
+          urls: {
+            next: '',
+            last: '',
+          },
+        },
+        // FIXME: why type error?
+        releases: existingCollection.map(
+          (row) => row.basic_release_data as Release,
+        ),
+      };
+      return NextResponse.json(collectionResponse);
+    }
+
+    // fetch collection from Discogs and ingest it into the database
 
     const collection = await sdk.collection.getCollection({
       username,
@@ -57,10 +86,7 @@ export async function GET(request: Request) {
       }),
     );
 
-    const supabase = await createClient();
-    const { ingestCollection } = CollectionUtils(supabase);
-
-    await ingestCollection(releases);
+    await ingestCollection(collection, releases);
 
     return NextResponse.json(collection);
   } catch (error) {
