@@ -1,4 +1,6 @@
+import { Release } from '@/types/discogs';
 import { DiscogsSDK } from '@crate.ai/discogs-sdk';
+import { rateLimiter } from './utils/rateLimiter';
 
 const discogs = new DiscogsSDK({
   DiscogsConsumerKey: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_KEY || '',
@@ -55,3 +57,40 @@ export async function getGenres(
 
   return genreCounts;
 }
+
+export const getDiscogsRelease = async (
+  accessToken: string,
+  accessTokenSecret: string,
+  ip: string,
+  releaseId: string,
+) => {
+  const identifier = `discogs:${accessToken ? accessToken : ip}`;
+
+  // Check rate limit first
+  const { isLimited, remaining, reset } = rateLimiter.check(identifier);
+
+  if (isLimited) {
+    return { isLimited, remaining, reset };
+  }
+
+  const discogsUrl = `https://api.discogs.com/releases/${releaseId}`;
+
+  const response = await fetch(discogsUrl, {
+    headers: {
+      Authorization: `OAuth oauth_token=${accessToken}, oauth_token_secret=${accessTokenSecret}`,
+      'User-Agent': 'CrateApp/1.0 +https://crate.ai',
+      Accept: 'application/json',
+    },
+    next: {
+      revalidate: 3600,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Discogs API error: ${response.status}`);
+  }
+
+  const release: Release = await response.json();
+
+  return { release, remaining, reset, isLimited };
+};

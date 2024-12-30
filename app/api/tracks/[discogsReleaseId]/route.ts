@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies, headers } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
-import { getDiscogsRelease } from '../../discogs/release/[id]/route';
 import { findTrackVideo } from '@/lib/services/youtube';
 import { Database } from '@/types/supabase';
+import { getDiscogsRelease } from '@/lib/discogsAPI';
 
 export type InsertCrateTrack = Database['public']['Tables']['tracks']['Insert'];
 export type CrateTrack = Database['public']['Tables']['tracks']['Row'];
