@@ -1,21 +1,25 @@
-// lib/services/claude.ts
-import  Messages  from '@anthropic-ai/sdk';
+import { DJAssistantPrompt } from '@/lib/prompts/dj-assistant';
+import { TrackWithDetails } from '@/types/dj';
 
-export async function sendMessageToClaude(messages: Messages, collection: any[]) {
+interface ClaudeMessage {
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+}
+
+export async function sendMessageToClaude(prompt: string, tracks: TrackWithDetails[]) {
   const response = await fetch('/api/chat', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ 
-      messages,
-      collection: collection.map(item => ({
-        title: item.basic_information.title,
-        artist: item.basic_information.artists[0].name,
-        year: item.basic_information.year,
-        genres: item.basic_information.genres,
-        styles: item.basic_information.styles
-      }))
+      messages: [
+        { 
+          role: 'user', 
+          content: DJAssistantPrompt.createUserPrompt(prompt, tracks)
+        }
+      ],
+      collection: tracks
     }),
   });
 

@@ -1,5 +1,6 @@
 import { CollectionRelease } from '@/types/discogs';
 import TrackGrid from './TrackGrid';
+import { TrackWithDetails } from '@/types/dj';
 interface CollectionViewProps {
   isLoading: boolean;
   error: string | null;
@@ -7,6 +8,7 @@ interface CollectionViewProps {
   viewMode: 'grid' | 'list';
   playingTrackId: number | null;
   onPlayToggle: (id: number) => void;
+  suggestedTracks?: TrackWithDetails[];
 }
 
 const CollectionView = ({

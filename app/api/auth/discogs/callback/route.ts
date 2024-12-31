@@ -111,7 +111,7 @@ export async function GET(request: Request) {
         JSON.stringify({
           userId: signUpData.user.id,
           username: userIdentity.username,
-          avatarUrl: userProfile.avatarUrl || '/default-avatar.png',
+          avatarUrl: userProfile.avatar_url  || '/default-avatar.png',
         }),
         {
           httpOnly: true,
@@ -135,7 +135,7 @@ export async function GET(request: Request) {
         JSON.stringify({
           userId: signInData.user.id,
           username: userIdentity.username,
-          avatarUrl: userProfile.avatarUrl || '/default-avatar.png',
+          avatarUrl: userProfile.avatar_url || '/default-avatar.png',
         }),
         {
           httpOnly: true,

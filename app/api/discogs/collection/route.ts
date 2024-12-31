@@ -4,7 +4,7 @@ import { cookies, headers } from 'next/headers';
 import { CollectionUtils } from '@/lib/supabase/serverUtils/collection';
 import { createClient } from '@/lib/supabase/server';
 import { CollectionResponse } from '@crate.ai/discogs-sdk/dist/collection/types';
-import { Release } from '@/types/discogs';
+import { Release } from '@crate.ai/discogs-sdk/dist/collection/types';
 
 export async function GET(request: Request) {
   try {
@@ -62,15 +62,37 @@ export async function GET(request: Request) {
 
     // fetch collection from Discogs and ingest it into the database
 
-    const collection = await sdk.collection.getCollection({
-      username,
-      page: 1,
-      perPage: 100,
-    });
+    let allReleases: Release[] = [];
+    let page = 1;
+    let hasMorePages = true;
 
-    await ingestCollection(collection);
+    while (hasMorePages) {
+      const pageCollection = await sdk.collection.getCollection({
+        username,
+        page,
+        perPage: 100,
+      });
 
-    return NextResponse.json(collection);
+      allReleases = [...allReleases, ...pageCollection.releases];
+      
+      hasMorePages = !!pageCollection.pagination.urls.next;
+      page++;
+    }
+
+    const fullCollection = {
+      pagination: {
+        page: 1,
+        pages: 1,
+        per_page: allReleases.length,
+        items: allReleases.length,
+        urls: { next: '', last: '' }
+      },
+      releases: allReleases
+    };
+
+    await ingestCollection(fullCollection);
+
+    return NextResponse.json(fullCollection);
   } catch (error) {
     console.error('Error fetching collection:', error);
     return NextResponse.json(

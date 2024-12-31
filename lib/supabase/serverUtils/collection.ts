@@ -36,7 +36,12 @@ export const CollectionUtils = (supabase: SupabaseClient<Database>) => {
   };
 
   const ingestCollection = async (collection: CollectionResponse) => {
-    const combinedReleaseInfo = collection.releases.map((r) => ({
+    // First, deduplicate releases by discogs_release_id
+    const uniqueReleases = Array.from(
+      new Map(collection.releases.map(r => [r.id.toString(), r])).values()
+    );
+
+    const combinedReleaseInfo = uniqueReleases.map((r) => ({
       discogs_release_id: r.id.toString(),
       discogs_release_data: null,
       basic_release_data: r,
@@ -44,7 +49,9 @@ export const CollectionUtils = (supabase: SupabaseClient<Database>) => {
 
     const { error: releaseError } = await supabase
       .from('discogs_releases')
-      .upsert(combinedReleaseInfo);
+      .upsert(combinedReleaseInfo, {
+        onConflict: 'discogs_release_id'
+      });
 
     if (releaseError) {
       throw new Error(releaseError.message);
@@ -58,10 +65,13 @@ export const CollectionUtils = (supabase: SupabaseClient<Database>) => {
     const { error: userReleaseError } = await supabase
       .from('user_releases')
       .upsert(
-        collection.releases.map((r) => ({
+        uniqueReleases.map((r) => ({
           user_id: userData.user.id,
           discogs_release_id: r.id.toString(),
         })),
+        {
+          onConflict: 'user_id,discogs_release_id'
+        }
       );
 
     if (userReleaseError) {
