@@ -1,7 +1,7 @@
 import { InsertCrateTrack } from '@/app/api/tracks/[discogsReleaseId]/route';
 import { findTrackVideo } from '@/lib/services/youtube';
-import { CollectionResponse, Release } from '@/types/discogs';
 import { Database } from '@/types/supabase';
+import { CollectionResponse } from '@crate.ai/discogs-sdk/dist/collection/types';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 export const CollectionUtils = (supabase: SupabaseClient<Database>) => {
@@ -35,68 +35,19 @@ export const CollectionUtils = (supabase: SupabaseClient<Database>) => {
     return releases;
   };
 
-  const ingestCollection = async (
-    collection: CollectionResponse,
-    releases: Release[],
-  ) => {
-    const combinedReleaseInfo = [];
-    for (let i = 0; i < collection.releases.length; i++) {
-      combinedReleaseInfo.push({
-        discogs_release_id: collection.releases[i].id,
-        discogs_release_data: releases[i],
-        basic_release_data: collection.releases[i],
-      });
-    }
+  const ingestCollection = async (collection: CollectionResponse) => {
+    const combinedReleaseInfo = collection.releases.map((r) => ({
+      discogs_release_id: r.id.toString(),
+      discogs_release_data: null,
+      basic_release_data: r,
+    }));
+
     const { error: releaseError } = await supabase
       .from('discogs_releases')
       .upsert(combinedReleaseInfo);
 
     if (releaseError) {
       throw new Error(releaseError.message);
-    }
-    // Fetch the videoId for each track in the release, then flatten into an
-    // array of tracks for the entire collection
-    const releaseTracks: InsertCrateTrack[] = (
-      await Promise.all(
-        releases.map(async (release) => {
-          return await Promise.all(
-            release.tracklist.map(async (track) => {
-              const trackInfo = {
-                discogs_release_id: release.id.toString(),
-                title: track.title,
-                position: track.position,
-                extra_artists: track.extraartists
-                  ?.map((artist) => artist.name)
-                  .join(', '),
-                artist: release.artists.map((artist) => artist.name).join(', '),
-                duration: track.duration,
-                bpm: Math.floor(Math.random() * (140 - 115) + 115),
-              };
-              try {
-                const videoId = await findTrackVideo(track, release);
-                return {
-                  ...trackInfo,
-                  youtube_video_id: videoId,
-                };
-              } catch {
-                return {
-                  ...trackInfo,
-                  youtube_video_id: null,
-                };
-              }
-            }),
-          );
-        }),
-      )
-    ).flat();
-
-    const { error: newTrackError } = await supabase
-      .from('tracks')
-      .upsert(releaseTracks)
-      .select();
-
-    if (newTrackError) {
-      throw newTrackError;
     }
 
     const { data: userData, error: userError } = await supabase.auth.getUser();
@@ -107,9 +58,9 @@ export const CollectionUtils = (supabase: SupabaseClient<Database>) => {
     const { error: userReleaseError } = await supabase
       .from('user_releases')
       .upsert(
-        releases.map((r) => ({
+        collection.releases.map((r) => ({
           user_id: userData.user.id,
-          discogs_release_id: r.id,
+          discogs_release_id: r.id.toString(),
         })),
       );
 
