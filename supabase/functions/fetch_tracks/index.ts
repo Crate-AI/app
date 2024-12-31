@@ -75,7 +75,9 @@ async function getTrackYoutubeId(track, release) {
     const response = await fetch(youtubeUrl);
     const youtubeData = await response.json();
 
-    return youtubeData.items?.[0]?.id?.videoId || null;
+    return Object.keys(youtubeData).length === 0
+      ? null
+      : (youtubeData.items?.[0]?.id?.videoId ?? null);
   } catch {
     return null;
   }
@@ -96,7 +98,7 @@ async function processReleaseTracks(release: any) {
         bpm: Math.floor(Math.random() * (140 - 115) + 115),
       };
 
-      const videoId = getTrackYoutubeId(track, release);
+      const videoId = await getTrackYoutubeId(track, release);
       return {
         ...trackInfo,
         youtube_video_id: videoId,
@@ -161,8 +163,6 @@ async function processBatch() {
   if (!pendingReleases?.length) {
     return summary;
   }
-
-  console.log(`Processing batch of ${pendingReleases.length} releases`);
 
   // Get count of remaining releases after this batch
   const { count: totalPending, error: countError } = await supabase
