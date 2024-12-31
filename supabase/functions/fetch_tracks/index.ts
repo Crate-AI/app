@@ -88,7 +88,7 @@ const DiscogsPAT = Deno.env.get('DISCOGS_CONSUMER_KEY');
 
 Deno.serve(async (req) => {
   const payload: WebhookPayload = await req.json();
-  const { discogs_release_id: releaseId } = payload.record;
+  const { discogs_release_id: releaseId, basic_release_data } = payload.record;
   const discogsUrl = `https://api.discogs.com/releases/${releaseId}`;
 
   const response = await rateLimitedRequest(discogsUrl, {
@@ -122,6 +122,7 @@ Deno.serve(async (req) => {
           duration: track.duration,
           bpm: Math.floor(Math.random() * (140 - 115) + 115),
         };
+
         try {
           const query = `${track.title} ${release.artists[0]?.name || ''}`;
           const youtubeUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=1&q=${encodeURIComponent(query)}&key=${YOUTUBE_API_KEY}`;
@@ -147,6 +148,18 @@ Deno.serve(async (req) => {
       }),
     )
   ).flat();
+
+  const { error: newReleaseError } = await supabase
+    .from('discogs_releases')
+    .update({
+      discogs_release_id: releaseId,
+      basic_release_data,
+      discogs_release_data: release,
+    });
+
+  if (newReleaseError) {
+    throw newReleaseError;
+  }
 
   const { error: newTrackError } = await supabase
     .from('tracks')
