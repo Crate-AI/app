@@ -32,6 +32,7 @@
     "react-hook-form": "^7.52.1",
     "realtime-bpm-analyzer": "^4.0.2",
     "recharts": "^2.14.1",
+    "redis": "^4.7.0",
     "supabase": "^2.0.0",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
