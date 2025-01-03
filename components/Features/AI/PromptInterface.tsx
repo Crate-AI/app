@@ -1,101 +1,86 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Send, Sparkles, X } from 'lucide-react';
+import { Send, Sparkles, Clock, X } from 'lucide-react';
 
-const BPM_RANGES = [
-  { label: 'Warm-up', range: '115-124 BPM' },
-  { label: 'Peak Time', range: '124-130 BPM' },
-  { label: 'Closing', range: '118-124 BPM' }
-];
-
-interface AIPromptInterfaceProps {
-  onSearch: (prompt: string) => void;
-  isLoading: boolean;
-}
-
-const AIPromptInterface = ({ onSearch, isLoading }: AIPromptInterfaceProps) => {
+const AIPromptInterface = ({ onSearch, isLoading }: { onSearch: (prompt: string) => void; isLoading: boolean }) => {
   const [prompt, setPrompt] = useState('');
-  const [recentPrompts, setRecentPrompts] = useState<string[]>([]);
+  const [showExamples, setShowExamples] = useState(false);
+  const [recentSearches, setRecentSearches] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return JSON.parse(localStorage.getItem('recentDJSearches') || '[]');
+    }
+    return [];
+  });
+
+  const saveRecentSearch = (searchPrompt: string) => {
+    const updatedSearches = [
+      searchPrompt,
+      ...recentSearches.filter((s: string) => s !== searchPrompt)
+    ].slice(0, 5);
+    setRecentSearches(updatedSearches);
+    localStorage.setItem('recentDJSearches', JSON.stringify(updatedSearches));
+  };
 
   const handleSearch = () => {
     if (!prompt.trim()) return;
-    setRecentPrompts(prev => [prompt, ...prev.slice(0, 2)]);
+    saveRecentSearch(prompt);
     onSearch(prompt);
   };
 
-  const removePrompt = (index: number) => {
-    setRecentPrompts(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const handleBPMRangeClick = (label: string, range: string) => {
-    setPrompt(`${label} set: Opening set, gentle progression, ${range}`);
-  };
-
   return (
-    <div className="space-y-3">
-      {/* Main Search */}
-      <div className="flex gap-2">
-        <div className="relative flex-1">
-          <Sparkles className="absolute left-3 top-3 h-4 w-4 text-text/40" />
-          <Input
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            className="pl-10 h-12 border-2 rounded-lg"
-            placeholder="Warm-up set: Opening set, gentle progression, 115-124 BPM"
-          />
-        </div>
-        <Button
-          onClick={handleSearch}
-          disabled={isLoading || !prompt.trim()}
-          className="h-12 px-6"
-        >
-          {isLoading ? 'Thinking...' : 'Suggest Tracks'}
-          <Send className="ml-2 h-4 w-4" />
-        </Button>
-      </div>
-
-      {/* BPM Range Buttons */}
-      <div className="flex gap-2">
-        {BPM_RANGES.map(({ label, range }) => (
-          <button
-            key={label}
-            onClick={() => handleBPMRangeClick(label, range)}
-            className="px-4 py-2 rounded-full border-2 border-border hover:bg-gray-50 transition-colors"
+    <div className="space-y-4">
+      {/* Main Search Input */}
+      <div className="relative">
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Sparkles className="absolute left-2 top-2.5 h-4 w-4 text-text/40" />
+            <Input
+              placeholder="Describe the vibe you want to play..."
+              className="pl-8"
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              onFocus={() => setShowExamples(true)}
+            />
+          </div>
+          <Button 
+            onClick={handleSearch}
+            disabled={isLoading || !prompt.trim()}
           >
-            <div className="text-center">
-              <div className="font-medium">{label}</div>
-              <div className="text-xs text-text/60">{range}</div>
-            </div>
-          </button>
-        ))}
+            {isLoading ? 'Thinking...' : 'Suggest Tracks'}
+            <Send className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
-      {/* Recent Prompts as Tags */}
-      {recentPrompts.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {recentPrompts.map((recentPrompt, index) => (
-            <div
+      {/* Recent Searches */}
+      {recentSearches.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-2">
+          {recentSearches.map((search: string, index: number) => (
+            <Button
               key={index}
-              className="flex items-center gap-1 px-3 py-1 bg-gray-100 rounded-full text-sm"
+              variant="outline"
+              size="sm"
+              className="text-xs flex items-center gap-1"
+              onClick={() => setPrompt(search)}
             >
-              <span className="truncate max-w-md">
-                {recentPrompt.length > 50 
-                  ? `${recentPrompt.substring(0, 50)}...` 
-                  : recentPrompt}
-              </span>
-              <button
-                onClick={() => removePrompt(index)}
-                className="p-1 hover:bg-gray-200 rounded-full"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </div>
+              <Clock className="w-3 h-3" />
+              {search.length > 30 ? `${search.substring(0, 30)}...` : search}
+              <X
+                className="w-3 h-3 ml-1 hover:text-red-500"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const updatedSearches = recentSearches.filter((search: string, i: number) => i !== index);
+                  setRecentSearches(updatedSearches);
+                  localStorage.setItem('recentDJSearches', JSON.stringify(updatedSearches));
+                }}
+              />
+            </Button>
           ))}
         </div>
       )}
     </div>
   );
-};
+}; 
 
 export default AIPromptInterface;

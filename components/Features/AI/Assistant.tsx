@@ -11,27 +11,6 @@ interface AIAssistantProps {
   onSuggestTracks?: (tracks: TrackWithDetails[], reason: string) => void;
 }
 
-const QUICK_PROMPTS = [
-  { 
-    label: "Warm-up",
-    bpm: "115-124 BPM",
-    description: "Opening set, gentle progression",
-    example: "A warm-up set with deep house and melodic tracks, gradually building energy, around 115-120 BPM"
-  },
-  { 
-    label: "Peak Time",
-    bpm: "124-130 BPM",
-    description: "Main room energy",
-    example: "High energy peak time house and techno tracks, driving basslines, 126-130 BPM"
-  },
-  { 
-    label: "Closing",
-    bpm: "118-124 BPM",
-    description: "End of night vibes",
-    example: "Deep and emotional closing tracks, maintaining groove but reducing energy, 118-124 BPM"
-  }
-];
-
 const AIAssistant = ({ tracks, onSuggestTracks }: AIAssistantProps) => {
   const [prompt, setPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -154,27 +133,6 @@ const AIAssistant = ({ tracks, onSuggestTracks }: AIAssistantProps) => {
                 </>
               )}
             </Button>
-          </div>
-
-          <div className="flex gap-2 overflow-x-auto pb-2">
-            {QUICK_PROMPTS.map((quickPrompt) => (
-              <motion.button
-                key={quickPrompt.label}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="px-4 py-2 bg-white rounded-full border-2 border-border hover:bg-bg 
-                          transition-colors group flex-none"
-                onClick={() => {
-                  setPrompt(quickPrompt.example);
-                  handleSuggestion(quickPrompt.example);
-                }}
-              >
-                <div className="text-center">
-                  <div className="font-medium">{quickPrompt.label}</div>
-                  <div className="text-xs text-text/60">{quickPrompt.bpm}</div>
-                </div>
-              </motion.button>
-            ))}
           </div>
 
           {lastUsed.length > 0 && (

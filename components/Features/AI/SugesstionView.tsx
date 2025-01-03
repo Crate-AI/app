@@ -39,47 +39,41 @@ const AISuggestionView = ({ tracks, playingTrackId, onPlayToggle }: AISuggestion
   };
   const parseAIResponse = async (text: string, availableTracks: TrackWithDetails[]): Promise<TrackSuggestion[]> => {
     const suggestions: TrackSuggestion[] = [];
-    // Skip the analysis section
-    const mainContent = text.split('Now for my track selection recommendations:')[1] || text;
-    const lines = mainContent.split('\n').filter(line => line.trim());
-    
-    // Keep track of used releases to avoid duplicates
     const usedReleaseIds = new Set<number>();
     
+    // Skip to the suggestions section
+    const suggestionsSection = text.split('SUGGESTIONS:')[1] || text;
+    const lines = suggestionsSection.split('\n').filter(line => line.trim());
+    
+    // Updated pattern to match Claude's current format
+    const pattern = /"([^"]+)"\s*by\s*([^(]+)\s*\((\d+)\s*BPM\)\s*-\s*\[(.*?)\]/i;
+
     for (const line of lines) {
-      const patterns = [
-        /^"([^"]+)"\s*by\s*([^(]+)\s*\(BPM\s*(\d+)\)\s*-\s*\[(.*?)\]/,
-        /^"([^"]+)"\s*by\s*([^(]+)\s*\((\d+)\s*BPM\)\s*-\s*\[(.*?)\]/,
-        /"([^"]+)"\s*by\s*([^(]+)\s*\(BPM\s*(\d+)\)\s*-\s*(.*)/,
-        /"([^"]+)"\s*by\s*([^(]+)\s*\((\d+)\s*BPM\)\s*-\s*(.*)/
-      ];
-  
-      let match = null;
-      for (const pattern of patterns) {
-        match = line.match(pattern);
-        if (match) break;
-      }
-  
+      console.log('Processing line:', line); // Debug
+      const match = line.match(pattern);
       if (match) {
+        console.log('Found match:', match); // Debug
         const [, title, artist, bpm, reason] = match;
-        const foundTrack = availableTracks.find(track => 
-          track.title.toLowerCase() === title.trim().toLowerCase() &&
-          track.artist.toLowerCase() === artist.trim().toLowerCase() &&
-          !usedReleaseIds.has(track.releaseId)
-        );
-  
+        
+        const foundTrack = availableTracks.find(track => {
+          const titleMatch = track.title.toLowerCase().includes(title.trim().toLowerCase());
+          const artistMatch = track.artist.toLowerCase().includes(artist.trim().toLowerCase());
+          const notUsed = !usedReleaseIds.has(track.releaseId);
+          console.log('Matching:', { title, artist, titleMatch, artistMatch, notUsed }); // Debug
+          return titleMatch && artistMatch && notUsed;
+        });
+
         if (foundTrack) {
           usedReleaseIds.add(foundTrack.releaseId);
           suggestions.push({
             track: foundTrack,
-            reason: reason?.trim().replace(/[\[\]]/g, '') || 
-                    'Selected for style and energy compatibility'
+            reason: reason.trim()
           });
         }
       }
     }
-  
-    console.log('Parsed suggestions:', suggestions);
+
+    console.log('Final suggestions:', suggestions);
     return suggestions;
   };
 

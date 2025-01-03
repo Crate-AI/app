@@ -1,5 +1,3 @@
-// lib/prompts/dj-assistant.ts
-
 import { TrackWithDetails } from '@/types/dj';
 
 export const DJAssistantPrompt = {
