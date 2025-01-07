@@ -1,32 +1,49 @@
 // app/api/chat/route.ts
-import { NextRequest } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
+import { CoreMessage, streamText } from 'ai'
+import { createAnthropic } from '@ai-sdk/anthropic'
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+export const runtime = 'edge'
+
+const anthropic = createAnthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY!,
+})
+const model = anthropic('claude-3-5-sonnet-20241022');
 
 const SYSTEM_PROMPT = `As a DJ assistant, analyze record collections and suggest tracks based on:
 - Venue type (club, bar, lounge)
 - Time slot (warm-up, peak time, closing)
 - Genre compatibility
 - BPM/Energy level appropriateness
-- Crowd expectations`;
+- Crowd expectations`
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const { messages, collection } = await req.json();
+    const { prompt, collection } = await req.json()
+    console.log('collection', collection)
+    // Create a message array with the user's prompt
+    const messages: CoreMessage[] = [
+      { role: 'user', content: prompt }
+    ]
 
-    const response = await anthropic.messages.create({
-      model: "claude-3-opus-20240229",
-      max_tokens: 1024,
-      messages: messages.filter((msg: any) => msg.role !== 'system'),
+    const result = await streamText({
+      model,
+      messages,
       system: SYSTEM_PROMPT + `\nAvailable tracks: ${JSON.stringify(collection)}`,
-    });
+    })
 
-    return Response.json(response);
-  } catch (error) {
-    console.error('Claude API error:', error);
-    return Response.json({ error: 'Failed to process request' }, { status: 500 });
+    
+    return result.toDataStreamResponse()
+
+  } catch (error: any) {
+    console.error('Chat API error:', error)
+    return new Response(
+      JSON.stringify({
+        error: error?.message || 'An error occurred during the request',
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
   }
 }
