@@ -1,23 +1,23 @@
 'use client';
 
 import { useAuthStore } from '@/lib/store/authStore';
-import CrateExplorer from '@/components/Features/CrateExplorer/CrateExplorer';
 import { redirect } from 'next/navigation';
-
+import SearchBar from '@/components/Features/CrateExplorer/SearchBar';
+import useDiscogsSearch from '@/lib/hooks/useDiscogsSearch';
 interface UserProfileProps {
   username: string;
 }
 
 const UserProfile = ({ username }: UserProfileProps) => {
   const { userIdentity } = useAuthStore();
-
+  const { query, setQuery, isLoading } = useDiscogsSearch();
   if (!userIdentity) {
     redirect('/');
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <CrateExplorer />
+      <SearchBar query={query} isLoading={isLoading} onQueryChange={setQuery} />
     </div>
   );
 };
