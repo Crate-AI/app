@@ -1,13 +1,13 @@
 'use client'
 
-import { Track } from '@/types/collection'
 import { useEffect, useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Play, Pause } from 'lucide-react'
 import type { YouTubePlayer, YouTubeConfig } from '@/types/youtube'
+import { CrateTrack } from '@/app/api/tracks/[discogsReleaseId]/route'
 
 export default function TracksTable() {
-  const [tracks, setTracks] = useState<Track[]>([])
+  const [tracks, setTracks] = useState<CrateTrack[]>([])
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [playingTrackId, setPlayingTrackId] = useState<string | null>(null)
@@ -83,7 +83,7 @@ export default function TracksTable() {
     fetchTracks()
   }, [])
 
-  const handlePlayToggle = async (track: Track) => {
+  const handlePlayToggle = async (track: CrateTrack) => {
     if (!track.youtube_video_id || !playerRef.current) {
       return
     }
