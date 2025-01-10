@@ -39,16 +39,19 @@ export type Database = {
           basic_release_data: Json | null
           discogs_release_data: Json | null
           discogs_release_id: string
+          uploaded_at: string | null
         }
         Insert: {
           basic_release_data?: Json | null
           discogs_release_data?: Json | null
           discogs_release_id: string
+          uploaded_at?: string | null
         }
         Update: {
           basic_release_data?: Json | null
           discogs_release_data?: Json | null
           discogs_release_id?: string
+          uploaded_at?: string | null
         }
         Relationships: []
       }
@@ -60,6 +63,7 @@ export type Database = {
           discogs_release_id: string
           duration: string
           extra_artists: string | null
+          genres: string | null
           id: string
           position: string
           title: string
@@ -72,6 +76,7 @@ export type Database = {
           discogs_release_id: string
           duration: string
           extra_artists?: string | null
+          genres?: string | null
           id?: string
           position: string
           title: string
@@ -84,6 +89,7 @@ export type Database = {
           discogs_release_id?: string
           duration?: string
           extra_artists?: string | null
+          genres?: string | null
           id?: string
           position?: string
           title?: string
