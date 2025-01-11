@@ -151,6 +151,9 @@ export default function TracksTable() {
             <th scope="col" className="w-72 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Artist
             </th>
+            <th scope="col" className="w-48 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Genre
+            </th>
             <th scope="col" className="w-24 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               BPM
             </th>
@@ -215,6 +218,9 @@ export default function TracksTable() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 truncate max-w-[18rem]">
                     {formatArtists(track.artist, track.extra_artists)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {track.genres?.join(', ') || '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {track.bpm}
