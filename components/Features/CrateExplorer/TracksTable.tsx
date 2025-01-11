@@ -17,14 +17,13 @@ export default function TracksTable() {
   const [isPlayerReady, setIsPlayerReady] = useState(false)
   const playerRef = useRef<YouTubePlayer>()
 
+  // YouTube player initialization
   useEffect(() => {
-    // Initialize YouTube Player
     const tag = document.createElement('script')
     tag.src = 'https://www.youtube.com/iframe_api'
     const firstScriptTag = document.getElementsByTagName('script')[0]
     firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag)
 
-    // Create hidden container for player
     const playerContainer = document.createElement('div')
     playerContainer.id = 'youtube-player'
     playerContainer.style.display = 'none'
@@ -62,17 +61,15 @@ export default function TracksTable() {
     }
   }, [])
 
+  // Set loading state when tracks are available
   useEffect(() => {
-    // Set loading to false once we have tracks
     if (allTracks.length > 0) {
       setLoading(false)
     }
   }, [allTracks])
 
   const handlePlayToggle = async (track: CrateTrack) => {
-    if (!track.youtube_video_id || !playerRef.current) {
-      return
-    }
+    if (!track.youtube_video_id || !playerRef.current) return
 
     try {
       if (playingTrackId === track.id) {
@@ -106,7 +103,7 @@ export default function TracksTable() {
     return [...suggested, ...notSuggested]
   }, [allTracks, suggestedTrackIds])
 
-  // Add smooth scroll behavior when tracks are suggested
+  // Scroll to suggested tracks
   useEffect(() => {
     if (suggestedTrackIds.size > 0) {
       const firstSuggested = document.querySelector('[data-suggested="true"]')
@@ -187,7 +184,7 @@ export default function TracksTable() {
                 >
                   {isFirstSuggested && (
                     <td 
-                      colSpan={6} 
+                      colSpan={7} 
                       className="absolute -top-8 left-0 right-0 text-center py-1 border-t border-primary/10"
                     >
                       <span className="px-3 py-1 text-xs bg-primary text-primary-foreground rounded-full">
