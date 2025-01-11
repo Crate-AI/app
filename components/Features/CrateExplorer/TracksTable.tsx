@@ -1,13 +1,16 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Play, Pause } from 'lucide-react'
 import type { YouTubePlayer, YouTubeConfig } from '@/types/youtube'
 import { CrateTrack } from '@/app/api/tracks/[discogsReleaseId]/route'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useTracksStore } from '@/components/Features/AIDJAssistant/store/useTracksStore'
+import { cn } from '@/lib/utils/utils'
 
 export default function TracksTable() {
-  const [tracks, setTracks] = useState<CrateTrack[]>([])
+  const { allTracks, suggestedTrackIds } = useTracksStore()
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [playingTrackId, setPlayingTrackId] = useState<string | null>(null)
@@ -60,29 +63,11 @@ export default function TracksTable() {
   }, [])
 
   useEffect(() => {
-    async function fetchTracks() {
-      try {
-        const res = await fetch(`/api/tracks`, {
-          credentials: 'include'
-        })
-        
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`)
-        }
-        
-        const data = await res.json()
-        console.log('Fetched tracks:', data.tracks?.slice(0, 3)) // Log first 3 tracks as sample
-        setTracks(data.tracks || [])
-      } catch (e) {
-        console.error('Error loading tracks:', e)
-        setError(e instanceof Error ? e.message : 'Failed to load tracks')
-      } finally {
-        setLoading(false)
-      }
+    // Set loading to false once we have tracks
+    if (allTracks.length > 0) {
+      setLoading(false)
     }
-
-    fetchTracks()
-  }, [])
+  }, [allTracks])
 
   const handlePlayToggle = async (track: CrateTrack) => {
     if (!track.youtube_video_id || !playerRef.current) {
@@ -106,7 +91,34 @@ export default function TracksTable() {
     }
   }
 
-  if (loading) {
+  const formatArtists = (artist: string, extraArtists: string | null) => {
+    if (!extraArtists) return artist
+    return `${artist}, ${extraArtists}`
+  }
+
+  // Sort tracks with suggested ones first
+  const sortedTracks = useMemo(() => {
+    const suggested = allTracks.filter(t => suggestedTrackIds.has(t.id))
+      .sort((a, b) => Number(a.bpm) - Number(b.bpm))
+    
+    const notSuggested = allTracks.filter(t => !suggestedTrackIds.has(t.id))
+    
+    return [...suggested, ...notSuggested]
+  }, [allTracks, suggestedTrackIds])
+
+  // Add smooth scroll behavior when tracks are suggested
+  useEffect(() => {
+    if (suggestedTrackIds.size > 0) {
+      const firstSuggested = document.querySelector('[data-suggested="true"]')
+      firstSuggested?.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center',
+        inline: 'nearest'
+      })
+    }
+  }, [suggestedTrackIds])
+
+  if (loading && allTracks.length === 0) {
     return <div>Loading tracks...</div>
   }
 
@@ -114,7 +126,7 @@ export default function TracksTable() {
     return <div className="text-red-500">{error}</div>
   }
 
-  if (!tracks.length) {
+  if (!sortedTracks.length) {
     return (
       <div className="text-gray-600">
         <p>No tracks found in your collection.</p>
@@ -127,67 +139,96 @@ export default function TracksTable() {
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" className="w-20 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Play
             </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" className="w-24 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Position
             </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" className="w-96 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Title
             </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" className="w-72 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Artist
             </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Genre
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" className="w-24 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               BPM
             </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" className="w-28 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Duration
             </th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {tracks.map((track) => (
-            <tr key={track.id} className="hover:bg-gray-50">
-              <td className="px-6 py-4 whitespace-nowrap">
-                <Button
-                  variant="noShadow"
-                  size="icon"
-                  className="w-8 h-8"
-                  onClick={() => handlePlayToggle(track)}
-                  disabled={!track.youtube_video_id || !isPlayerReady}
-                >
-                  {playingTrackId === track.id ? (
-                    <Pause className="w-4 h-4" />
-                  ) : (
-                    <Play className="w-4 h-4" />
+          <AnimatePresence>
+            {sortedTracks.map((track, index) => {
+              const isSuggested = suggestedTrackIds.has(track.id)
+              const isFirstSuggested = isSuggested && 
+                (!suggestedTrackIds.has(sortedTracks[index - 1]?.id))
+              const isLastSuggested = isSuggested && 
+                (!suggestedTrackIds.has(sortedTracks[index + 1]?.id))
+
+              return (
+                <motion.tr
+                  key={track.id}
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  data-suggested={isSuggested}
+                  className={cn(
+                    'hover:bg-gray-50 group relative',
+                    isSuggested && 'bg-primary/5'
                   )}
-                </Button>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {track.position}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                {track.title}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {track.artist}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {track.genres || '-'}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {track.bpm}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {track.duration || '-'}
-              </td>
-            </tr>
-          ))}
+                >
+                  {isFirstSuggested && (
+                    <td 
+                      colSpan={6} 
+                      className="absolute -top-8 left-0 right-0 text-center py-1 border-t border-primary/10"
+                    >
+                      <span className="px-3 py-1 text-xs bg-primary text-primary-foreground rounded-full">
+                        Suggested Tracks
+                      </span>
+                    </td>
+                  )}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <Button
+                      variant="noShadow"
+                      size="icon"
+                      className="w-8 h-8"
+                      onClick={() => handlePlayToggle(track)}
+                      disabled={!track.youtube_video_id || !isPlayerReady}
+                    >
+                      {playingTrackId === track.id ? (
+                        <Pause className="w-4 h-4" />
+                      ) : (
+                        <Play className="w-4 h-4" />
+                      )}
+                    </Button>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {track.position}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 truncate max-w-[24rem]">
+                    {track.title}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 truncate max-w-[18rem]">
+                    {formatArtists(track.artist, track.extra_artists)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {track.bpm}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {track.duration || '-'}
+                  </td>
+                  {isLastSuggested && (
+                    <div className="absolute -bottom-px left-0 right-0 h-px bg-primary/20" />
+                  )}
+                </motion.tr>
+              )
+            })}
+          </AnimatePresence>
         </tbody>
       </table>
     </div>
