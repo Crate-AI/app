@@ -85,7 +85,7 @@ export const CollectionUtils = (supabase: SupabaseClient<Database>) => {
 
     const { data: tracksData, error: tracksError } = await supabase
       .from('tracks')
-      .select()
+      .select('*')
       .in(
         'discogs_release_id',
         userReleases.map((r) => r.discogs_release_id),

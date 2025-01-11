@@ -71,6 +71,7 @@ export default function TracksTable() {
         }
         
         const data = await res.json()
+        console.log('Fetched tracks:', data.tracks?.slice(0, 3)) // Log first 3 tracks as sample
         setTracks(data.tracks || [])
       } catch (e) {
         console.error('Error loading tracks:', e)
@@ -139,6 +140,9 @@ export default function TracksTable() {
               Artist
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Genre
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               BPM
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -172,6 +176,9 @@ export default function TracksTable() {
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {track.artist}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {track.genres || '-'}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {track.bpm}

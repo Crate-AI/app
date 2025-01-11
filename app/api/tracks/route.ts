@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
     const { getCollectionTracks } = CollectionUtils(supabase);
     const tracks = await getCollectionTracks();
-    
+    console.log('tracks', tracks)
     return NextResponse.json({ tracks: tracks || [] });
   } catch (error) {
     return NextResponse.json(
