@@ -217,7 +217,7 @@ export default function TracksTable() {
                     {formatArtists(track.artist, track.extra_artists)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {track.genres?.join(', ') || '-'}
+                    {track.genres ? track.genres: '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {track.bpm}
