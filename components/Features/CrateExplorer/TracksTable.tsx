@@ -2,10 +2,11 @@
 
 import { useEffect, useState, useRef, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
-import { Play, Pause, GripVertical } from 'lucide-react'
+import { Play, Pause, GripVertical, ArrowUpDown, Sparkles } from 'lucide-react'
 import type { YouTubePlayer, YouTubeConfig } from '@/types/youtube'
 import { CrateTrack } from '@/app/api/tracks/[discogsReleaseId]/route'
 import { useTracksStore } from '@/components/Features/AIDJAssistant/store/useTracksStore'
+import type { OrderingConfig } from '@/components/Features/AIDJAssistant/store/useTracksStore'
 import { cn } from '@/lib/utils/utils'
 import {
   DndContext,
@@ -25,6 +26,7 @@ import {
 } from '@dnd-kit/sortable'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { CSS } from '@dnd-kit/utilities'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface SortableRowProps {
   track: CrateTrack
@@ -75,23 +77,16 @@ const SortableRow = ({
         ...style,
         touchAction: 'none'
       }}
-      data-dragging={isDragging}
       className={cn(
-        'hover:bg-gray-50 group relative touch-none',
-        isSuggested && 'bg-primary/5',
+        'hover:bg-gray-50/80 group relative touch-none transition-all duration-300',
+        isSuggested && [
+          'bg-gradient-to-r from-primary/[0.03] to-primary/[0.07]',
+          'border-l-[3px] border-primary/40',
+          'shadow-[inset_0_0_40px_rgba(0,0,0,0.02)]'
+        ],
         isDragging && 'shadow-lg bg-white opacity-50'
       )}
     >
-      {isFirstSuggested && (
-        <td 
-          colSpan={8} 
-          className="absolute -top-8 left-0 right-0 text-center py-1 border-t border-primary/10"
-        >
-          <span className="px-3 py-1 text-xs bg-primary text-primary-foreground rounded-full">
-            Suggested Tracks
-          </span>
-        </td>
-      )}
       <td className="px-2 py-4 whitespace-nowrap">
         <button
           type="button"
@@ -135,20 +130,31 @@ const SortableRow = ({
       <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
         {track.duration || '-'}
       </td>
+      {isFirstSuggested && (
+        <div className="absolute -top-px left-0 right-0 h-px bg-primary/10" />
+      )}
       {isLastSuggested && (
-        <div className="absolute -bottom-px left-0 right-0 h-px bg-primary/20" />
+        <div className="absolute -bottom-px left-0 right-0 h-px bg-primary/10" />
       )}
     </tr>
   )
 }
 
 export default function TracksTable() {
-  const { allTracks, suggestedTrackIds, reorderTracks, setDraggedTrackId } = useTracksStore()
+  const { 
+    allTracks, 
+    suggestedTrackIds, 
+    reorderTracks, 
+    setDraggedTrackId,
+    orderingConfig,
+    setOrderingConfig 
+  } = useTracksStore()
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [playingTrackId, setPlayingTrackId] = useState<string | null>(null)
   const [isPlayerReady, setIsPlayerReady] = useState(false)
   const playerRef = useRef<YouTubePlayer>()
+  const [isReordering, setIsReordering] = useState(false)
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -251,13 +257,41 @@ export default function TracksTable() {
   }
 
   const sortedTracks = useMemo(() => {
+    setIsReordering(true)
     const suggested = allTracks.filter(t => suggestedTrackIds.has(t.id))
-      .sort((a, b) => Number(a.bpm) - Number(b.bpm))
+    const regular = allTracks.filter(t => !suggestedTrackIds.has(t.id))
     
-    const notSuggested = allTracks.filter(t => !suggestedTrackIds.has(t.id))
+    const sortByConfig = (tracks: CrateTrack[]) => {
+      switch (orderingConfig.orderBy) {
+        case 'bpm':
+          return tracks.sort((a, b) => {
+            const diff = Number(a.bpm) - Number(b.bpm)
+            return orderingConfig.direction === 'asc' ? diff : -diff
+          })
+        case 'genre':
+          return tracks.sort((a, b) => {
+            const aGenre = (a.genres?.[0] || '').toLowerCase()
+            const bGenre = (b.genres?.[0] || '').toLowerCase()
+            const diff = aGenre.localeCompare(bGenre)
+            return orderingConfig.direction === 'asc' ? diff : -diff
+          })
+        case 'suggested':
+          // Keep suggested tracks in their original order from the AI
+          return tracks
+        default:
+          return tracks
+      }
+    }
+
+    // Always keep suggested tracks at the top when they exist
+    const result = suggestedTrackIds.size > 0 
+      ? [...sortByConfig(suggested), ...regular]
+      : sortByConfig([...suggested, ...regular])
     
-    return [...suggested, ...notSuggested]
-  }, [allTracks, suggestedTrackIds])
+    // Add slight delay to show transition
+    setTimeout(() => setIsReordering(false), 100)
+    return result
+  }, [allTracks, suggestedTrackIds, orderingConfig])
 
   if (loading && allTracks.length === 0) {
     return <div>Loading tracks...</div>
@@ -276,69 +310,112 @@ export default function TracksTable() {
   }
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-      modifiers={[restrictToVerticalAxis]}
-    >
-      <div className="overflow-x-auto relative">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th scope="col" className="w-12 px-2 py-3"></th>
-              <th scope="col" className="w-20 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Play
-              </th>
-              <th scope="col" className="w-24 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Position
-              </th>
-              <th scope="col" className="w-96 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Title
-              </th>
-              <th scope="col" className="w-72 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Artist
-              </th>
-              <th scope="col" className="w-48 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Genre
-              </th>
-              <th scope="col" className="w-24 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                BPM
-              </th>
-              <th scope="col" className="w-28 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Duration
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200 relative">
-            <SortableContext
-              items={sortedTracks.map(track => track.id)}
-              strategy={verticalListSortingStrategy}
+    <div className={cn(
+      'transition-opacity duration-200',
+      isReordering && 'opacity-90'
+    )}>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        modifiers={[restrictToVerticalAxis]}
+      >
+        <div className="overflow-x-auto relative">
+          <div className="mb-4 flex items-center gap-4">
+            <Select
+              value={orderingConfig.orderBy}
+              onValueChange={(value) => 
+                setOrderingConfig({ 
+                  orderBy: value as OrderingConfig['orderBy'] 
+                })
+              }
             >
-              {sortedTracks.map((track, index) => (
-                <SortableRow
-                  key={track.id}
-                  track={track}
-                  index={index}
-                  isSuggested={suggestedTrackIds.has(track.id)}
-                  isFirstSuggested={
-                    suggestedTrackIds.has(track.id) &&
-                    !suggestedTrackIds.has(sortedTracks[index - 1]?.id)
-                  }
-                  isLastSuggested={
-                    suggestedTrackIds.has(track.id) &&
-                    !suggestedTrackIds.has(sortedTracks[index + 1]?.id)
-                  }
-                  playingTrackId={playingTrackId}
-                  isPlayerReady={isPlayerReady}
-                  onPlayToggle={handlePlayToggle}
-                />
-              ))}
-            </SortableContext>
-          </tbody>
-        </table>
-      </div>
-    </DndContext>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Sort by..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="manual">Manual Order</SelectItem>
+                <SelectItem value="bpm">BPM</SelectItem>
+                <SelectItem value="genre">Genre</SelectItem>
+                <SelectItem value="suggested">AI Suggested</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setOrderingConfig({
+                direction: orderingConfig.direction === 'asc' ? 'desc' : 'asc'
+              })}
+              className={cn(
+                'transition-transform',
+                orderingConfig.direction === 'desc' && 'rotate-180'
+              )}
+            >
+              <ArrowUpDown className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th scope="col" className="w-12 px-2 py-3"></th>
+                <th scope="col" className="w-20 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Play
+                </th>
+                <th scope="col" className="w-24 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Position
+                </th>
+                <th scope="col" className="w-96 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Title
+                </th>
+                <th scope="col" className="w-72 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Artist
+                </th>
+                <th scope="col" className="w-48 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Genre
+                </th>
+                <th scope="col" className="w-24 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  BPM
+                </th>
+                <th scope="col" className="w-28 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Duration
+                </th>
+              </tr>
+            </thead>
+            <tbody className={cn(
+              'bg-white divide-y divide-gray-200 relative',
+              'transition-all duration-300 ease-in-out'
+            )}>
+              <SortableContext
+                items={sortedTracks.map(track => track.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {sortedTracks.map((track, index) => (
+                  <SortableRow
+                    key={track.id}
+                    track={track}
+                    index={index}
+                    isSuggested={suggestedTrackIds.has(track.id)}
+                    isFirstSuggested={
+                      suggestedTrackIds.has(track.id) &&
+                      !suggestedTrackIds.has(sortedTracks[index - 1]?.id)
+                    }
+                    isLastSuggested={
+                      suggestedTrackIds.has(track.id) &&
+                      !suggestedTrackIds.has(sortedTracks[index + 1]?.id)
+                    }
+                    playingTrackId={playingTrackId}
+                    isPlayerReady={isPlayerReady}
+                    onPlayToggle={handlePlayToggle}
+                  />
+                ))}
+              </SortableContext>
+            </tbody>
+          </table>
+        </div>
+      </DndContext>
+    </div>
   )
 }

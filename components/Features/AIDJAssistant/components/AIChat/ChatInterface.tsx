@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useCallback } from 'react'
 import { Send } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -20,8 +20,41 @@ interface ChatInterfaceProps {
   onTracksFilter?: (tracks: CrateTrack[]) => void
 }
 
+interface ParsedTrack {
+  title: string
+  artist: string
+  bpm: number
+}
+
+const findMatchingTrack = (suggestion: ParsedTrack, tracks: CrateTrack[]) => {
+  // Try exact match first
+  let match = tracks.find(t => 
+    t.title.toLowerCase() === suggestion.title.toLowerCase() &&
+    t.artist.toLowerCase().includes(suggestion.artist.toLowerCase())
+  )
+
+  // If no exact match, try fuzzy matching
+  if (!match) {
+    match = tracks.find(t => 
+      t.title.toLowerCase().includes(suggestion.title.toLowerCase()) ||
+      suggestion.title.toLowerCase().includes(t.title.toLowerCase())
+    )
+  }
+
+  return match
+}
+
+const parseTracksFromMessage = (content: string): ParsedTrack[] => {
+  const matches = content.matchAll(/["'](.+?)["']\s*-\s*(.+?)\s*\((\d+)\s*BPM\)/g)
+  return Array.from(matches).map(match => ({
+    title: match[1].trim(),
+    artist: match[2].trim(),
+    bpm: parseInt(match[3])
+  }))
+}
+
 export default function ChatInterface({ tracks, onTracksFilter }: ChatInterfaceProps) {
-  const [messages, setMessages] = React.useState<Message[]>([{
+  const [messages, setMessages] = useState<Message[]>([{
     id: '1',
     role: 'assistant',
     content: 'Hey DJ! I can help you find the perfect tracks. Try asking about specific genres, BPM ranges, or get mixing suggestions.'
@@ -29,32 +62,33 @@ export default function ChatInterface({ tracks, onTracksFilter }: ChatInterfaceP
   
   const setSuggestedTracks = useTracksStore(state => state.setSuggestedTracks)
 
-  const formatMessage = (content: string) => {
+  // Separate processing from rendering
+  const processTrackSuggestions = useCallback((content: string) => {
     try {
-      const jsonMatch = content.match(/__JSON__(.+)$/)
-      if (jsonMatch) {
-        const jsonData = JSON.parse(jsonMatch[1].trim())
-        if (jsonData.tracks?.length > 0) {
-          setSuggestedTracks(jsonData.tracks)
+      const suggestedTracks = parseTracksFromMessage(content)
+      if (suggestedTracks.length > 0) {
+        const matchedTracks = suggestedTracks
+          .map(suggestion => findMatchingTrack(suggestion, tracks))
+          .filter(Boolean) as CrateTrack[]
+
+        if (matchedTracks.length > 0) {
+          setSuggestedTracks(matchedTracks)
         }
       }
     } catch (e) {
-      console.error('Failed to parse JSON:', e)
+      console.error('Failed to process track suggestions:', e)
     }
-
-    const [displayText] = content.split('__JSON__')
-    return <div className="whitespace-pre-wrap">{displayText.trim()}</div>
-  }
+  }, [tracks, setSuggestedTracks])
 
   const { completion, complete, input, handleInputChange, isLoading } = useCompletion({
     api: '/api/chat',
     body: { tracks },
     onFinish: (prompt, completion) => {
-      console.log('Completion received:', completion)
       setMessages(prev => [...prev, 
         { id: Date.now().toString(), role: 'user', content: prompt },
         { id: (Date.now() + 1).toString(), role: 'assistant', content: completion }
       ])
+      processTrackSuggestions(completion)
     }
   })
 
@@ -86,7 +120,7 @@ export default function ChatInterface({ tracks, onTracksFilter }: ChatInterfaceP
                   : 'bg-muted/50 border-muted-foreground/20 text-foreground hover:bg-muted/60'
               )}
             >
-              {formatMessage(message.content)}
+              <div className="whitespace-pre-wrap">{message.content}</div>
             </div>
           </div>
         ))}

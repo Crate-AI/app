@@ -1,4 +1,3 @@
-// app/api/chat/route.ts
 import { CoreMessage, streamText } from 'ai'
 import { createAnthropic } from '@ai-sdk/anthropic'
 
@@ -9,10 +8,14 @@ const anthropic = createAnthropic({
 })
 const model = anthropic('claude-3-5-sonnet-20241022')
 
-const SYSTEM_PROMPT = `You are a world class DJ assistant, you are helping a DJ to find the perfect tracks for their set and  a music curator. Format your responses in two parts:
+const SYSTEM_PROMPT = `You are a world class DJ assistant, helping DJs find perfect tracks for their sets. When suggesting tracks, always format them exactly like this:
 
-1. First, write your explanation and track list as plain text:
-[track name] - [artist] ([bpm] BPM)`
+"[Track Title]" - [Artist Name] ([BPM] BPM)
+
+For example:
+"Deep Burnt" - Pépé Bradock (127 BPM)
+
+Always include the quotes around track titles for accurate parsing.`
 
 export async function POST(req: Request) {
   try {
