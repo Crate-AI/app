@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
-import { Play, Pause, GripVertical, ArrowUpDown, Search, X } from 'lucide-react'
+import { Play, Pause, GripVertical, ArrowUpDown, Search, X, ListPlus, } from 'lucide-react'
 import type { YouTubePlayer, YouTubeConfig } from '@/types/youtube'
 import { CrateTrack } from '@/app/api/tracks/[discogsReleaseId]/route'
 import { useTracksStore } from '@/components/Features/AIDJAssistant/store/useTracksStore'
@@ -38,6 +38,7 @@ interface SortableRowProps {
   playingTrackId: string | null
   isPlayerReady: boolean
   onPlayToggle: (track: CrateTrack) => void
+  onAddToPlaylist: (track: CrateTrack) => void
 }
 
 const SortableRow = ({
@@ -49,6 +50,7 @@ const SortableRow = ({
   playingTrackId,
   isPlayerReady,
   onPlayToggle,
+  onAddToPlaylist,
 }: SortableRowProps) => {
   const {
     attributes,
@@ -93,6 +95,19 @@ const SortableRow = ({
         isDragging && 'shadow-lg bg-white opacity-50'
       )}
     >
+    <td className="px-4 py-4 whitespace-nowrap">
+        <div className="relative group">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="flex items-center gap-2 hover:bg-primary/5 group-hover:flex"
+            onClick={() => onAddToPlaylist(track)}
+          >
+            <ListPlus className="w-4 h-4" />
+            <span className="sr-only">Add to Bag</span>
+          </Button>
+        </div>
+      </td>
       <td className="px-2 py-4 whitespace-nowrap">
         <button
           type="button"
@@ -311,6 +326,11 @@ export default function TracksTable() {
     return result
   }, [allTracks, suggestedTrackIds, orderingConfig, searchQuery])
 
+  const handleAddToPlaylist = (track: CrateTrack) => {
+    // TODO: Implement playlist functionality
+    console.log('Adding to playlist:', track.title)
+  }
+
   if (loading && allTracks.length === 0) {
     return <div>Loading tracks...</div>
   }
@@ -497,7 +517,69 @@ export default function TracksTable() {
 
           {/* Table Structure */}
           <table className="min-w-full divide-y divide-gray-200">
-            {/* ... Keep your existing thead section ... */}
+            <thead className="bg-gray-50">
+                <tr>
+                <th 
+        scope="col" 
+        className="w-12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+        >
+        Bag
+        </th>
+        <th 
+        scope="col" 
+        className="w-10 px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+        >
+        </th>
+        <th 
+        scope="col" 
+        className="w-16 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+        >
+        Play
+        </th>
+        <th 
+        scope="col" 
+        className="w-20 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+        >
+        Position
+        </th>
+        <th 
+        scope="col" 
+        className="w-80 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+        >
+        Title
+        </th>
+        <th 
+        scope="col" 
+        className="w-48 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+        >
+        Artist
+        </th>
+        <th 
+        scope="col" 
+        className="w-32 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+        >
+        Genre
+        </th>
+        <th 
+        scope="col" 
+        className="w-36 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+        >
+        Styles
+        </th>
+        <th 
+        scope="col" 
+        className="w-20 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+        >
+        BPM
+        </th>
+        <th 
+        scope="col" 
+        className="w-24 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+        >
+        Duration
+        </th>
+                </tr>
+            </thead>
             <tbody className={cn(
               'bg-white divide-y divide-gray-200 relative',
               'transition-all duration-300 ease-in-out'
@@ -523,6 +605,7 @@ export default function TracksTable() {
                     playingTrackId={playingTrackId}
                     isPlayerReady={isPlayerReady}
                     onPlayToggle={handlePlayToggle}
+                    onAddToPlaylist={handleAddToPlaylist}
                   />
                 ))}
               </SortableContext>
