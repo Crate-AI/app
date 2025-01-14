@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface BannerProps {
   username: string;
@@ -33,13 +34,10 @@ export default function Banner({
           authElement
         ) : (
           <>
-            <Image
-              src={avatarUrl}
-              alt={username}
-              width={32}
-              height={32}
-              className="w-8 h-8 rounded-full border-2 border-black shadow-light"
-            />
+            <Avatar>
+              <AvatarImage src={avatarUrl} />
+              <AvatarFallback>{username.charAt(0)}</AvatarFallback>
+            </Avatar>
             <span className="font-medium">{username}</span>
           </>
         )}
