@@ -19,17 +19,20 @@ Always include the quotes around track titles for accurate parsing.`
 
 export async function POST(req: Request) {
   try {
-    const { prompt, tracks } = await req.json()
-    if (!prompt) throw new Error('No prompt provided')
+    const { messages, tracks } = await req.json()
+    if (!messages || !Array.isArray(messages)) {
+      throw new Error('Invalid or missing messages array')
+    }
 
-    const messages: CoreMessage[] = [
+    const fullMessages: CoreMessage[] = [
       { role: 'system', content: SYSTEM_PROMPT },
-      { role: 'user', content: `Tracks: ${JSON.stringify(tracks)}\n\nRequest: ${prompt}` }
+      { role: 'user', content: `Available Tracks: ${JSON.stringify(tracks)}` },
+      ...messages
     ]
 
     const result = await streamText({
       model,
-      messages,
+      messages: fullMessages,
     })
 
     return result.toDataStreamResponse()
