@@ -70,6 +70,11 @@ const SortableRow = ({
     return `${artist}, ${extraArtists}`
   }
 
+  const formatList = (list: string | null) => {
+    if (!list) return '-'
+    return list.split(',').join(', ')
+  }
+
   return (
     <tr
       ref={setNodeRef}
@@ -122,10 +127,13 @@ const SortableRow = ({
         {formatArtists(track.artist, track.extra_artists)}
       </td>
       <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-        {track.genres || '-'}
+        {formatList(track.genres)}
       </td>
       <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-        {track.bpm}
+        {formatList(track.styles)}
+      </td>
+      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+        {track.bpm || '-'}
       </td>
       <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
         {track.duration || '-'}
@@ -375,6 +383,9 @@ export default function TracksTable() {
                 </th>
                 <th scope="col" className="w-48 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Genre
+                </th>
+                <th scope="col" className="w-48 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Styles
                 </th>
                 <th scope="col" className="w-24 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   BPM

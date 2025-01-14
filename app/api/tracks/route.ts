@@ -15,6 +15,6 @@ export async function GET() {
     return NextResponse.json({ tracks })
   } catch (error) {
     console.error('Tracks API error:', error)
-    return NextResponse.json({ tracks: [] }, { status: 200 }) // Return empty array instead of error
+    return NextResponse.json({ tracks: [] }, { status: 200 })
   }
 } 
