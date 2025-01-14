@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
-import { Play, Pause, GripVertical, ArrowUpDown, Sparkles } from 'lucide-react'
+import { Play, Pause, GripVertical, ArrowUpDown, Search, X } from 'lucide-react'
 import type { YouTubePlayer, YouTubeConfig } from '@/types/youtube'
 import { CrateTrack } from '@/app/api/tracks/[discogsReleaseId]/route'
 import { useTracksStore } from '@/components/Features/AIDJAssistant/store/useTracksStore'
@@ -27,6 +27,7 @@ import {
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { CSS } from '@dnd-kit/utilities'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
 
 interface SortableRowProps {
   track: CrateTrack
@@ -163,6 +164,7 @@ export default function TracksTable() {
   const [isPlayerReady, setIsPlayerReady] = useState(false)
   const playerRef = useRef<YouTubePlayer>()
   const [isReordering, setIsReordering] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -266,8 +268,17 @@ export default function TracksTable() {
 
   const sortedTracks = useMemo(() => {
     setIsReordering(true)
-    const suggested = allTracks.filter(t => suggestedTrackIds.has(t.id))
-    const regular = allTracks.filter(t => !suggestedTrackIds.has(t.id))
+    const filteredTracks = searchQuery 
+      ? allTracks.filter(track => 
+          track.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          track.artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          track.genres?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          track.styles?.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      : allTracks
+
+    const suggested = filteredTracks.filter(t => suggestedTrackIds.has(t.id))
+    const regular = filteredTracks.filter(t => !suggestedTrackIds.has(t.id))
     
     const sortByConfig = (tracks: CrateTrack[]) => {
       switch (orderingConfig.orderBy) {
@@ -284,7 +295,6 @@ export default function TracksTable() {
             return orderingConfig.direction === 'asc' ? diff : -diff
           })
         case 'suggested':
-          // Keep suggested tracks in their original order from the AI
           return tracks
         default:
           return tracks
@@ -296,10 +306,10 @@ export default function TracksTable() {
       ? [...sortByConfig(suggested), ...regular]
       : sortByConfig([...suggested, ...regular])
     
-    // Add slight delay to show transition
+    
     setTimeout(() => setIsReordering(false), 100)
     return result
-  }, [allTracks, suggestedTrackIds, orderingConfig])
+  }, [allTracks, suggestedTrackIds, orderingConfig, searchQuery])
 
   if (loading && allTracks.length === 0) {
     return <div>Loading tracks...</div>
@@ -311,8 +321,98 @@ export default function TracksTable() {
 
   if (!sortedTracks.length) {
     return (
-      <div className="text-gray-600">
-        <p>No tracks found in your collection.</p>
+      <div>
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <Select
+                value={orderingConfig.orderBy}
+                onValueChange={(value) => 
+                  setOrderingConfig({ 
+                    orderBy: value as OrderingConfig['orderBy'] 
+                  })
+                }
+              >
+                <SelectTrigger className="w-[180px] bg-background border border-input hover:border-input focus:border-input ring-offset-background">
+                  <SelectValue placeholder="Sort by..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="manual">Manual Order</SelectItem>
+                  <SelectItem value="bpm">BPM</SelectItem>
+                  <SelectItem value="genre">Genre</SelectItem>
+                  <SelectItem value="suggested">AI Suggested</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setOrderingConfig({
+                  direction: orderingConfig.direction === 'asc' ? 'desc' : 'asc'
+              })}
+              className={cn(
+                  'transition-transform',
+                  'border-input hover:border-input focus-visible:border-input',
+                  'hover:bg-accent hover:text-accent-foreground',
+                  'focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none',
+                  orderingConfig.direction === 'desc' && 'rotate-180'
+              )}
+              >
+              <ArrowUpDown className="h-4 w-4" />
+          </Button>
+          </div>
+
+
+          <div className="flex items-center gap-2 w-[300px]">
+            <div className="relative w-full p-[4px]">
+              <Search 
+                className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" 
+              />
+              <Input
+                type="text"
+                placeholder="Search tracks..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={cn(
+                  "w-full pl-9 pr-8",
+                  "transition-shadow duration-300",
+                  "hover:shadow-hover",
+                  "focus:shadow-focus"
+                )}
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+
+        <div className="text-center py-8">
+          <p className="text-gray-600 mb-2">
+            {searchQuery 
+              ? `No tracks found matching "${searchQuery}"`
+              : "No tracks found in your collection."
+            }
+          </p>
+          {searchQuery && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSearchQuery('')}
+              className="mt-2"
+            >
+              Clear Search
+            </Button>
+          )}
+        </div>
       </div>
     )
   }
@@ -330,71 +430,74 @@ export default function TracksTable() {
         modifiers={[restrictToVerticalAxis]}
       >
         <div className="overflow-x-auto relative">
-          <div className="mb-4 flex items-center gap-4">
-            <Select
-              value={orderingConfig.orderBy}
-              onValueChange={(value) => 
-                setOrderingConfig({ 
-                  orderBy: value as OrderingConfig['orderBy'] 
-                })
-              }
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Sort by..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="manual">Manual Order</SelectItem>
-                <SelectItem value="bpm">BPM</SelectItem>
-                <SelectItem value="genre">Genre</SelectItem>
-                <SelectItem value="suggested">AI Suggested</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="mb-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              {/* Fixed Select Component */}
+              <div className="relative">
+                <Select
+                  value={orderingConfig.orderBy}
+                  onValueChange={(value) => 
+                    setOrderingConfig({ 
+                      orderBy: value as OrderingConfig['orderBy'] 
+                    })
+                  }
+                >
+                  <SelectTrigger className="w-[180px] bg-background border border-input hover:border-input focus:border-input ring-offset-background">
+                    <SelectValue placeholder="Sort by..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="manual">Manual Order</SelectItem>
+                    <SelectItem value="bpm">BPM</SelectItem>
+                    <SelectItem value="genre">Genre</SelectItem>
+                    <SelectItem value="suggested">AI Suggested</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setOrderingConfig({
-                direction: orderingConfig.direction === 'asc' ? 'desc' : 'asc'
-              })}
-              className={cn(
-                'transition-transform',
-                orderingConfig.direction === 'desc' && 'rotate-180'
-              )}
-            >
-              <ArrowUpDown className="h-4 w-4" />
+              {/* Fixed Sort Button */}
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setOrderingConfig({
+                    direction: orderingConfig.direction === 'asc' ? 'desc' : 'asc'
+                })}
+                className={cn(
+                    'transition-transform',
+                    'border-input hover:border-input focus-visible:border-input',
+                    'hover:bg-accent hover:text-accent-foreground',
+                    'focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none',
+                    orderingConfig.direction === 'desc' && 'rotate-180'
+                )}
+                >
+                <ArrowUpDown className="h-4 w-4" />
             </Button>
-          </div>
+            </div>
 
+            {/* Fixed Search Input */}
+            <div className="flex items-center gap-2 w-[300px]">
+            <div className="relative w-full p-[4px]"> {/* Added padding to prevent shadow clipping */}
+                <Search 
+                className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" 
+                />
+                <Input
+                type="text"
+                placeholder="Search tracks..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={cn(
+                    "w-full pl-9",
+                    "transition-shadow duration-300",
+                    "hover:shadow-hover", // Custom shadow on hover instead of scale
+                    "focus:shadow-focus" // Custom shadow on focus
+                )}
+                />
+            </div>
+          </div>
+         </div>
+
+          {/* Table Structure */}
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="w-12 px-2 py-3"></th>
-                <th scope="col" className="w-20 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Play
-                </th>
-                <th scope="col" className="w-24 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Position
-                </th>
-                <th scope="col" className="w-96 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Title
-                </th>
-                <th scope="col" className="w-72 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Artist
-                </th>
-                <th scope="col" className="w-48 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Genre
-                </th>
-                <th scope="col" className="w-48 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Styles
-                </th>
-                <th scope="col" className="w-24 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  BPM
-                </th>
-                <th scope="col" className="w-28 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Duration
-                </th>
-              </tr>
-            </thead>
+            {/* ... Keep your existing thead section ... */}
             <tbody className={cn(
               'bg-white divide-y divide-gray-200 relative',
               'transition-all duration-300 ease-in-out'
