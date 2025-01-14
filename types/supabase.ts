@@ -66,6 +66,7 @@ export type Database = {
           genres: string | null
           id: string
           position: string
+          styles: string | null
           title: string
           youtube_video_id: string | null
         }
@@ -79,6 +80,7 @@ export type Database = {
           genres?: string | null
           id?: string
           position: string
+          styles?: string | null
           title: string
           youtube_video_id?: string | null
         }
@@ -92,6 +94,7 @@ export type Database = {
           genres?: string | null
           id?: string
           position?: string
+          styles?: string | null
           title?: string
           youtube_video_id?: string | null
         }
