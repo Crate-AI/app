@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useState, useRef, useMemo } from 'react'
+import { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
-import { Play, Pause, GripVertical, ArrowUpDown, Search, X, ListPlus, } from 'lucide-react'
+import { Play, Pause, GripVertical, ArrowUpDown, Search, X, ListPlus, ShoppingBag, Heart, Plus } from 'lucide-react'
 import type { YouTubePlayer, YouTubeConfig } from '@/types/youtube'
 import { CrateTrack } from '@/app/api/tracks/[discogsReleaseId]/route'
 import { useTracksStore } from '@/components/Features/AIDJAssistant/store/useTracksStore'
@@ -28,6 +28,14 @@ import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { CSS } from '@dnd-kit/utilities'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
+import { 
+  DropdownMenu, 
+  DropdownMenuTrigger, 
+  DropdownMenuContent, 
+  DropdownMenuItem,
+  DropdownMenuSeparator 
+} from '@/components/ui/dropdown-menu'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 
 interface SortableRowProps {
   track: CrateTrack
@@ -38,7 +46,8 @@ interface SortableRowProps {
   playingTrackId: string | null
   isPlayerReady: boolean
   onPlayToggle: (track: CrateTrack) => void
-  onAddToPlaylist: (track: CrateTrack) => void
+  onAddToPlaylist: (track: CrateTrack, playlistName: string) => void
+  onCreateNewPlaylist: (track: CrateTrack, name: string) => void
 }
 
 const SortableRow = ({
@@ -51,6 +60,7 @@ const SortableRow = ({
   isPlayerReady,
   onPlayToggle,
   onAddToPlaylist,
+  onCreateNewPlaylist,
 }: SortableRowProps) => {
   const {
     attributes,
@@ -78,6 +88,17 @@ const SortableRow = ({
     return list.split(',').join(', ')
   }
 
+  const [isNewPlaylistDialogOpen, setIsNewPlaylistDialogOpen] = useState(false)
+  const [newPlaylistName, setNewPlaylistName] = useState('')
+
+  const handleCreateNewPlaylist = () => {
+    if (newPlaylistName.trim()) {
+      onCreateNewPlaylist(track, newPlaylistName.trim())
+      setNewPlaylistName('')
+      setIsNewPlaylistDialogOpen(false)
+    }
+  }
+
   return (
     <tr
       ref={setNodeRef}
@@ -97,15 +118,46 @@ const SortableRow = ({
     >
     <td className="px-4 py-4 whitespace-nowrap">
         <div className="relative group">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex items-center gap-2 hover:bg-primary/5 group-hover:flex"
-            onClick={() => onAddToPlaylist(track)}
-          >
-            <ListPlus className="w-4 h-4" />
-            <span className="sr-only">Add to Bag</span>
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex items-center gap-2 hover:bg-primary/5 group-hover:flex"
+              >
+                <ListPlus className="w-4 h-4" />
+                <span className="sr-only">Add to Bag</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setIsNewPlaylistDialogOpen(true)}>
+                <Plus className="w-4 h-4 mr-2" />
+                Create New Bag
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <Dialog open={isNewPlaylistDialogOpen} onOpenChange={setIsNewPlaylistDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create New Bag</DialogTitle>
+              </DialogHeader>
+              <Input
+                placeholder="Enter bag name (e.g., Datach Gig Jan 2025)"
+                value={newPlaylistName}
+                onChange={(e) => setNewPlaylistName(e.target.value)}
+              />
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsNewPlaylistDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleCreateNewPlaylist}>
+                  Create
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </td>
       <td className="px-2 py-4 whitespace-nowrap">
@@ -171,7 +223,9 @@ export default function TracksTable() {
     reorderTracks, 
     setDraggedTrackId,
     orderingConfig,
-    setOrderingConfig 
+    setOrderingConfig,
+    createPlaylist,
+    addTrackToPlaylist
   } = useTracksStore()
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -326,10 +380,14 @@ export default function TracksTable() {
     return result
   }, [allTracks, suggestedTrackIds, orderingConfig, searchQuery])
 
-  const handleAddToPlaylist = (track: CrateTrack) => {
-    // TODO: Implement playlist functionality
-    console.log('Adding to playlist:', track.title)
-  }
+  const handleAddToPlaylist = useCallback((track: CrateTrack, playlistId: string) => {
+    addTrackToPlaylist(track.id, playlistId)
+  }, [addTrackToPlaylist])
+
+  const handleCreateNewPlaylist = useCallback((track: CrateTrack, name: string) => {
+    const playlistId = createPlaylist(name)
+    addTrackToPlaylist(track.id, playlistId)
+  }, [createPlaylist, addTrackToPlaylist])
 
   if (loading && allTracks.length === 0) {
     return <div>Loading tracks...</div>
@@ -606,6 +664,7 @@ export default function TracksTable() {
                     isPlayerReady={isPlayerReady}
                     onPlayToggle={handlePlayToggle}
                     onAddToPlaylist={handleAddToPlaylist}
+                    onCreateNewPlaylist={handleCreateNewPlaylist}
                   />
                 ))}
               </SortableContext>
