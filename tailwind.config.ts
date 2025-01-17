@@ -11,8 +11,9 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        main: '#FFDC58',
+        main: '#FFDC58', // Bright yellow
         mainAccent: '#ffc800',
+        mainAccent2: '#f6a313', // RGB 246,163,19
         overlay: 'rgba(0,0,0,0.8)',
         bg: '#FEF2E8',
         text: '#000',
