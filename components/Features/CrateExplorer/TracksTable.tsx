@@ -36,6 +36,8 @@ import {
   DropdownMenuSeparator 
 } from '@/components/ui/dropdown-menu'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { usePlaylistStore } from '@/store/usePlaylistStore'
+import { toast } from 'react-hot-toast'
 
 interface SortableRowProps {
   track: CrateTrack
@@ -88,15 +90,22 @@ const SortableRow = ({
     return list.split(',').join(', ')
   }
 
+  const { playlists, createPlaylist, addTrackToPlaylist } = usePlaylistStore()
   const [isNewPlaylistDialogOpen, setIsNewPlaylistDialogOpen] = useState(false)
   const [newPlaylistName, setNewPlaylistName] = useState('')
 
   const handleCreateNewPlaylist = () => {
     if (newPlaylistName.trim()) {
-      onCreateNewPlaylist(track, newPlaylistName.trim())
+      const newPlaylist = createPlaylist(newPlaylistName.trim(), [track])
       setNewPlaylistName('')
       setIsNewPlaylistDialogOpen(false)
+      toast(`Added to ${newPlaylist.title}`)
     }
+  }
+
+  const handleAddToPlaylist = (playlistId: number) => {
+    addTrackToPlaylist(playlistId, track)
+    toast('Added to playlist')
   }
 
   return (
@@ -119,29 +128,43 @@ const SortableRow = ({
     <td className="px-4 py-4 whitespace-nowrap">
         <div className="relative group">
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
                 size="sm"
-                className="flex items-center gap-2 hover:bg-primary/5 group-hover:flex"
+                className="flex items-center gap-2 hover:bg-primary/5 group-hover:flex bg-mainAccent2"
               >
                 <ListPlus className="w-4 h-4" />
-                <span className="sr-only">Add to Bag</span>
+                <span className="sr-only">Add to Playlist</span>
               </Button>
             </DropdownMenuTrigger>
+            <div className="flex items-center gap-2 hover:bg-primary/5 group-hover:flex bg-mainAccent2">
             <DropdownMenuContent align="start" className="w-48">
+              {playlists.map((playlist) => (
+                <DropdownMenuItem 
+                  key={playlist.id}
+                  onClick={() => handleAddToPlaylist(playlist.id)}
+                  className="bg-mainAccent2"
+                >
+                  {playlist.title}
+                </DropdownMenuItem>
+              ))}
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setIsNewPlaylistDialogOpen(true)}>
+              <DropdownMenuItem 
+                onClick={() => setIsNewPlaylistDialogOpen(true)}
+                className="bg-mainAccent2"
+              >
                 <Plus className="w-4 h-4 mr-2" />
-                Create New Bag
+                Create New Playlist
               </DropdownMenuItem>
             </DropdownMenuContent>
+            </div>
           </DropdownMenu>
 
           <Dialog open={isNewPlaylistDialogOpen} onOpenChange={setIsNewPlaylistDialogOpen}>
-            <DialogContent>
+            <DialogContent className="bg-bg border border-border shadow-light">
               <DialogHeader>
-                <DialogTitle>Create New Bag</DialogTitle>
+                <DialogTitle>New Playlist</DialogTitle>
               </DialogHeader>
               <Input
                 placeholder="Enter bag name (e.g., Datach Gig Jan 2025)"
@@ -149,7 +172,7 @@ const SortableRow = ({
                 onChange={(e) => setNewPlaylistName(e.target.value)}
               />
               <DialogFooter>
-                <Button variant="outline" onClick={() => setIsNewPlaylistDialogOpen(false)}>
+                <Button  onClick={() => setIsNewPlaylistDialogOpen(false)}>
                   Cancel
                 </Button>
                 <Button onClick={handleCreateNewPlaylist}>
@@ -581,7 +604,7 @@ export default function TracksTable() {
         scope="col" 
         className="w-12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
         >
-        Bag
+        Playlist
         </th>
         <th 
         scope="col" 
