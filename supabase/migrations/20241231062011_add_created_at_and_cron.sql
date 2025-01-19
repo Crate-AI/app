@@ -1,6 +1,6 @@
 ALTER TABLE discogs_releases
     ADD COLUMN uploaded_at timestamptz DEFAULT now();
-
+CREATE EXTENSION pg_cron;
 -- create a cron job to fetch discogs data using pg_cron
 -- taken from https://supabase.com/docs/guides/functions/schedule-functions
 SELECT

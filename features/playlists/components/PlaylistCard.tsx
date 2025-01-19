@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Play, Pause } from "lucide-react";
 import { cn } from "@/lib/utils/utils";
-import { PlaylistCardProps } from "@/types/playlist";
+import { PlaylistCardProps } from "@/types";
 
 export const PlaylistCard = ({ 
   playlist,
