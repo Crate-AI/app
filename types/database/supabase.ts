@@ -58,6 +58,7 @@ export type Database = {
       tracks: {
         Row: {
           artist: string
+          artwork: string | null
           bpm: number | null
           created_at: string | null
           discogs_release_id: string
@@ -72,6 +73,7 @@ export type Database = {
         }
         Insert: {
           artist: string
+          artwork?: string | null
           bpm?: number | null
           created_at?: string | null
           discogs_release_id: string
@@ -86,6 +88,7 @@ export type Database = {
         }
         Update: {
           artist?: string
+          artwork?: string | null
           bpm?: number | null
           created_at?: string | null
           discogs_release_id?: string
