@@ -1,8 +1,8 @@
 'use client';
 
-import { useAuthStore } from '@/lib/store/authStore';
+import { useAuthStore } from '@/stores';
 import { redirect } from 'next/navigation';
-import SearchBar from '@/components/Features/CrateExplorer/SearchBar';
+import SearchBar from '@/features/crate-explorer/components/SearchBar';
 import useDiscogsSearch from '@/lib/hooks/useDiscogsSearch';
 interface UserProfileProps {
   username: string;

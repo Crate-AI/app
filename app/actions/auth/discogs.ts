@@ -1,7 +1,7 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import type { UserIdentity } from '@/types/auth';
+import type { UserIdentity } from '@/types';
 
 export async function getCurrentUserIdentity(): Promise<UserIdentity | null> {
   try {
