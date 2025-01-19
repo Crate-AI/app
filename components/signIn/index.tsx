@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { useAuthStore } from '@/lib/store/authStore';
 import { requestDiscogsAuth } from '@/app/actions/auth/discogs';
 import { LoaderCircle } from 'lucide-react';
 

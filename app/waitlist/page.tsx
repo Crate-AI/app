@@ -1,12 +1,5 @@
 import type { Metadata } from 'next';
-import { DiscogsSDK, StorageService } from '@crate.ai/discogs-sdk';
-import {
-  UserDetails,
-  DiscogsCollectionResponse,
-  Release,
-  MasterRelease,
-} from '@/types/discogs';
-import Waitlist from '@/components/Waitlist';
+import { Waitlist } from '@/features/waitlist';
 
 export const metadata: Metadata = {
   title: 'Crate',

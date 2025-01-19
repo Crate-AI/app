@@ -1,6 +1,6 @@
 import React from 'react';
+import FileIcon from '@/components/common/FileIcon';
 import DropZoneComponent from '@/components/DropZone';
-import FileIcon from '@/components/FileIcon';
 import { DropzoneOptions } from 'react-dropzone';
 
 interface SubmitFormProps {

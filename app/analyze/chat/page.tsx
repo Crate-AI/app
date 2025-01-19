@@ -1,7 +1,7 @@
 // app/analyze/chat/page.tsx
 'use client';
 
-import { Chatbot } from '@/components/Features/Analyze/Chatbot';
+import { Chatbot } from '@/features/analyze/components/Chatbot';
 
 export default function ChatPage() {
   return (

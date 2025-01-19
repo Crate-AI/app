@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { CollectionRelease } from '@/types/discogs';
+import type { CollectionRelease } from '@/types';
 
 interface CollectionData {
   collection: CollectionRelease[];
@@ -21,7 +21,7 @@ export function useDiscogsCollection() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch('/api/discogs/collection');
+      const response = await fetch('/api/external/discogs/collection');
       if (!response.ok) throw new Error('Failed to fetch collection');
 
       const data = await response.json();

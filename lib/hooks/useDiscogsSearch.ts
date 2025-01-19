@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import useDebounce from './useDebounce';
-import type { DiscogsSearchResult } from '@/types/discogs';
+import type { DiscogsSearchResult } from '@/types';
 
 interface UseDiscogsSearchReturn {
   query: string;
@@ -34,7 +34,7 @@ const useDiscogsSearch = (): UseDiscogsSearchReturn => {
       setError(null);
 
       try {
-        const response = await fetch('/api/discogs/search', {
+        const response = await fetch('/api/external/discogs/search', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

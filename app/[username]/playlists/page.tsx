@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from "react";
-import { PlaylistCard } from '@/components/Features/Playlists/PlaylistCard';
-import { Playlist } from '@/components/Features/Playlists/Playlist';
-import { usePlaylistStore } from '@/store/usePlaylistStore';
+import { PlaylistCard } from '@/features/playlists/components/PlaylistCard';
+import { Playlist } from '@/features/playlists/components/Playlist';
+import { usePlaylistStore } from '@/stores';
 
 const PlaylistPage = () => {
   const [activePlaylistId, setActivePlaylistId] = useState<number | null>(null);
