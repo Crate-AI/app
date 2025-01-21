@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { YouTubePlayer as YTPlayer, YouTubeEvent } from '@/types';
+import type { YouTubePlayer as YTPlayer, YouTubeEvent, CrateTrack } from '@/types';
 
 interface PlayerState {
   player: YTPlayer | null;
@@ -9,6 +9,9 @@ interface PlayerState {
   setPlayer: (player: YTPlayer) => void;
   setIsReady: (ready: boolean) => void;
   setPlayingTrackId: (trackId: string | null) => void;
+  playTrack: (track: CrateTrack) => void;
+  pauseTrack: () => void;
+  togglePlayPause: (track: CrateTrack) => void;
   reset: () => void;
 }
 
@@ -76,5 +79,40 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   setPlayer: (player) => set({ player }),
   setIsReady: (ready) => set({ isReady: ready }),
   setPlayingTrackId: (trackId) => set({ playingTrackId: trackId }),
+
+  playTrack: (track) => {
+    const { player, isReady } = get();
+    if (!player || !isReady || !track.youtube_video_id) return;
+    
+    player.loadVideoById({ videoId: track.youtube_video_id, suggestedQuality: 'highres' });
+    player.playVideo();
+    set({ playingTrackId: track.id });
+  },
+
+  pauseTrack: () => {
+    const { player } = get();
+    if (!player) return;
+    
+    player.pauseVideo();
+  },
+
+  togglePlayPause: (track) => {
+    const { player, playingTrackId } = get();
+    if (!player || !track.youtube_video_id) return;
+    
+    if (playingTrackId === track.id) {
+      const state = player.getPlayerState();
+      if (state === 1) { // playing
+        player.pauseVideo();
+      } else {
+        player.playVideo();
+      }
+    } else {
+      player.loadVideoById({ videoId: track.youtube_video_id, suggestedQuality: 'highres' });
+      player.playVideo();
+      set({ playingTrackId: track.id });
+    }
+  },
+
   reset: () => set({ player: null, isReady: false, playingTrackId: null }),
 })); 

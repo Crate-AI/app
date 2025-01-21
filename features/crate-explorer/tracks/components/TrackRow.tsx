@@ -16,7 +16,9 @@ interface TrackRowProps {
     onPlayToggle: (track: CrateTrack) => void
     onAddToPlaylist: (playlistId: string, trackId: string) => void
     onCreateNewPlaylist: (name: string, track: CrateTrack) => void
-  }
+    isPlaying: boolean
+    onPlayPause: () => void
+}
   
 export const TrackRow = ({
     track,
@@ -29,6 +31,8 @@ export const TrackRow = ({
     onPlayToggle,
     onAddToPlaylist,
     onCreateNewPlaylist,
+    isPlaying,
+    onPlayPause,
   }: TrackRowProps) => {
     const { playlists } = usePlaylistStore()
     const formatArtists = (artist: string, extraArtists: string | null) => {

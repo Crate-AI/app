@@ -169,6 +169,8 @@ export default function TracksTable() {
                 onPlayToggle={handlePlayToggle}
                 onAddToPlaylist={handleAddToPlaylist}
                 onCreateNewPlaylist={handleCreateNewPlaylist}
+                isPlaying={playingTrackId === track.id}
+                onPlayPause={() => handlePlayToggle(track)}
               />
             ))}
           </tbody>

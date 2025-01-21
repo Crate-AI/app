@@ -3,24 +3,31 @@ import { Play, Pause } from "lucide-react";
 import { cn } from "@/lib/utils/utils";
 import { PlaylistWithTracks } from "@/types";
 import Image from "next/image";
+import { usePlayerStore } from "@/stores";
+
 interface PlaylistCardProps {
   playlist: PlaylistWithTracks;
   isPlaying?: boolean;
-  onClick?: () => void;
+  handleClick: () => void;
+  handlePlayPause: () => void;
 }
 
 export const PlaylistCard = ({ 
   playlist,
   isPlaying = false,
-  onClick 
+  handleClick,
+  handlePlayPause
 }: PlaylistCardProps) => {
+  const { togglePlayPause } = usePlayerStore();
+
+
   return (
     <Card 
       className={cn(
         "group relative overflow-hidden transition-all hover:shadow-light cursor-pointer border-none",
         isPlaying && 'ring-2 ring-mainAccent'
       )}
-      onClick={onClick}
+      onClick={handleClick}
     >
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
       
@@ -32,7 +39,7 @@ export const PlaylistCard = ({
         )}
         onClick={(e) => {
           e.stopPropagation();
-          onClick?.();
+          handlePlayPause();
         }}
       >
         {isPlaying ? <Pause size={24} /> : <Play size={24} />}

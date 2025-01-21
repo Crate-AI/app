@@ -3,18 +3,23 @@
 import { useState, useEffect } from "react";
 import { PlaylistCard } from '@/features/playlists/components/PlaylistCard';
 import { Playlist } from '@/features/playlists/components/Playlist';
-import { usePlaylistStore } from '@/stores';
+import { usePlaylistStore, usePlayerStore } from '@/stores';
+import { PlaylistWithTracks } from "@/types";
 
 const PlaylistPage = () => {
   const [activePlaylistId, setActivePlaylistId] = useState<string | null>(null);
   const { playlists, fetchPlaylists } = usePlaylistStore();
+  const { togglePlayPause } = usePlayerStore();
 
   useEffect(() => {
     fetchPlaylists();
   }, [fetchPlaylists]);
 
-  const handlePlaylistClick = (playlistId: string) => {
-    setActivePlaylistId(currentId => currentId === playlistId ? null : playlistId);
+  const handlePlaylistAction = (playlist: PlaylistWithTracks) => {
+    if (playlist.tracks?.length > 0) {
+      togglePlayPause(playlist.tracks[0]);
+      setActivePlaylistId(currentId => currentId === playlist.id ? null : playlist.id);
+    }
   };
 
   return (
@@ -30,7 +35,8 @@ const PlaylistPage = () => {
               key={playlist.id}
               playlist={playlist}
               isPlaying={activePlaylistId === playlist.id}
-              onClick={() => handlePlaylistClick(playlist.id)}
+              handleClick={() => handlePlaylistAction(playlist)}
+              handlePlayPause={() => handlePlaylistAction(playlist)}
             />
           ))}
         </div>

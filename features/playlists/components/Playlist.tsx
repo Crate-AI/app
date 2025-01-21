@@ -1,11 +1,10 @@
 'use client';
 
-import { useState } from "react";
+import { useEffect } from "react";
 import { Play, Pause } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils/utils";
-import { usePlaylistStore } from "@/stores";
-import { PlaylistWithTracks } from "@/types";
+import { usePlaylistStore, usePlayerStore } from "@/stores";
 import { formatDuration } from "@/lib/utils/format";
 
 interface PlaylistProps {
@@ -13,24 +12,18 @@ interface PlaylistProps {
 }
 
 export const Playlist = ({ activePlaylistId }: PlaylistProps) => {
-  const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
   const { playlists } = usePlaylistStore();
+  const { initializePlayer, playingTrackId, togglePlayPause } = usePlayerStore();
   
   const activePlaylist = playlists.find(p => p.id === activePlaylistId);
   
+  useEffect(() => {
+    initializePlayer();
+  }, [initializePlayer]);
+
   if (!activePlaylist) {
     return null;
   }
-
-  const handlePlayPause = (trackId: string) => {
-    if (currentlyPlaying === trackId) {
-      setCurrentlyPlaying(null);
-      toast("Paused");
-    } else {
-      setCurrentlyPlaying(trackId);
-      toast("Now playing");
-    }
-  };
 
   return (
     <div className="relative overflow-x-auto">
@@ -60,20 +53,20 @@ export const Playlist = ({ activePlaylistId }: PlaylistProps) => {
               key={track.id}
               className={cn(
                 "group hover:bg-gray-50/5 transition-colors duration-200",
-                currentlyPlaying === track.id && "bg-mainAccent/10"
+                playingTrackId === track.id && "bg-mainAccent/10"
               )}
             >
               <td className="pl-4 py-3">
                 <button
-                  onClick={() => handlePlayPause(track.id)}
+                  onClick={() => togglePlayPause(track)}
                   className={cn(
                     "p-2 rounded-full transition-colors",
-                    currentlyPlaying === track.id
+                    playingTrackId === track.id
                       ? "bg-mainAccent text-text"
                       : "bg-gray-50/10 hover:bg-gray-50/20 text-text"
                   )}
                 >
-                  {currentlyPlaying === track.id ? (
+                  {playingTrackId === track.id ? (
                     <Pause className="w-4 h-4" />
                   ) : (
                     <Play className="w-4 h-4" />
