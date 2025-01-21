@@ -1,15 +1,19 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PlaylistCard } from '@/features/playlists/components/PlaylistCard';
 import { Playlist } from '@/features/playlists/components/Playlist';
 import { usePlaylistStore } from '@/stores';
 
 const PlaylistPage = () => {
-  const [activePlaylistId, setActivePlaylistId] = useState<number | null>(null);
-  const playlists = usePlaylistStore((state) => state.playlists);
+  const [activePlaylistId, setActivePlaylistId] = useState<string | null>(null);
+  const { playlists, fetchPlaylists } = usePlaylistStore();
 
-  const handlePlaylistClick = (playlistId: number) => {
+  useEffect(() => {
+    fetchPlaylists();
+  }, [fetchPlaylists]);
+
+  const handlePlaylistClick = (playlistId: string) => {
     setActivePlaylistId(currentId => currentId === playlistId ? null : playlistId);
   };
 

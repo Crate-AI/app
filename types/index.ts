@@ -1,14 +1,24 @@
-// Database types
-export * from './database/supabase';
-export * from './database/tracks';
-export * from './database/playlist';
+// Re-export database types
+export type {
+  CrateTrack,
+  InsertCrateTrack,
+  Playlist,
+  PlaylistTrack,
+  InsertPlaylist,
+  InsertPlaylistTrack,
+} from './database';
+
+// Re-export UI types
+export type {
+  PlaylistWithTracks,
+  PlaylistCardProps,
+} from './ui/playlist';
 
 // External service types
 export * from './external-services/discogs';
 export * from './external-services/youtube';
 
 // UI types
-export * from './ui/playlist';
 export * from './ui/ordering';
 
 // API types

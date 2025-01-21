@@ -14,8 +14,8 @@ interface TrackRowProps {
     playingTrackId: string | null
     isPlayerReady: boolean
     onPlayToggle: (track: CrateTrack) => void
-    onAddToPlaylist: (track: CrateTrack, playlistId: string) => void
-    onCreateNewPlaylist: (track: CrateTrack, name: string) => void
+    onAddToPlaylist: (playlistId: string, trackId: string) => void
+    onCreateNewPlaylist: (name: string, track: CrateTrack) => void
   }
   
 export const TrackRow = ({

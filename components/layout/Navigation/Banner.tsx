@@ -22,9 +22,10 @@ export default function Banner({
           <Image
             src="/logo.svg"
             alt="Crate Logo"
-            width={100}
-            height={100}
-            className="transition-transform duration-300 hover:scale-110"
+            width={48}
+            height={48}
+            priority
+            className="w-12 h-12"
           />
         </Link>
       </div>

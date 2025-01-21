@@ -70,66 +70,13 @@ export async function GET(request: Request) {
     const password = `discogs_${userIdentity.id}`;
 
     // Try to sign in with email first
-    const { data: signInData, error: signInError } =
-      await supabase.auth.signInWithPassword({
-        email: user.email,
-        password,
-      });
+    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password,
+    });
 
-    // If user doesn't exist, create new account
-    // TODO: is there a better check?
-    if (signInError?.message.includes('Invalid login credentials')) {
-      const { data: signUpData, error: signUpError } =
-        await supabase.auth.signUp({
-          email: user.email,
-          password,
-          options: {
-            data: {
-              discogs_username: userIdentity.username,
-              discogs_id: userIdentity.id,
-            },
-          },
-        });
-
-      if (signUpError || !signUpData.user) {
-        console.error('Failed to create user:', signUpError);
-        return NextResponse.redirect(
-          new URL('/?error=signup_failed', request.url),
-        );
-      }
-      const { error: createError } = await supabase
-        .from('user_discogs_profile')
-        .upsert({
-          user_id: signUpData.user.id,
-          username: userIdentity.username,
-        });
-      if (createError) {
-        throw createError;
-      }
-      cookies().set(
-        'user_data',
-        JSON.stringify({
-          userId: signUpData.user.id,
-          username: userIdentity.username,
-          avatarUrl: userProfile.avatar_url || '/default-avatar.png',
-        }),
-        {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'lax',
-        },
-      );
-    } else if (signInData?.user) {
-      const { error: createError } = await supabase
-        .from('user_discogs_profile')
-        .upsert({
-          user_id: signInData.user.id,
-          username: userIdentity.username,
-        });
-      if (createError) {
-        throw createError;
-      }
-      // Existing user signed in successfully
+    if (signInData?.user) {
+      // Update user data cookie
       cookies().set(
         'user_data',
         JSON.stringify({
@@ -141,13 +88,70 @@ export async function GET(request: Request) {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
           sameSite: 'lax',
-        },
+        }
       );
+      
+      // Update Discogs profile
+      const { error: updateError } = await supabase
+        .from('user_discogs_profile')
+        .upsert({
+          user_id: signInData.user.id,
+          username: userIdentity.username,
+        });
+        
+      if (updateError) {
+        console.error('Failed to update user profile:', updateError);
+      }
+      
+      return NextResponse.redirect(new URL('/', request.url));
     }
 
-    return NextResponse.redirect(
-      new URL(`/${userIdentity.username}`, request.url),
+    // If user doesn't exist, create new account
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      email: user.email,
+      password,
+      options: {
+        data: {
+          discogs_username: userIdentity.username,
+          discogs_id: userIdentity.id,
+        },
+      },
+    });
+
+    if (signUpError || !signUpData.user) {
+      console.error('Failed to create user:', signUpError);
+      return NextResponse.redirect(new URL('/?error=signup_failed', request.url));
+    }
+
+    // Create Discogs profile
+    const { error: createError } = await supabase
+      .from('user_discogs_profile')
+      .upsert({
+        user_id: signUpData.user.id,
+        username: userIdentity.username,
+      });
+
+    if (createError) {
+      console.error('Failed to create user profile:', createError);
+      return NextResponse.redirect(new URL('/?error=profile_failed', request.url));
+    }
+
+    // Set user data cookie
+    cookies().set(
+      'user_data',
+      JSON.stringify({
+        userId: signUpData.user.id,
+        username: userIdentity.username,
+        avatarUrl: userProfile.avatar_url || '/default-avatar.png',
+      }),
+      {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+      }
     );
+
+    return NextResponse.redirect(new URL('/', request.url));
   } catch (error) {
     console.error('Error during OAuth callback:', error);
     return NextResponse.redirect(new URL('/?error=auth_failed', request.url));

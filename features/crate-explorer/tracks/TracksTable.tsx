@@ -11,7 +11,7 @@ import { TableHeader } from './components/TableHeader'
 
 export default function TracksTable() {
   const { allTracks, suggestedTrackIds } = useTracksStore()
-  const { createPlaylist, addTrackToPlaylist } = usePlaylistStore()
+  const { createPlaylist, addTrackToPlaylist, fetchPlaylists } = usePlaylistStore()
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -22,13 +22,24 @@ export default function TracksTable() {
   const { playingTrackId, isPlayerReady, handlePlayToggle } = useYouTubePlayer()
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const handleAddToPlaylist = async (track: CrateTrack, playlistId: string) => {
-    await addTrackToPlaylist(playlistId, track)
+  useEffect(() => {
+    fetchPlaylists().catch(error => {
+      console.error('Error fetching playlists:', error);
+      setError('Failed to fetch playlists');
+    });
+  }, [fetchPlaylists]);
+
+  const handleAddToPlaylist = async (playlistId: string, trackId: string) => {
+    await addTrackToPlaylist(playlistId, trackId);
   }
 
-  const handleCreateNewPlaylist = async (track: CrateTrack, name: string) => {
-    const playlistId = await createPlaylist(name)
-    await addTrackToPlaylist(playlistId, track)
+  const handleCreateNewPlaylist = async (name: string, track: CrateTrack) => {
+    try {
+      const playlistId = await createPlaylist(name);
+      await addTrackToPlaylist(playlistId, track.id);
+    } catch (error) {
+      throw error;
+    }
   }
 
   const handleSort = (column: OrderingConfig['orderBy']) => {
