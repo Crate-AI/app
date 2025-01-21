@@ -1,14 +1,13 @@
-import { CrateTrack } from '@/types';
+import { CrateTrack } from '@/types'
+import { Playlist as DbPlaylist } from '@/types/database/playlist'
 
-export interface Playlist {
-  id: number;
-  title: string;
-  tracks: CrateTrack[];
-  coverImage?: string;
+export interface PlaylistWithTracks extends DbPlaylist {
+  tracks: CrateTrack[]
+  isPlaying?: boolean
 }
 
 export interface PlaylistCardProps {
-  playlist: Playlist;
-  isPlaying?: boolean;
-  onClick?: () => void;
-} 
+  playlist: PlaylistWithTracks
+  isPlaying?: boolean
+  onClick?: () => void
+}
