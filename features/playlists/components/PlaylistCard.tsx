@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Play, Pause } from "lucide-react";
 import { cn } from "@/lib/utils/utils";
-import { PlaylistCardProps } from "@/types";
+import { PlaylistCardProps,  } from "@/types";
 
 export const PlaylistCard = ({ 
   playlist,
@@ -33,9 +33,9 @@ export const PlaylistCard = ({
       </button>
 
       <CardHeader className="h-48 bg-gray-100">
-        {playlist.coverImage ? (
+        {playlist.cover_image_url ? (
           <img 
-            src={playlist.coverImage} 
+            src={playlist.cover_image_url} 
             alt={playlist.title} 
             className="w-full h-full object-cover" 
           />
