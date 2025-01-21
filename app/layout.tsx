@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Suspense } from 'react';
+import { Toaster } from 'sonner';
 import './globals.css';
 import AuthProvider from '@/features/auth/components/AuthProvider';
 import Navigation from '@/components/layout/Navigation';
@@ -54,6 +55,7 @@ const RootLayout = ({ children }: Readonly<RootLayoutProps>) => {
             </main>
           </AuthProvider>
         </ErrorBoundary>
+        <Toaster />
       </body>
     </html>
   );
