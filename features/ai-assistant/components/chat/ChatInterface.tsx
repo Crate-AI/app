@@ -10,8 +10,8 @@ import { CrateTrack } from '@/types'
 import { ChatLoader } from '@/features/ai-assistant/components/chat/ChatLoader'
 import { useChat } from 'ai/react'
 import { cn } from '@/lib/utils/utils'
-import { useAuthStore } from '@/stores'
-import { useTracksStore } from '@/stores'
+import { useAuthStore, useTracksStore } from '@/stores'
+import { useTrackSorting } from '@/lib/hooks/useTrackSorting'
 import { toast } from 'sonner'
 
 interface ChatInterfaceProps {
@@ -54,7 +54,8 @@ const parseTracksFromMessage = (content: string): ParsedTrack[] => {
 export default function ChatInterface({ tracks, onTracksFilter }: ChatInterfaceProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const { userIdentity } = useAuthStore()
-  const { setOrderingConfig, setSuggestedTracks } = useTracksStore()
+  const { setSuggestedTracks } = useTracksStore()
+  const { setOrderingConfig } = useTrackSorting(tracks)
 
   const processTrackSuggestions = useCallback((content: string) => {
     try {

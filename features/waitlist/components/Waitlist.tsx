@@ -19,9 +19,10 @@ const Waitlist: React.FC = () => {
           <Image
             src="/logo.svg"
             alt="Crate Logo"
-            width={100}
-            height={100}
-            className="transition-transform duration-300 hover:scale-110"
+            width={64}
+            height={64}
+            priority
+            className="w-16 h-16"
           />
           {/* <h1 className="text-2xl font-heading text-black ml-4">Welcome to Crate</h1> */}
         </div>

@@ -4,35 +4,30 @@ import { useState } from "react";
 import { Play, Pause } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils/utils";
-
-interface Song {
-  id: number;
-  title: string;
-  artist: string;
-  duration: string;
-}
-
-const sampleSongs: Song[] = [
-  { id: 1, title: "Dreams", artist: "Fleetwood Mac", duration: "4:14" },
-  { id: 2, title: "Bohemian Rhapsody", artist: "Queen", duration: "5:55" },
-  { id: 3, title: "Hotel California", artist: "Eagles", duration: "6:30" },
-  { id: 4, title: "Sweet Child O' Mine", artist: "Guns N' Roses", duration: "5:56" },
-  { id: 5, title: "Billie Jean", artist: "Michael Jackson", duration: "4:54" },
-];
+import { usePlaylistStore } from "@/stores";
+import { PlaylistWithTracks } from "@/types";
+import { formatDuration } from "@/lib/utils/format";
 
 interface PlaylistProps {
-  activePlaylistId?: number | null;
+  activePlaylistId: string;
 }
 
 export const Playlist = ({ activePlaylistId }: PlaylistProps) => {
-  const [currentlyPlaying, setCurrentlyPlaying] = useState<number | null>(null);
+  const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
+  const { playlists } = usePlaylistStore();
+  
+  const activePlaylist = playlists.find(p => p.id === activePlaylistId);
+  
+  if (!activePlaylist) {
+    return null;
+  }
 
-  const handlePlayPause = (songId: number) => {
-    if (currentlyPlaying === songId) {
+  const handlePlayPause = (trackId: string) => {
+    if (currentlyPlaying === trackId) {
       setCurrentlyPlaying(null);
       toast("Paused");
     } else {
-      setCurrentlyPlaying(songId);
+      setCurrentlyPlaying(trackId);
       toast("Now playing");
     }
   };
@@ -41,7 +36,7 @@ export const Playlist = ({ activePlaylistId }: PlaylistProps) => {
     <div className="relative overflow-x-auto">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-medium-title font-heading font-bold text-text">
-          My Playlist
+          {activePlaylist.title}
         </h2>
       </div>
       
@@ -60,25 +55,25 @@ export const Playlist = ({ activePlaylistId }: PlaylistProps) => {
           </tr>
         </thead>
         <tbody className="bg-bg divide-y divide-border">
-          {sampleSongs.map((song) => (
+          {activePlaylist.tracks.map((track) => (
             <tr
-              key={song.id}
+              key={track.id}
               className={cn(
                 "group hover:bg-gray-50/5 transition-colors duration-200",
-                currentlyPlaying === song.id && "bg-mainAccent/10"
+                currentlyPlaying === track.id && "bg-mainAccent/10"
               )}
             >
               <td className="pl-4 py-3">
                 <button
-                  onClick={() => handlePlayPause(song.id)}
+                  onClick={() => handlePlayPause(track.id)}
                   className={cn(
                     "p-2 rounded-full transition-colors",
-                    currentlyPlaying === song.id
+                    currentlyPlaying === track.id
                       ? "bg-mainAccent text-text"
                       : "bg-gray-50/10 hover:bg-gray-50/20 text-text"
                   )}
                 >
-                  {currentlyPlaying === song.id ? (
+                  {currentlyPlaying === track.id ? (
                     <Pause className="w-4 h-4" />
                   ) : (
                     <Play className="w-4 h-4" />
@@ -88,16 +83,16 @@ export const Playlist = ({ activePlaylistId }: PlaylistProps) => {
               <td className="px-4 py-3">
                 <div className="flex flex-col">
                   <span className="text-sm font-medium text-text">
-                    {song.title}
+                    {track.title}
                   </span>
                   <span className="text-small-subtitle text-text/70">
-                    {song.artist}
+                    {track.artist}
                   </span>
                 </div>
               </td>
               <td className="px-4 py-3 text-right">
                 <span className="text-small-subtitle text-text/70">
-                  {song.duration}
+                  {formatDuration(parseInt(track.duration))}
                 </span>
               </td>
             </tr>

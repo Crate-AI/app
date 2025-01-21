@@ -1,6 +1,8 @@
 import { ListPlus, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { CrateTrack } from '@/types'
+import { toast } from 'sonner'
+import { useAuthStore } from '@/stores'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -14,9 +16,9 @@ import { useState } from 'react'
 
 interface PlaylistActionsProps {
   track: CrateTrack
-  playlists: { id: string; name: string }[]
-  onAddToPlaylist: (track: CrateTrack, playlistId: string) => void
-  onCreateNewPlaylist: (track: CrateTrack, name: string) => void
+  playlists: Array<{ id: string; name: string }>
+  onAddToPlaylist: (playlistId: string, trackId: string) => void
+  onCreateNewPlaylist: (name: string, track: CrateTrack) => void
 }
 
 export function PlaylistActions({
@@ -27,12 +29,29 @@ export function PlaylistActions({
 }: PlaylistActionsProps) {
   const [isCreatingPlaylist, setIsCreatingPlaylist] = useState(false)
   const [newPlaylistName, setNewPlaylistName] = useState('')
+  const { isAuthenticated } = useAuthStore()
 
-  const handleCreateNewPlaylist = () => {
+  const handleCreateNewPlaylist = async () => {
+    
     if (!newPlaylistName.trim()) return
-    onCreateNewPlaylist(track, newPlaylistName)
-    setNewPlaylistName('')
-    setIsCreatingPlaylist(false)
+    
+    try {
+      await onCreateNewPlaylist(newPlaylistName, track)
+      setNewPlaylistName('')
+      setIsCreatingPlaylist(false)
+      toast.success('Playlist created successfully')
+    } catch (error) {
+      toast.error('Failed to create playlist')
+    }
+  }
+
+  const handleAddToPlaylist = (playlistId: string) => {
+    if (!isAuthenticated()) {
+      toast.error('Please sign in to add tracks to playlists');
+      return;
+    }
+    
+    onAddToPlaylist(playlistId, track.id);
   }
 
   return (
@@ -47,7 +66,7 @@ export function PlaylistActions({
           {playlists.map((playlist) => (
             <DropdownMenuItem
               key={playlist.id}
-              onClick={() => onAddToPlaylist(track, playlist.id)}
+              onClick={() => handleAddToPlaylist(playlist.id)}
             >
               {playlist.name}
             </DropdownMenuItem>

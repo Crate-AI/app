@@ -1,23 +1,36 @@
 import { supabase } from './client';
 
 export async function auth() {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return null;
-  return session.user;
+  try {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error) {
+      return null;
+    }
+    if (!session) {
+      return null;
+    };
+    return session.user;
+  } catch (error) {
+    console.error('Auth error:', error);
+    return null;
+  }
 }
 
 export async function initializeAuth() {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return null;
-
-  // Set up auth state change listener
-  supabase.auth.onAuthStateChange((event, session) => {
-    if (event === 'SIGNED_IN') {
-      console.log('User signed in:', session?.user);
-    } else if (event === 'SIGNED_OUT') {
-      console.log('User signed out');
+  try {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    
+    if (error) {
+      return null;
     }
-  });
 
-  return session.user;
+    
+    if (!session) {
+      return null;
+    }
+
+    return session.user;
+  } catch (error) {
+    return null;
+  }
 } 

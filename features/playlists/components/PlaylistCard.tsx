@@ -1,7 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Play, Pause } from "lucide-react";
 import { cn } from "@/lib/utils/utils";
-import { PlaylistCardProps,  } from "@/types";
+import { PlaylistWithTracks } from "@/types";
+import Image from "next/image";
+interface PlaylistCardProps {
+  playlist: PlaylistWithTracks;
+  isPlaying?: boolean;
+  onClick?: () => void;
+}
 
 export const PlaylistCard = ({ 
   playlist,
@@ -33,11 +39,14 @@ export const PlaylistCard = ({
       </button>
 
       <CardHeader className="h-48 bg-gray-100">
-        {playlist.cover_image_url ? (
-          <img 
-            src={playlist.cover_image_url} 
-            alt={playlist.title} 
+        {playlist.tracks?.length > 0 && playlist.tracks[0].artwork ? (
+          <Image 
+            src={decodeURIComponent(playlist.tracks[0].artwork.replace(/^"(.*)"$/, '$1'))}
+            alt={playlist.tracks[0].artist ?? ''}
             className="w-full h-full object-cover" 
+            width={400}
+            height={400}
+            priority
           />
         ) : (
           <div className="w-full h-full bg-gray-100 flex items-center justify-center">
@@ -48,10 +57,10 @@ export const PlaylistCard = ({
 
       <CardContent className="p-4 bg-bg">
         <CardTitle className="text-lg font-heading font-medium text-text mb-1">
-          {playlist.title}
+          {playlist?.title}
         </CardTitle>
         <p className="text-small-subtitle text-text/70">
-          {playlist.tracks.length} tracks
+          {playlist?.tracks?.length} tracks
         </p>
       </CardContent>
     </Card>

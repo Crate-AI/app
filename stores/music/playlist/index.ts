@@ -1,8 +1,5 @@
 import { create } from 'zustand';
-import { CrateTrack } from '@/types';
-import { PlaylistWithTracks } from '@/types/ui/playlist';
-import { supabase } from '@/lib/supabase/client';
-import { InsertPlaylist, InsertPlaylistTrack, Playlist, PlaylistTrack } from '@/types/database/playlist';
+import { CrateTrack, PlaylistWithTracks } from '@/types';
 import { toast } from 'sonner';
 
 interface PlaylistStore {
@@ -12,7 +9,7 @@ interface PlaylistStore {
   
   fetchPlaylists: () => Promise<void>;
   createPlaylist: (title: string, description?: string) => Promise<string>;
-  addTrackToPlaylist: (playlistId: string, track: CrateTrack) => Promise<void>;
+  addTrackToPlaylist: (playlistId: string, trackId: string) => Promise<void>;
   removeTrackFromPlaylist: (playlistId: string, trackId: string) => Promise<void>;
   updateTrackOrder: (playlistId: string, trackId: string, newPosition: number) => Promise<void>;
   clearError: () => void;
@@ -27,26 +24,20 @@ export const usePlaylistStore = create<PlaylistStore>((set, get) => {
     fetchPlaylists: async () => {
       set({ isLoading: true, error: null });
       try {
-        const { data: playlists, error } = await supabase
-          .from('playlists')
-          .select(`
-            *,
-            playlist_tracks (
-              *,
-              track: tracks (*)
-            )
-          `)
-          .order('created_at', { ascending: false });
-          
-        if (error) throw error;
+        const response = await fetch('/api/music/playlists');
+        if (!response.ok) {
+          throw new Error('Failed to fetch playlists');
+        }
+        
+        const playlists = await response.json();
         
         // Transform the data to match PlaylistWithTracks
-        const transformedPlaylists: PlaylistWithTracks[] = (playlists ?? []).map((playlist) => ({
+        const transformedPlaylists = (playlists ?? []).map((playlist: any) => ({
           ...playlist,
           tracks: (playlist.playlist_tracks ?? [])
-            .filter(pt => pt.track !== null)
-            .sort((a, b) => a.position - b.position)
-            .map(pt => pt.track as CrateTrack)
+            .filter((pt: { track: CrateTrack | null }) => pt.track !== null)
+            .sort((a: { position: number }, b: { position: number }) => a.position - b.position)
+            .map((pt: { track: CrateTrack }) => pt.track)
         }));
         
         set({ playlists: transformedPlaylists });
@@ -59,111 +50,90 @@ export const usePlaylistStore = create<PlaylistStore>((set, get) => {
     },
     
     createPlaylist: async (title: string, description?: string) => {
-      set({ isLoading: true, error: null });
+      
       try {
-        const session = await supabase.auth.getSession();
-        console.log('session', session);
-        const user = session.data.session?.user;
-        console.log('user', user);
-        if (!user) {
-          throw new Error('User not authenticated');
+        const response = await fetch('/api/music/playlists', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ title, description }),
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          console.error('PlaylistStore: Response not OK', error);
+          throw new Error(error.message || 'Failed to create playlist');
         }
-        
-        const newPlaylist: InsertPlaylist = {
-          title,
-          description,
-          user_id: user.id
-        };
-        
-        const { data: playlist, error } = await supabase
-          .from('playlists')
-          .insert(newPlaylist)
-          .select()
-          .single();
-          
-        if (error) throw error;
+
+        const playlist = await response.json();
         
         set(state => ({
-          playlists: [...state.playlists, { ...playlist, tracks: [] }]
+          playlists: [...state.playlists, playlist]
         }));
         
-        toast.success('Playlist created');
         return playlist.id;
       } catch (error) {
-        set({ error: (error as Error).message });
-        toast.error('Failed to create playlist');
+        console.error('PlaylistStore: Error in createPlaylist:', error);
+        const message = error instanceof Error ? error.message : 'Failed to create playlist';
+        toast.error(message);
         throw error;
-      } finally {
-        set({ isLoading: false });
       }
     },
     
-    addTrackToPlaylist: async (playlistId: string, track: CrateTrack) => {
-      set({ isLoading: true, error: null });
+    addTrackToPlaylist: async (playlistId: string, trackId: string) => {
       try {
-        // Get the current highest position
-        const { data: currentTracks } = await supabase
-          .from('playlist_tracks')
-          .select('position')
-          .eq('playlist_id', playlistId)
-          .order('position', { ascending: false })
-          .limit(1);
-          
-        const newPosition = (currentTracks?.[0]?.position ?? -1) + 1;
+        const response = await fetch(`/api/music/playlists/${playlistId}/tracks`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ trackId }),
+        });
         
-        const newTrack: InsertPlaylistTrack = {
-          playlist_id: playlistId,
-          track_id: track.id,
-          position: newPosition
-        };
-        
-        const { error } = await supabase
-          .from('playlist_tracks')
-          .insert(newTrack);
-          
-        if (error) throw error;
-        
-        // Update local state
-        set(state => ({
-          playlists: state.playlists.map(playlist =>
-            playlist.id === playlistId
-              ? { ...playlist, tracks: [...playlist.tracks, track] }
-              : playlist
-          )
-        }));
-        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Failed to add track to playlist');
+        }
+
         toast.success('Track added to playlist');
       } catch (error) {
-        set({ error: (error as Error).message });
-        toast.error('Failed to add track to playlist');
-      } finally {
-        set({ isLoading: false });
+        console.error('PlaylistStore: Error adding track to playlist:', error);
+        const message = error instanceof Error ? error.message : 'Failed to add track to playlist';
+        toast.error(message);
+        throw error;
       }
     },
     
     removeTrackFromPlaylist: async (playlistId: string, trackId: string) => {
       set({ isLoading: true, error: null });
       try {
-        const { error } = await supabase
-          .from('playlist_tracks')
-          .delete()
-          .eq('playlist_id', playlistId)
-          .eq('track_id', trackId);
-          
-        if (error) throw error;
+        const response = await fetch(`/api/music/playlists/${playlistId}/tracks/${trackId}`, {
+          method: 'DELETE',
+        });
         
-        // Update local state
+        if (!response.ok) {
+          throw new Error('Failed to remove track from playlist');
+        }
+        
+        // Update local state by filtering out the removed track
         set(state => ({
-          playlists: state.playlists.map(playlist =>
-            playlist.id === playlistId
-              ? {
-                  ...playlist,
-                  tracks: playlist.tracks.filter(track => track.id !== trackId)
-                }
-              : playlist
-          )
+          playlists: state.playlists.map(playlist => {
+            if (playlist.id === playlistId) {
+              // Type error occurs because playlist.tracks is not defined in the type
+              // We need to ensure playlist has a tracks array property
+              const playlistWithTracks = playlist as unknown as { 
+                id: string;
+                tracks: CrateTrack[];
+              };
+              return {
+                ...playlist,
+                tracks: playlistWithTracks.tracks.filter(track => track.id !== trackId)
+              };
+            }
+            return playlist;
+          })
         }));
-        
         toast.success('Track removed from playlist');
       } catch (error) {
         set({ error: (error as Error).message });
@@ -176,13 +146,17 @@ export const usePlaylistStore = create<PlaylistStore>((set, get) => {
     updateTrackOrder: async (playlistId: string, trackId: string, newPosition: number) => {
       set({ isLoading: true, error: null });
       try {
-        const { error } = await supabase
-          .from('playlist_tracks')
-          .update({ position: newPosition })
-          .eq('playlist_id', playlistId)
-          .eq('track_id', trackId);
-          
-        if (error) throw error;
+        const response = await fetch(`/api/music/playlists/${playlistId}/tracks/${trackId}/position`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ position: newPosition }),
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to update track order');
+        }
         
         // Fetch updated playlist to ensure correct order
         await get().fetchPlaylists();
