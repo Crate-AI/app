@@ -1,19 +1,20 @@
 'use client';
 
 import { useEffect } from "react";
-import { Play, Pause } from "lucide-react";
+import { Play, Pause, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils/utils";
 import { usePlaylistStore, usePlayerStore } from "@/stores";
 import { formatDuration } from "@/lib/utils/format";
+import { Button } from "@/components/ui/button";
 
 interface PlaylistProps {
   activePlaylistId: string;
 }
 
 export const Playlist = ({ activePlaylistId }: PlaylistProps) => {
-  const { playlists } = usePlaylistStore();
-  const { initializePlayer, playingTrackId, togglePlayPause } = usePlayerStore();
+  const { playlists, removeTrackFromPlaylist } = usePlaylistStore();
+  const { initializePlayer, playingTrackId, isPlaying, togglePlayPause } = usePlayerStore();
   
   const activePlaylist = playlists.find(p => p.id === activePlaylistId);
   
@@ -24,6 +25,14 @@ export const Playlist = ({ activePlaylistId }: PlaylistProps) => {
   if (!activePlaylist) {
     return null;
   }
+
+  const handleRemoveTrack = async (trackId: string) => {
+    try {
+      await removeTrackFromPlaylist(activePlaylistId, trackId);
+    } catch (error) {
+      console.error('Error removing track:', error);
+    }
+  };
 
   return (
     <div className="relative overflow-x-auto">
@@ -45,51 +54,50 @@ export const Playlist = ({ activePlaylistId }: PlaylistProps) => {
             <th className="w-24 px-4 py-3 text-right text-xs font-medium text-text/70 uppercase tracking-wider">
               Duration
             </th>
+            <th className="w-16 px-4 py-3 text-right text-xs font-medium text-text/70 uppercase tracking-wider">
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody className="bg-bg divide-y divide-border">
-          {activePlaylist.tracks.map((track) => (
-            <tr
-              key={track.id}
-              className={cn(
-                "group hover:bg-gray-50/5 transition-colors duration-200",
-                playingTrackId === track.id && "bg-mainAccent/10"
-              )}
-            >
-              <td className="pl-4 py-3">
-                <button
-                  onClick={() => togglePlayPause(track)}
-                  className={cn(
-                    "p-2 rounded-full transition-colors",
-                    playingTrackId === track.id
-                      ? "bg-mainAccent text-text"
-                      : "bg-gray-50/10 hover:bg-gray-50/20 text-text"
-                  )}
-                >
-                  {playingTrackId === track.id ? (
-                    <Pause className="w-4 h-4" />
-                  ) : (
-                    <Play className="w-4 h-4" />
-                  )}
-                </button>
-              </td>
-              <td className="px-4 py-3">
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-text">
-                    {track.title}
-                  </span>
-                  <span className="text-small-subtitle text-text/70">
-                    {track.artist}
-                  </span>
-                </div>
-              </td>
-              <td className="px-4 py-3 text-right">
-                <span className="text-small-subtitle text-text/70">
-                  {formatDuration(parseInt(track.duration))}
-                </span>
-              </td>
-            </tr>
-          ))}
+          {activePlaylist.tracks?.map((track) => {
+            const isPlayingThisTrack = playingTrackId === track.id;
+            return (
+              <tr key={track.id} className="hover:bg-bg/50">
+                <td className="px-4 py-3 whitespace-nowrap">
+                  <button
+                    onClick={() => togglePlayPause(track)}
+                    className="p-2 rounded-full hover:bg-bg/50"
+                  >
+                    {isPlayingThisTrack && isPlaying ? (
+                      <Pause className="h-4 w-4" />
+                    ) : (
+                      <Play className="h-4 w-4" />
+                    )}
+                  </button>
+                </td>
+                <td className="px-4 py-3 whitespace-nowrap">
+                  <div className="flex items-center">
+                    <div className="text-sm font-medium text-text">
+                      {track.title}
+                    </div>
+                  </div>
+                </td>
+                <td className="px-4 py-3 whitespace-nowrap text-right text-sm text-text/70">
+                  {formatDuration(track.duration)}
+                </td>
+                <td className="px-4 py-3 whitespace-nowrap text-right">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleRemoveTrack(track.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

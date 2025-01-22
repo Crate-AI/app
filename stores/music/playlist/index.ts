@@ -12,6 +12,7 @@ interface PlaylistStore {
   addTrackToPlaylist: (playlistId: string, trackId: string) => Promise<void>;
   removeTrackFromPlaylist: (playlistId: string, trackId: string) => Promise<void>;
   updateTrackOrder: (playlistId: string, trackId: string, newPosition: number) => Promise<void>;
+  deletePlaylist: (playlistId: string) => Promise<void>;
   clearError: () => void;
 }
 
@@ -108,8 +109,12 @@ export const usePlaylistStore = create<PlaylistStore>((set, get) => {
     removeTrackFromPlaylist: async (playlistId: string, trackId: string) => {
       set({ isLoading: true, error: null });
       try {
-        const response = await fetch(`/api/music/playlists/${playlistId}/tracks/${trackId}`, {
+        const response = await fetch(`/api/music/playlists/${playlistId}/tracks`, {
           method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ trackId }),
         });
         
         if (!response.ok) {
@@ -120,8 +125,6 @@ export const usePlaylistStore = create<PlaylistStore>((set, get) => {
         set(state => ({
           playlists: state.playlists.map(playlist => {
             if (playlist.id === playlistId) {
-              // Type error occurs because playlist.tracks is not defined in the type
-              // We need to ensure playlist has a tracks array property
               const playlistWithTracks = playlist as unknown as { 
                 id: string;
                 tracks: CrateTrack[];
@@ -165,6 +168,29 @@ export const usePlaylistStore = create<PlaylistStore>((set, get) => {
       } catch (error) {
         set({ error: (error as Error).message });
         toast.error('Failed to update track order');
+      } finally {
+        set({ isLoading: false });
+      }
+    },
+    
+    deletePlaylist: async (playlistId: string) => {
+      set({ isLoading: true, error: null });
+      try {
+        const response = await fetch(`/api/music/playlists/${playlistId}`, {
+          method: 'DELETE',
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to delete playlist');
+        }
+        
+        // Update local state by removing the deleted playlist
+        set(state => ({
+          playlists: state.playlists.filter(playlist => playlist.id !== playlistId)
+        }));
+      } catch (error) {
+        set({ error: (error as Error).message });
+        throw error;
       } finally {
         set({ isLoading: false });
       }

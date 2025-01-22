@@ -4,6 +4,7 @@ import { CrateTrack } from '@/types'
 import { cn } from '@/lib/utils/utils'
 import { usePlaylistStore } from '@/stores'
 import { PlaylistActions } from './PlaylistActions'
+import Image from 'next/image'
 
 interface TrackRowProps {
     track: CrateTrack
@@ -44,6 +45,7 @@ export const TrackRow = ({
       if (!list) return '-'
       return list.split(',').join(', ')
     }
+    
     return (
       <tr
         className={cn(
@@ -85,8 +87,25 @@ export const TrackRow = ({
         <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
           {track.position}
         </td>
-        <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900 truncate max-w-[24rem]">
-          {track.title}
+        <td className="px-4 py-4 whitespace-nowrap">
+          <div className="flex items-center">
+            {track.artwork ? (
+              <div className="h-10 w-10 flex-shrink-0 mr-4">
+                <Image
+                  src={track.artwork}
+                  alt={track.title}
+                  width={40}
+                  height={40}
+                  className="h-10 w-10 rounded-sm object-cover"
+                />
+              </div>
+            ) : (
+              <div className="h-10 w-10 flex-shrink-0 mr-4 bg-gray-100 rounded-sm" />
+            )}
+            <span className="text-sm font-medium text-gray-900 truncate max-w-[24rem]">
+              {track.title}
+            </span>
+          </div>
         </td>
         <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 truncate max-w-[18rem]">
           {formatArtists(track.artist, track.extra_artists)}
