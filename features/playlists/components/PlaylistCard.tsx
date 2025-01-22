@@ -1,49 +1,77 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Play, Pause } from "lucide-react";
+import { Play, Pause, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils/utils";
 import { PlaylistWithTracks } from "@/types";
 import Image from "next/image";
-import { usePlayerStore } from "@/stores";
+import { usePlayerStore, usePlaylistStore } from "@/stores";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface PlaylistCardProps {
   playlist: PlaylistWithTracks;
-  isPlaying?: boolean;
   handleClick: () => void;
-  handlePlayPause: () => void;
+  onExpand: () => void;
 }
 
 export const PlaylistCard = ({ 
   playlist,
-  isPlaying = false,
   handleClick,
-  handlePlayPause
+  onExpand,
 }: PlaylistCardProps) => {
-  const { togglePlayPause } = usePlayerStore();
+  const { deletePlaylist } = usePlaylistStore();
+  const { playingTrackId, isPlaying, togglePlayPause } = usePlayerStore();
 
+  const isPlayingThisPlaylist = playlist.tracks?.some(track => track.id === playingTrackId);
+
+  const handlePlayPause = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (playlist.tracks?.length > 0) {
+      togglePlayPause(playlist.tracks[0]);
+      onExpand(); // Always expand when playing
+    }
+  };
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await deletePlaylist(playlist.id);
+      toast.success('Playlist deleted');
+    } catch (error) {
+      toast.error('Failed to delete playlist');
+    }
+  };
 
   return (
     <Card 
       className={cn(
         "group relative overflow-hidden transition-all hover:shadow-light cursor-pointer border-none",
-        isPlaying && 'ring-2 ring-mainAccent'
+        isPlayingThisPlaylist && 'ring-2 ring-mainAccent'
       )}
       onClick={handleClick}
     >
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
       
-      <button 
-        className={cn(
-          "absolute right-4 top-4 p-3 rounded-full bg-mainAccent text-text",
-          isPlaying ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
-          "transition-all hover:scale-105"
-        )}
-        onClick={(e) => {
-          e.stopPropagation();
-          handlePlayPause();
-        }}
-      >
-        {isPlaying ? <Pause size={24} /> : <Play size={24} />}
-      </button>
+      <div className="absolute right-4 top-4 flex gap-2">
+        <button 
+          className={cn(
+            "p-3 rounded-full bg-mainAccent text-text",
+            isPlayingThisPlaylist ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
+            "transition-all hover:scale-105"
+          )}
+          onClick={handlePlayPause}
+        >
+          {isPlayingThisPlaylist && isPlaying ? <Pause size={24} /> : <Play size={24} />}
+        </button>
+
+        <Button
+          variant="destructive"
+          size="icon"
+          className="opacity-0 group-hover:opacity-100 transition-opacity"
+          onClick={handleDelete}
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </div>
 
       <CardHeader className="h-48 bg-gray-100">
         {playlist.tracks?.length > 0 && playlist.tracks[0].artwork ? (

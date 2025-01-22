@@ -85,7 +85,7 @@ export async function POST(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { playlistId: string; trackId: string } }
+  { params }: { params: { playlistId: string } }
 ) {
   try {
     const cookieStore = cookies();
@@ -99,16 +99,41 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Verify playlist ownership
+    const { data: playlist, error: playlistError } = await supabase
+      .from('playlists')
+      .select()
+      .eq('id', params.playlistId)
+      .eq('user_id', userData.userId)
+      .single();
+
+    if (playlistError || !playlist) {
+      console.error('Error verifying playlist ownership:', playlistError);
+      return NextResponse.json(
+        { error: 'Playlist not found or unauthorized' },
+        { status: 404 }
+      );
+    }
+
+    const { trackId } = await request.json();
+    if (!trackId) {
+      return NextResponse.json(
+        { error: 'Track ID is required' },
+        { status: 400 }
+      );
+    }
+
     const { error } = await supabase
       .from('playlist_tracks')
       .delete()
       .eq('playlist_id', params.playlistId)
-      .eq('track_id', params.trackId);
+      .eq('track_id', trackId);
 
     if (error) throw error;
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error('Error removing track from playlist:', error);
     return NextResponse.json(
       { error: (error as Error).message },
       { status: 500 }

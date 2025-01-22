@@ -4,6 +4,7 @@ import type { YouTubePlayer as YTPlayer, YouTubeEvent, CrateTrack } from '@/type
 interface PlayerState {
   player: YTPlayer | null;
   isReady: boolean;
+  isPlaying: boolean;
   playingTrackId: string | null;
   initializePlayer: () => Promise<void>;
   setPlayer: (player: YTPlayer) => void;
@@ -18,6 +19,7 @@ interface PlayerState {
 export const usePlayerStore = create<PlayerState>((set, get) => ({
   player: null,
   isReady: false,
+  isPlaying: false,
   playingTrackId: null,
 
   initializePlayer: async () => {
@@ -63,16 +65,17 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
             if (event.data !== -1) {
               set({ isReady: true });
             }
+            set({ isPlaying: event.data === 1 });
           },
           onError: (event: YouTubeEvent) => {
             if ([2, 5, 100, 101, 150].includes(event.data)) {
-              set({ isReady: false, player: null });
+              set({ isReady: false, player: null, isPlaying: false });
             }
           },
         },
       });
     } catch (error) {
-      set({ isReady: false, player: null });
+      set({ isReady: false, player: null, isPlaying: false });
     }
   },
 
@@ -86,7 +89,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     
     player.loadVideoById({ videoId: track.youtube_video_id, suggestedQuality: 'highres' });
     player.playVideo();
-    set({ playingTrackId: track.id });
+    set({ playingTrackId: track.id, isPlaying: true });
   },
 
   pauseTrack: () => {
@@ -94,25 +97,27 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     if (!player) return;
     
     player.pauseVideo();
+    set({ isPlaying: false });
   },
 
   togglePlayPause: (track) => {
-    const { player, playingTrackId } = get();
+    const { player, playingTrackId, isPlaying } = get();
     if (!player || !track.youtube_video_id) return;
     
     if (playingTrackId === track.id) {
-      const state = player.getPlayerState();
-      if (state === 1) { // playing
+      if (isPlaying) {
         player.pauseVideo();
+        set({ isPlaying: false });
       } else {
         player.playVideo();
+        set({ isPlaying: true });
       }
     } else {
       player.loadVideoById({ videoId: track.youtube_video_id, suggestedQuality: 'highres' });
       player.playVideo();
-      set({ playingTrackId: track.id });
+      set({ playingTrackId: track.id, isPlaying: true });
     }
   },
 
-  reset: () => set({ player: null, isReady: false, playingTrackId: null }),
+  reset: () => set({ player: null, isReady: false, playingTrackId: null, isPlaying: false }),
 })); 

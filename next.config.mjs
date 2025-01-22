@@ -7,6 +7,10 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'i.discogs.com',
             },
+            {
+                protocol: 'https',
+                hostname: 'st.discogs.com',
+            },
             // discogs uses this to set default profile pictures
             {
                 protocol: 'https',

@@ -3,28 +3,30 @@
 import { useState, useEffect } from "react";
 import { PlaylistCard } from '@/features/playlists/components/PlaylistCard';
 import { Playlist } from '@/features/playlists/components/Playlist';
-import { usePlaylistStore, usePlayerStore } from '@/stores';
+import { usePlaylistStore } from '@/stores';
 import { PlaylistWithTracks } from "@/types";
+import { CollectionNav } from '@/components/layout/Navigation';
 
 const PlaylistPage = () => {
-  const [activePlaylistId, setActivePlaylistId] = useState<string | null>(null);
+  const [expandedPlaylistId, setExpandedPlaylistId] = useState<string | null>(null);
   const { playlists, fetchPlaylists } = usePlaylistStore();
-  const { togglePlayPause } = usePlayerStore();
 
   useEffect(() => {
     fetchPlaylists();
   }, [fetchPlaylists]);
 
-  const handlePlaylistAction = (playlist: PlaylistWithTracks) => {
-    if (playlist.tracks?.length > 0) {
-      togglePlayPause(playlist.tracks[0]);
-      setActivePlaylistId(currentId => currentId === playlist.id ? null : playlist.id);
-    }
+  const handlePlaylistClick = (playlist: PlaylistWithTracks) => {
+    setExpandedPlaylistId(currentId => currentId === playlist.id ? null : playlist.id);
+  };
+
+  const handlePlaylistExpand = (playlistId: string) => {
+    setExpandedPlaylistId(playlistId);
   };
 
   return (
     <div className="min-h-screen py-8">
       <div className="container mx-auto px-4">
+        <CollectionNav />
         <h1 className="text-medium-title font-heading font-bold mb-8 text-text">
           Playlists
         </h1>
@@ -34,16 +36,15 @@ const PlaylistPage = () => {
             <PlaylistCard
               key={playlist.id}
               playlist={playlist}
-              isPlaying={activePlaylistId === playlist.id}
-              handleClick={() => handlePlaylistAction(playlist)}
-              handlePlayPause={() => handlePlaylistAction(playlist)}
+              handleClick={() => handlePlaylistClick(playlist)}
+              onExpand={() => handlePlaylistExpand(playlist.id)}
             />
           ))}
         </div>
 
-        {activePlaylistId && (
+        {expandedPlaylistId && (
           <div className="mt-12">
-            <Playlist activePlaylistId={activePlaylistId} />
+            <Playlist activePlaylistId={expandedPlaylistId} />
           </div>
         )}
       </div>

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase/client';
 import { auth } from '@/lib/supabase/auth';
+import { createClient } from '@/lib/supabase/server';
+import { cookies } from 'next/headers';
 
 export async function GET(
   request: Request,
@@ -84,21 +86,40 @@ export async function DELETE(
   { params }: { params: { playlistId: string } }
 ) {
   try {
-    const user = await auth();
-    if (!user) {
+    const cookieStore = cookies();
+    const supabase = await createClient();
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Verify playlist ownership
+    const { data: playlist, error: playlistError } = await supabase
+      .from('playlists')
+      .select()
+      .eq('id', params.playlistId)
+      .eq('user_id', session.user.id)
+      .single();
+
+    if (playlistError || !playlist) {
+      return NextResponse.json(
+        { error: 'Playlist not found or unauthorized' },
+        { status: 404 }
+      );
     }
 
     const { error } = await supabase
       .from('playlists')
       .delete()
       .eq('id', params.playlistId)
-      .eq('user_id', user.id);
+      .eq('user_id', session.user.id);
 
     if (error) throw error;
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error('Error deleting playlist:', error);
     return NextResponse.json(
       { error: (error as Error).message },
       { status: 500 }

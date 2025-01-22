@@ -21,6 +21,7 @@ const buttonVariants = cva(
         chat: 'bg-main border-2 border-border dark:border-darkBorder hover:translate-x-reverseBoxShadowX hover:translate-y-reverseBoxShadowY hover:shadow-light dark:hover:shadow-dark',
         outline: 'bg-main border-2 border-border dark:border-darkBorder hover:translate-x-reverseBoxShadowX hover:translate-y-reverseBoxShadowY hover:shadow-light dark:hover:shadow-dark',
         ghost: 'bg-transparent border-2 border-border dark:border-darkBorder hover:translate-x-reverseBoxShadowX hover:translate-y-reverseBoxShadowY hover:shadow-light dark:hover:shadow-dark',
+        destructive: 'bg-red-500 text-white hover:bg-red-600',
       },
       size: {
         default: 'h-10 px-4 py-2',

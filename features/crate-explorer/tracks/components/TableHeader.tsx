@@ -1,68 +1,91 @@
-import { OrderingConfig } from "@/types"
+import { ArrowUpDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { OrderingConfig } from '@/types';
 
 interface TableHeaderProps {
-  onSort: (column: OrderingConfig['orderBy']) => void
+  onSort: (column: OrderingConfig['orderBy']) => void;
 }
 
-export function TableHeader({ onSort }: TableHeaderProps) {
+export const TableHeader = ({ onSort }: TableHeaderProps) => {
   return (
-    <thead>
-      <tr className="bg-background/50">
-        <th scope="col" className="w-12 px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
-          Playlist
+    <thead className="bg-gray-50">
+      <tr>
+        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          Actions
         </th>
-        <th scope="col" className="w-16 px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
+        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
           Play
         </th>
-        <th 
-          scope="col" 
-          className="w-20 px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase"
-        >
+        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
           Position
         </th>
-        <th 
-          scope="col" 
-          className="w-80 px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase cursor-pointer hover:text-foreground"
-          onClick={() => onSort?.('title')}
-        >
-          Title
+        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="-ml-3 h-8 data-[state=open]:bg-accent"
+            onClick={() => onSort('title')}
+          >
+            <span>Title</span>
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
         </th>
-        <th 
-          scope="col" 
-          className="w-48 px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase cursor-pointer hover:text-foreground"
-          onClick={() => onSort?.('artist')}
-        >
-          Artist
+        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="-ml-3 h-8 data-[state=open]:bg-accent"
+            onClick={() => onSort('artist')}
+          >
+            <span>Artist</span>
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
         </th>
-        <th 
-          scope="col" 
-          className="w-32 px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase cursor-pointer hover:text-foreground"
-          onClick={() => onSort?.('genre')}
-        >
-          Genre
+        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="-ml-3 h-8 data-[state=open]:bg-accent"
+            onClick={() => onSort('genre')}
+          >
+            <span>Genre</span>
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
         </th>
-        <th 
-          scope="col" 
-          className="w-36 px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase cursor-pointer hover:text-foreground"
-          onClick={() => onSort?.('style')}
-        >
-          Styles
+        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="-ml-3 h-8 data-[state=open]:bg-accent"
+            onClick={() => onSort('style')}
+          >
+            <span>Style</span>
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
         </th>
-        <th 
-          scope="col" 
-          className="w-20 px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase cursor-pointer hover:text-foreground"
-          onClick={() => onSort?.('bpm')}
-        >
-          BPM
+        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="-ml-3 h-8 data-[state=open]:bg-accent"
+            onClick={() => onSort('bpm')}
+          >
+            <span>BPM</span>
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
         </th>
-        <th 
-          scope="col" 
-          className="w-24 px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase cursor-pointer hover:text-foreground"
-          onClick={() => onSort?.('duration')}
-        >
-          Duration
+        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="-ml-3 h-8 data-[state=open]:bg-accent"
+            onClick={() => onSort('duration')}
+          >
+            <span>Duration</span>
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
         </th>
       </tr>
     </thead>
-  )
-} 
+  );
+}; 
