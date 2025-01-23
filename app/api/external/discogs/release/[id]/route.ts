@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies, headers } from 'next/headers';
-import { getDiscogsRelease } from '@/lib/discogsAPI';
+import { getDiscogsRelease } from '@/lib/api-clients/discogs';
 
 export async function GET(
   request: Request,
