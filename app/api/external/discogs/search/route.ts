@@ -5,7 +5,7 @@ import type {
   SearchParams,
   SearchResult,
   SearchResponse,
-} from '@/types/discogs';
+} from '@/types';
 
 function buildSearchParams(originalQuery: string): SearchParams {
   const terms = originalQuery.trim().split(/\s+/);
