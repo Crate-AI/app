@@ -5,7 +5,7 @@ import { PlaylistCard } from '@/features/playlists/components/PlaylistCard';
 import { Playlist } from '@/features/playlists/components/Playlist';
 import { usePlaylistStore } from '@/stores';
 import { PlaylistWithTracks } from "@/types";
-import { CollectionNav } from '@/components/layout/Navigation';
+import { CollectionNav } from '@/components/layout/CollectionNav';
 
 const PlaylistPage = () => {
   const [expandedPlaylistId, setExpandedPlaylistId] = useState<string | null>(null);

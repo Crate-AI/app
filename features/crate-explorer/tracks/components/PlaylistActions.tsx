@@ -29,12 +29,13 @@ export function PlaylistActions({
 }: PlaylistActionsProps) {
   const [isCreatingPlaylist, setIsCreatingPlaylist] = useState(false)
   const [newPlaylistName, setNewPlaylistName] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   const { isAuthenticated } = useAuthStore()
 
   const handleCreateNewPlaylist = async () => {
+    if (!newPlaylistName.trim() || isLoading) return
     
-    if (!newPlaylistName.trim()) return
-    
+    setIsLoading(true)
     try {
       await onCreateNewPlaylist(newPlaylistName, track)
       setNewPlaylistName('')
@@ -42,6 +43,8 @@ export function PlaylistActions({
       toast.success('Playlist created successfully')
     } catch (error) {
       toast.error('Failed to create playlist')
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -62,17 +65,24 @@ export function PlaylistActions({
             <ListPlus className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start">
+        <DropdownMenuContent 
+          align="start"
+          className="bg-background/60 backdrop-blur-lg border border-border/50"
+        >
           {playlists.map((playlist) => (
             <DropdownMenuItem
               key={playlist.id}
               onClick={() => handleAddToPlaylist(playlist.id)}
+              className="hover:bg-accent/50"
             >
               {playlist.name}
             </DropdownMenuItem>
           ))}
-          {playlists.length > 0 && <DropdownMenuSeparator />}
-          <DropdownMenuItem onClick={() => setIsCreatingPlaylist(true)}>
+          {playlists.length > 0 && <DropdownMenuSeparator className="bg-border/50" />}
+          <DropdownMenuItem 
+            onClick={() => setIsCreatingPlaylist(true)}
+            className="hover:bg-accent/50"
+          >
             <Plus className="h-4 w-4 mr-2" />
             Create New Playlist
           </DropdownMenuItem>
@@ -90,9 +100,10 @@ export function PlaylistActions({
               value={newPlaylistName}
               onChange={(e) => setNewPlaylistName(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && newPlaylistName.trim()) handleCreateNewPlaylist()
+                if (e.key === 'Enter' && newPlaylistName.trim() && !isLoading) handleCreateNewPlaylist()
                 if (e.key === 'Escape') setIsCreatingPlaylist(false)
               }}
+              disabled={isLoading}
               autoFocus
             />
           </div>
@@ -100,14 +111,15 @@ export function PlaylistActions({
             <Button
               variant="outline"
               onClick={() => setIsCreatingPlaylist(false)}
+              disabled={isLoading}
             >
               Cancel
             </Button>
             <Button 
               onClick={handleCreateNewPlaylist}
-              disabled={!newPlaylistName.trim()}
+              disabled={!newPlaylistName.trim() || isLoading}
             >
-              Create
+              {isLoading ? 'Creating...' : 'Create'}
             </Button>
           </DialogFooter>
         </DialogContent>

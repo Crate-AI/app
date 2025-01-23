@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils/utils';
 
-export const CollectionNav = () => {
+export function CollectionNav() {
   const pathname = usePathname();
   const router = useRouter();
   const username = pathname.split('/')[1];
@@ -31,4 +31,4 @@ export const CollectionNav = () => {
       ))}
     </nav>
   );
-}; 
+} 

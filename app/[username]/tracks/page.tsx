@@ -1,8 +1,11 @@
+'use client';
+
 import ErrorBoundary from '@/components/Error/ErrorBoundary'
 import TracksTable from '@/features/crate-explorer/tracks/TracksTable'
 import AiLayout from '@/features/ai-assistant/AiLayout'
-import { CollectionNav } from '@/components/layout/Navigation'
-export default function TracksPage({ params }: { params: { username: string } }) {
+import { CollectionNav } from '@/components/layout/CollectionNav'
+
+export default function TracksPage() {
   return (
     <ErrorBoundary>
       <AiLayout>
