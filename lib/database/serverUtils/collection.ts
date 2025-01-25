@@ -2,7 +2,39 @@ import { Database } from '@/types/supabase';
 import { CollectionResponse } from '@crate.ai/discogs-sdk/dist/collection/types';
 import { SupabaseClient } from '@supabase/supabase-js';
 
+// Internal type, don't export
+type DBTrack = Database['public']['Tables']['tracks']['Row'];
+
 export const CollectionUtils = (supabase: SupabaseClient<Database>) => {
+  const getTracks = async (tracksData: DBTrack[]) => {
+    const { data: trackAnalysisData, error: trackAnalysisError } =
+      await supabase
+        .from('track_analysis')
+        .select('*')
+        .in(
+          'track_id',
+          tracksData.map((t) => t.id),
+        );
+
+    if (trackAnalysisError) {
+      throw trackAnalysisError;
+    }
+
+    // combine with track analysis data
+    const crateTracks = tracksData.map((track) => {
+      const trackAnalysis = trackAnalysisData.find(
+        (analysis) => analysis.track_id === track.id,
+      );
+
+      return {
+        ...track,
+        bpm: trackAnalysis?.bpm,
+      };
+    });
+
+    return crateTracks;
+  };
+
   const getCollection = async () => {
     const { data: userData, error: userError } = await supabase.auth.getUser();
     if (userError) {
@@ -95,12 +127,30 @@ export const CollectionUtils = (supabase: SupabaseClient<Database>) => {
       throw tracksError;
     }
 
-    return tracksData;
+    const crateTracks = await getTracks(tracksData);
+
+    return crateTracks;
+  };
+
+  const getReleaseTracks = async (releaseId: string) => {
+    const { data: tracksData, error: tracksError } = await supabase
+      .from('tracks')
+      .select('*')
+      .eq('discogs_release_id', releaseId);
+
+    if (tracksError) {
+      throw tracksError;
+    }
+
+    const crateTracks = await getTracks(tracksData);
+
+    return crateTracks;
   };
 
   return {
     getCollection,
     ingestCollection,
     getCollectionTracks,
+    getReleaseTracks,
   };
 };
