@@ -127,18 +127,21 @@ export type Database = {
       track_analysis: {
         Row: {
           analysis: Json
+          bpm: number | null
           created_at: string | null
           id: string
           track_id: string | null
         }
         Insert: {
           analysis: Json
+          bpm?: number | null
           created_at?: string | null
           id?: string
           track_id?: string | null
         }
         Update: {
           analysis?: Json
+          bpm?: number | null
           created_at?: string | null
           id?: string
           track_id?: string | null
@@ -157,7 +160,6 @@ export type Database = {
         Row: {
           artist: string
           artwork: string | null
-          bpm: number | null
           created_at: string | null
           discogs_release_id: string
           duration: string
@@ -172,7 +174,6 @@ export type Database = {
         Insert: {
           artist: string
           artwork?: string | null
-          bpm?: number | null
           created_at?: string | null
           discogs_release_id: string
           duration: string
@@ -187,7 +188,6 @@ export type Database = {
         Update: {
           artist?: string
           artwork?: string | null
-          bpm?: number | null
           created_at?: string | null
           discogs_release_id?: string
           duration?: string
