@@ -1,8 +1,8 @@
-import { Database } from '@/types/supabase';
+import { Database } from '@/types/database/supabase';
 import { CollectionResponse } from '@crate.ai/discogs-sdk/dist/collection/types';
 import { SupabaseClient } from '@supabase/supabase-js';
 
-// Internal type, don't export
+// this type is used only here
 type DBTrack = Database['public']['Tables']['tracks']['Row'];
 
 export const CollectionUtils = (supabase: SupabaseClient<Database>) => {
@@ -106,30 +106,16 @@ export const CollectionUtils = (supabase: SupabaseClient<Database>) => {
       throw new Error(userError.message);
     }
 
-    const { data: userReleases, error: userReleasesError } = await supabase
-      .from('user_releases')
-      .select('discogs_release_id')
-      .eq('user_id', userData.user.id);
-
-    if (userReleasesError) {
-      throw userReleasesError;
-    }
-
-    const { data: tracksData, error: tracksError } = await supabase
-      .from('tracks')
-      .select('*')
-      .in(
-        'discogs_release_id',
-        userReleases.map((r) => r.discogs_release_id),
-      );
-
+    const { data: tracksData, error: tracksError } = await supabase.rpc(
+      'fetch_discogs_releases_and_tracks',
+      {
+        user_id: userData.user.id,
+      },
+    );
     if (tracksError) {
       throw tracksError;
     }
-
-    const crateTracks = await getTracks(tracksData);
-
-    return crateTracks;
+    return tracksData;
   };
 
   const getReleaseTracks = async (releaseId: string) => {
