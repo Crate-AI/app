@@ -89,6 +89,13 @@ export type Database = {
             foreignKeyName: "playlist_tracks_track_id_fkey"
             columns: ["track_id"]
             isOneToOne: false
+            referencedRelation: "releases_and_tracks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "playlist_tracks_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
             referencedRelation: "tracks"
             referencedColumns: ["id"]
           },
@@ -147,6 +154,13 @@ export type Database = {
           track_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "track_analysis_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "releases_and_tracks"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "track_analysis_track_id_fkey"
             columns: ["track_id"]
@@ -256,7 +270,24 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      releases_and_tracks: {
+        Row: {
+          artist: string | null
+          artwork: string | null
+          bpm: number | null
+          created_at: string | null
+          discogs_release_id: string | null
+          duration: string | null
+          extra_artists: string | null
+          genres: string | null
+          id: string | null
+          position: string | null
+          styles: string | null
+          title: string | null
+          youtube_video_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       fetch_discogs_releases_and_tracks: {
@@ -264,17 +295,18 @@ export type Database = {
           user_id: string
         }
         Returns: {
-          artist: string
+          artist: string | null
           artwork: string | null
+          bpm: number | null
           created_at: string | null
-          discogs_release_id: string
-          duration: string
+          discogs_release_id: string | null
+          duration: string | null
           extra_artists: string | null
           genres: string | null
-          id: string
-          position: string
+          id: string | null
+          position: string | null
           styles: string | null
-          title: string
+          title: string | null
           youtube_video_id: string | null
         }[]
       }
