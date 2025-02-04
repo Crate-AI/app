@@ -124,11 +124,42 @@ export type Database = {
         }
         Relationships: []
       }
+      track_analysis: {
+        Row: {
+          analysis: Json
+          bpm: number | null
+          created_at: string | null
+          id: string
+          track_id: string | null
+        }
+        Insert: {
+          analysis: Json
+          bpm?: number | null
+          created_at?: string | null
+          id?: string
+          track_id?: string | null
+        }
+        Update: {
+          analysis?: Json
+          bpm?: number | null
+          created_at?: string | null
+          id?: string
+          track_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "track_analysis_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tracks: {
         Row: {
           artist: string
           artwork: string | null
-          bpm: number | null
           created_at: string | null
           discogs_release_id: string
           duration: string
@@ -143,7 +174,6 @@ export type Database = {
         Insert: {
           artist: string
           artwork?: string | null
-          bpm?: number | null
           created_at?: string | null
           discogs_release_id: string
           duration: string
@@ -158,7 +188,6 @@ export type Database = {
         Update: {
           artist?: string
           artwork?: string | null
-          bpm?: number | null
           created_at?: string | null
           discogs_release_id?: string
           duration?: string
@@ -210,12 +239,45 @@ export type Database = {
           },
         ]
       }
+      waitlist: {
+        Row: {
+          email: string
+          user_type: string
+        }
+        Insert: {
+          email: string
+          user_type: string
+        }
+        Update: {
+          email?: string
+          user_type?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      fetch_discogs_releases_and_tracks: {
+        Args: {
+          user_id: string
+        }
+        Returns: {
+          artist: string
+          artwork: string | null
+          created_at: string | null
+          discogs_release_id: string
+          duration: string
+          extra_artists: string | null
+          genres: string | null
+          id: string
+          position: string
+          styles: string | null
+          title: string
+          youtube_video_id: string | null
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
