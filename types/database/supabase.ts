@@ -89,14 +89,14 @@ export type Database = {
             foreignKeyName: "playlist_tracks_track_id_fkey"
             columns: ["track_id"]
             isOneToOne: false
-            referencedRelation: "releases_and_tracks"
+            referencedRelation: "tracks"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "playlist_tracks_track_id_fkey"
             columns: ["track_id"]
             isOneToOne: false
-            referencedRelation: "tracks"
+            referencedRelation: "user_releases_and_tracks"
             referencedColumns: ["id"]
           },
         ]
@@ -158,14 +158,14 @@ export type Database = {
             foreignKeyName: "track_analysis_track_id_fkey"
             columns: ["track_id"]
             isOneToOne: false
-            referencedRelation: "releases_and_tracks"
+            referencedRelation: "tracks"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "track_analysis_track_id_fkey"
             columns: ["track_id"]
             isOneToOne: false
-            referencedRelation: "tracks"
+            referencedRelation: "user_releases_and_tracks"
             referencedColumns: ["id"]
           },
         ]
@@ -270,7 +270,7 @@ export type Database = {
       }
     }
     Views: {
-      releases_and_tracks: {
+      user_releases_and_tracks: {
         Row: {
           artist: string | null
           artwork: string | null
@@ -284,6 +284,7 @@ export type Database = {
           position: string | null
           styles: string | null
           title: string | null
+          user_id: string | null
           youtube_video_id: string | null
         }
         Relationships: []
@@ -307,6 +308,7 @@ export type Database = {
           position: string | null
           styles: string | null
           title: string | null
+          user_id: string | null
           youtube_video_id: string | null
         }[]
       }
