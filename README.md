@@ -49,4 +49,4 @@ supabase start
 ## Deploying changes
 
 - Apply the migration locally so that the types are updated. `supabase migration up --include-all`
-- You can generate the types for your changes using `npx supabase gen types typescript --local > types/supabase.ts`. This allows them to be used in the frontend code with type safety
+- You can generate the types for your changes using `npx supabase gen types typescript --local > types/database/supabase.ts`. This allows them to be used in the frontend code with type safety
