@@ -1,4 +1,4 @@
-import { Database } from '@/types';
+import { Database } from '@/types/database/supabase';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 

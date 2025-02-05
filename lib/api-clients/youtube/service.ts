@@ -1,4 +1,4 @@
-import { Release, Track } from '@/types/discogs';
+import { Release, Track } from '@/types';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 export async function searchVideo(query: string): Promise<string | null> {
