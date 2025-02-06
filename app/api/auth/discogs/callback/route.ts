@@ -5,14 +5,26 @@ import { createClient } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+if (!baseUrl) {
+  console.error('NEXT_PUBLIC_BASE_URL is not set');
+  throw new Error('NEXT_PUBLIC_BASE_URL environment variable is required');
+}
 
-console.log('Callback Route - Environment:', {
+console.log('Callback Route - Starting with config:', {
   baseUrl,
   hasConsumerKey: !!process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_KEY,
   hasConsumerSecret: !!process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET,
-  nodeEnv: process.env.NODE_ENV
+  nodeEnv: process.env.NODE_ENV,
+  consumerKeyLength: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_KEY?.length,
+  consumerSecretLength: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET?.length,
+  fullBaseUrl: process.env.NEXT_PUBLIC_BASE_URL
 });
+
+if (!process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_KEY || !process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET) {
+  console.error('Missing Discogs credentials');
+  throw new Error('Discogs credentials are required');
+}
 
 export async function GET(request: Request) {
   try {
@@ -21,15 +33,21 @@ export async function GET(request: Request) {
     const oauthVerifier = searchParams.get('oauth_verifier');
     const oauthToken = searchParams.get('oauth_token');
 
-    const requestToken = cookies().get('request_token')?.value;
-    const requestTokenSecret = cookies().get('request_token_secret')?.value;
+    const cookieStore = cookies();
+    const requestToken = cookieStore.get('request_token')?.value;
+    const requestTokenSecret = cookieStore.get('request_token_secret')?.value;
 
     console.log('OAuth parameters:', {
       hasOauthVerifier: !!oauthVerifier,
       hasOauthToken: !!oauthToken,
       hasRequestToken: !!requestToken,
       hasRequestTokenSecret: !!requestTokenSecret,
-      url: request.url
+      url: request.url,
+      oauthTokenLength: oauthToken?.length,
+      verifierLength: oauthVerifier?.length,
+      requestTokenLength: requestToken?.length,
+      requestTokenSecretLength: requestTokenSecret?.length,
+      tokensMatch: oauthToken === requestToken
     });
 
     if (!oauthToken || !oauthVerifier || !requestToken || !requestTokenSecret) {
@@ -60,10 +78,25 @@ export async function GET(request: Request) {
     const tokens = await sdk.auth.handleCallback({
       oauthVerifier,
       oauthToken,
+    }).catch(error => {
+      console.error('SDK handleCallback error:', {
+        message: error.message,
+        stack: error.stack,
+        cause: error.cause
+      });
+      throw error;
     });
+
+    if (!tokens?.token || !tokens?.secret) {
+      console.error('Invalid tokens response:', tokens);
+      throw new Error('Invalid response from Discogs callback');
+    }
+
     console.log('Got access tokens:', {
       hasToken: !!tokens.token,
-      hasSecret: !!tokens.secret
+      hasSecret: !!tokens.secret,
+      tokenLength: tokens.token?.length,
+      secretLength: tokens.secret?.length
     });
 
     console.log('Getting user identity...');
@@ -78,16 +111,16 @@ export async function GET(request: Request) {
     );
     console.log('Got user profile');
 
-    cookies().delete('request_token');
-    cookies().delete('request_token_secret');
+    cookieStore.delete('request_token');
+    cookieStore.delete('request_token_secret');
 
-    cookies().set('access_token', tokens.token, {
+    cookieStore.set('access_token', tokens.token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
     });
 
-    cookies().set('access_token_secret', tokens.secret, {
+    cookieStore.set('access_token_secret', tokens.secret, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
@@ -113,7 +146,7 @@ export async function GET(request: Request) {
     if (signInData?.user) {
       console.log('Signed in existing user');
       // Update user data cookie
-      cookies().set(
+      cookieStore.set(
         'user_data',
         JSON.stringify({
           userId: signInData.user.id,
@@ -174,7 +207,7 @@ export async function GET(request: Request) {
     }
 
     // Set user data cookie
-    cookies().set(
+    cookieStore.set(
       'user_data',
       JSON.stringify({
         userId: signUpData.user.id,
