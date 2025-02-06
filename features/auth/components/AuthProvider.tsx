@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -22,7 +22,7 @@ interface AuthProviderProps {
   children: React.ReactNode;
 }
 
-const AuthProvider = ({ children }: AuthProviderProps) => {
+function AuthProviderContent({ children }: AuthProviderProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { 
@@ -100,6 +100,12 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       {children}
     </>
   );
-};
+}
 
-export default AuthProvider;
+export default function AuthProvider({ children }: AuthProviderProps) {
+  return (
+    <Suspense fallback={null}>
+      <AuthProviderContent>{children}</AuthProviderContent>
+    </Suspense>
+  );
+}

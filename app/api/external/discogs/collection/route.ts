@@ -5,6 +5,8 @@ import { CollectionUtils } from '@/lib/database/serverUtils/collection';
 import { createClient } from '@/lib/database/server';
 import { CollectionResponse, Release } from '@crate.ai/discogs-sdk/dist/collection/types';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   try {
     const headersList = headers();

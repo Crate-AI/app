@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { DiscogsSDK } from '@crate.ai/discogs-sdk';
 import { cookies } from 'next/headers';
 
+export const dynamic = 'force-dynamic';
+
 const sdk = new DiscogsSDK({
   DiscogsConsumerKey: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_KEY || '',
   DiscogsConsumerSecret: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET || '',

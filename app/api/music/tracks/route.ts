@@ -1,6 +1,8 @@
-import {NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/database/server';
 import { CollectionUtils } from '@/lib/database/serverUtils/collection'
+
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
