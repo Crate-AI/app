@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 const sdk = new DiscogsSDK({
   DiscogsConsumerKey: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_KEY || '',
   DiscogsConsumerSecret: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET || '',
-  callbackUrl: 'http://localhost:3000/api/auth/discogs/callback',
+  callbackUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/discogs/callback`,
 });
 
 export async function GET() {

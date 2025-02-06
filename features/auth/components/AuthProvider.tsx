@@ -38,9 +38,14 @@ function AuthProviderContent({ children }: AuthProviderProps) {
     const newUrl = new URL(window.location.href);
     newUrl.searchParams.delete('error');
     router.replace(newUrl.pathname);
+    
+    // Handle both string errors and Error objects
+    const errorMessage = error instanceof Error ? error.message : 
+      typeof error === 'string' ? error : 'An error occurred during authentication';
+    
     setError(
-      ERROR_MESSAGES[error as AuthError] || 
-      'An error occurred during authentication'
+      ERROR_MESSAGES[errorMessage as AuthError] || 
+      (process.env.NODE_ENV === 'development' ? errorMessage : 'An error occurred during authentication')
     );
   };
 
