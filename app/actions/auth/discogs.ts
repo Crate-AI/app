@@ -19,8 +19,16 @@ export async function requestDiscogsAuth(): Promise<{
   authorizationUrl: string;
 }> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/auth/discogs/request-token`);
+    // For server-side requests in production, we need to use the internal URL
+    const url = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}/api/auth/discogs/request-token`
+      : 'http://localhost:3000/api/auth/discogs/request-token';
+
+    const response = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
     if (!response.ok) {
       throw new Error('Failed to get request token');
