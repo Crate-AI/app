@@ -36,11 +36,27 @@ export async function GET() {
   console.log('GET request started');
   try {
     console.log('Getting request token from Discogs...');
+    
+    // Log the SDK configuration
+    console.log('SDK Configuration:', {
+      consumerKey: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_KEY?.slice(0, 4) + '...',
+      consumerSecret: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET?.slice(0, 4) + '...',
+      callbackUrl: `${baseUrl}/api/auth/discogs/callback`,
+      userAgent: 'CrateApp/1.0 +https://crate.ai'
+    });
+
     const requestTokenResponse = await sdk.auth.getRequestToken().catch(error => {
+      // Log the full error details
       console.error('SDK getRequestToken error:', {
         message: error.message,
         stack: error.stack,
-        cause: error.cause
+        cause: error.cause,
+        response: error.response ? {
+          status: error.response.status,
+          statusText: error.response.statusText,
+          headers: Object.fromEntries(error.response.headers?.entries() || []),
+          body: error.response.body
+        } : undefined
       });
       throw error;
     });
