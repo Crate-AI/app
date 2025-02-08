@@ -3,12 +3,5 @@
     "deploymentEnabled": {
       "dev": true
     }
-  },
-  "authentication": {
-    "skipPaths": [
-      "^/api/auth/discogs/.*$",
-      "^/api/external/discogs/.*$",
-      "^/api/music/.*$"
-    ]
   }
 } 
