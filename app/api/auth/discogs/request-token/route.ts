@@ -30,6 +30,20 @@ const sdk = new DiscogsSDK({
   DiscogsConsumerSecret: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET,
   callbackUrl: `${baseUrl}/api/auth/discogs/callback`,
   userAgent: 'CrateApp/1.0 +https://crate.ai',
+  debug: true
+});
+
+// Log the SDK configuration and request details
+console.log('SDK Instance:', {
+  config: {
+    consumerKey: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_KEY?.slice(0, 4) + '...',
+    consumerSecret: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET?.slice(0, 4) + '...',
+    callbackUrl: `${baseUrl}/api/auth/discogs/callback`,
+    userAgent: 'CrateApp/1.0 +https://crate.ai'
+  },
+  authBase: typeof sdk.auth.base,
+  authMethods: Object.keys(sdk.auth),
+  tokenManager: typeof sdk.auth.base.getTokenManager === 'function' ? 'available' : 'not available'
 });
 
 export async function GET() {
