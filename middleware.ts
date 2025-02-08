@@ -3,12 +3,21 @@ import { type NextRequest } from 'next/server';
 import { updateSession } from '@/lib/database/middleware';
 
 export async function middleware(request: NextRequest) {
-  // Log request details for debugging
-  console.log('Middleware - Request:', {
-    pathname: request.nextUrl.pathname,
+  // Get the original URL and pathname
+  const url = request.url;
+  const pathname = request.nextUrl.pathname;
+  
+  // Log detailed request information
+  console.log('Middleware - Detailed Request:', {
+    url,
+    pathname,
     method: request.method,
     env: process.env.NODE_ENV,
-    vercelEnv: process.env.VERCEL_ENV
+    vercelEnv: process.env.VERCEL_ENV,
+    headers: {
+      host: request.headers.get('host'),
+      referer: request.headers.get('referer'),
+    }
   });
 
   // Define paths that should bypass Vercel's authentication
@@ -21,12 +30,23 @@ export async function middleware(request: NextRequest) {
 
   // Check if the current path should bypass auth
   const shouldBypassAuth = bypassAuthPaths.some(path => 
-    request.nextUrl.pathname.startsWith(path)
+    pathname.startsWith(path)
   );
 
   if (shouldBypassAuth) {
-    console.log('Bypassing Vercel auth for path:', request.nextUrl.pathname);
-    return NextResponse.next();
+    console.log('Bypassing Vercel auth for path:', pathname);
+    // Set headers to bypass Vercel's authentication
+    const response = NextResponse.next();
+    response.headers.set('x-middleware-bypass', '1');
+    return response;
+  }
+
+  // For API routes that should bypass auth but weren't caught above
+  if (pathname.startsWith('/api/')) {
+    console.log('API route detected:', pathname);
+    const response = NextResponse.next();
+    response.headers.set('x-middleware-bypass', '1');
+    return response;
   }
 
   // Continue with database session handling for other routes
@@ -41,11 +61,8 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
      */
     '/((?!_next/static|_next/image|favicon.ico).*)',
-    '/api/auth/discogs/:path*',
-    '/api/external/discogs/:path*',
-    '/api/music/:path*'
+    '/api/:path*'  // Explicitly match all API routes
   ],
 };
