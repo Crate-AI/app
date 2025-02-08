@@ -92,9 +92,13 @@ export async function GET() {
       userAgent: 'CrateApp/1.0 +https://crate.ai'
     });
 
-    const requestTokenResponse = await sdk.auth.getRequestToken().catch(error => {
-      // Log the full error details
-      console.error('DIRECT DEBUG - Request Token Error:', {
+    const requestTokenResponse = await sdk.auth.getRequestToken().catch(async error => {
+      // Check if the response is HTML (authentication page)
+      const responseText = error.response?.text ? await error.response.text() : '';
+      const isAuthPage = responseText.includes('Authentication Required');
+      
+      console.error('REQUEST TOKEN ERROR:', {
+        error_type: isAuthPage ? 'Vercel Authentication Required' : 'Discogs API Error',
         error: {
           message: error.message,
           stack: error.stack,
@@ -104,7 +108,8 @@ export async function GET() {
           status: error.response.status,
           statusText: error.response.statusText,
           headers: Object.fromEntries(error.response.headers?.entries() || []),
-          body: error.response.body,
+          is_html: responseText.startsWith('<!doctype html>'),
+          content_type: error.response.headers?.get('content-type'),
           url: error.response.url
         } : undefined,
         request: {
@@ -119,9 +124,12 @@ export async function GET() {
             method: error.request.method,
             authorization: error.request.headers?.Authorization || error.request.headers?.authorization
           } : undefined
-        },
-        generated_auth: authHeader // Include our generated auth header for comparison
+        }
       });
+
+      if (isAuthPage) {
+        throw new Error('Vercel authentication is blocking the request. Please configure authentication bypass in vercel.json');
+      }
       throw error;
     });
 
