@@ -69,8 +69,22 @@ export async function GET() {
           status: error.response.status,
           statusText: error.response.statusText,
           headers: Object.fromEntries(error.response.headers?.entries() || []),
-          body: error.response.body
-        } : undefined
+          body: error.response.body,
+          url: error.response.url
+        } : undefined,
+        request: {
+          consumerKey: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_KEY?.slice(0, 4) + '...',
+          callbackUrl: `${baseUrl}/api/auth/discogs/callback`,
+          baseUrl,
+          nodeEnv: process.env.NODE_ENV,
+          vercelEnv: process.env.VERCEL_ENV,
+          rawRequest: error.request ? {
+            headers: error.request.headers,
+            url: error.request.url,
+            method: error.request.method,
+            authorization: error.request.headers?.Authorization || error.request.headers?.authorization
+          } : undefined
+        }
       });
       throw error;
     });
