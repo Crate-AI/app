@@ -33,6 +33,39 @@ const sdk = new DiscogsSDK({
   debug: true
 });
 
+// Force log the OAuth parameters
+const timestamp = Math.floor(Date.now() / 1000).toString();
+const nonce = `${Date.now()}${Math.random().toString().substring(2)}`;
+const signature = `${process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET}&`;
+const authHeader =
+  `OAuth oauth_consumer_key="${process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_KEY}",` +
+  `oauth_nonce="${nonce}",` +
+  `oauth_callback="${encodeURIComponent(`${baseUrl}/api/auth/discogs/callback`)}",` +
+  `oauth_signature="${encodeURIComponent(signature)}",` +
+  `oauth_signature_method="PLAINTEXT",` +
+  `oauth_timestamp="${timestamp}",` +
+  `oauth_version="1.0"`;
+
+console.log('OAUTH DEBUG - Full Parameters:', {
+  raw_callback_url: `${baseUrl}/api/auth/discogs/callback`,
+  encoded_callback_url: encodeURIComponent(`${baseUrl}/api/auth/discogs/callback`),
+  environment: {
+    NODE_ENV: process.env.NODE_ENV,
+    VERCEL_ENV: process.env.VERCEL_ENV,
+    VERCEL_URL: process.env.VERCEL_URL,
+    BASE_URL: baseUrl,
+    protocol: baseUrl.startsWith('https') ? 'https' : 'http'
+  },
+  oauth: {
+    consumer_key_length: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_KEY?.length,
+    signature_method: 'PLAINTEXT',
+    timestamp,
+    nonce,
+    version: '1.0'
+  },
+  full_auth_header: authHeader
+});
+
 // Log the SDK configuration and request details
 console.log('SDK Instance:', {
   config: {
@@ -61,10 +94,12 @@ export async function GET() {
 
     const requestTokenResponse = await sdk.auth.getRequestToken().catch(error => {
       // Log the full error details
-      console.error('SDK getRequestToken error:', {
-        message: error.message,
-        stack: error.stack,
-        cause: error.cause,
+      console.error('DIRECT DEBUG - Request Token Error:', {
+        error: {
+          message: error.message,
+          stack: error.stack,
+          cause: error.cause,
+        },
         response: error.response ? {
           status: error.response.status,
           statusText: error.response.statusText,
@@ -84,7 +119,8 @@ export async function GET() {
             method: error.request.method,
             authorization: error.request.headers?.Authorization || error.request.headers?.authorization
           } : undefined
-        }
+        },
+        generated_auth: authHeader // Include our generated auth header for comparison
       });
       throw error;
     });

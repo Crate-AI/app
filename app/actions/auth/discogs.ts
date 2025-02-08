@@ -32,7 +32,12 @@ export async function requestDiscogsAuth(): Promise<{
       baseUrl,
       hasConsumerKey: !!process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_KEY,
       hasConsumerSecret: !!process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET,
-      nodeEnv: process.env.NODE_ENV
+      nodeEnv: process.env.NODE_ENV,
+      vercelEnv: process.env.VERCEL_ENV,
+      vercelUrl: process.env.VERCEL_URL,
+      protocol: baseUrl.startsWith('https') ? 'https' : 'http',
+      consumerKeyLength: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_KEY?.length,
+      consumerSecretLength: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET?.length
     });
 
     const response = await fetch(`${baseUrl}/api/auth/discogs/request-token`, {
@@ -41,17 +46,39 @@ export async function requestDiscogsAuth(): Promise<{
       },
     });
 
+    const responseText = await response.text();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (e) {
+      console.error('Failed to parse response:', {
+        text: responseText,
+        error: e
+      });
+      throw new Error('Invalid response format');
+    }
+
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
       console.error('Failed to get request token:', {
         status: response.status,
         statusText: response.statusText,
-        error: errorData
+        headers: Object.fromEntries(response.headers),
+        data,
+        url: `${baseUrl}/api/auth/discogs/request-token`
       });
-      throw new Error(errorData.error || 'Failed to get request token');
+      throw new Error(data.error || 'Failed to get request token');
     }
 
-    const data = await response.json();
+    console.log('Received response:', {
+      status: response.status,
+      hasAuthUrl: !!data.authUrl,
+      hasRequestToken: !!data.requestToken,
+      hasRequestTokenSecret: !!data.requestTokenSecret,
+      authUrlLength: data.authUrl?.length,
+      requestTokenLength: data.requestToken?.length,
+      requestTokenSecretLength: data.requestTokenSecret?.length,
+      fullAuthUrl: data.authUrl // This is safe to log as it's a public URL
+    });
 
     // Keep the cookie setting as it's crucial for the callback
     cookies().set('request_token', data.requestToken, {
