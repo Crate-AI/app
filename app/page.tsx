@@ -79,6 +79,7 @@ export const metadata: Metadata = {
 // };
 
 const Home: NextPage = async () => {
+  console.log('Home page');
   // const { username, resource_url } = StorageService.getItem('userIdentity');
   // const userDetails = await fetchUserDetails(resource_url);
   // const userCollection = await fetchUserCollection(username);
