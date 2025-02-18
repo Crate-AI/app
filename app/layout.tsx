@@ -1,32 +1,64 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import Image from "next/image";
-import { StrictMode } from "react";
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import { Suspense } from 'react';
+import { Toaster } from 'sonner';
+import './globals.css';
+import AuthProvider from '@/features/auth/components/AuthProvider';
+import Navigation from '@/components/layout/Navigation';
+import ErrorBoundary from '@/components/Error/ErrorBoundary';
+import { LoadingSpinner } from '@/components/ui/loading';
+import GlobalError from '@/components/Error/GlobalError';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | Crate",
-    default: "Crate",
+    template: '%s | Crate',
+    default: 'Crate',
   },
-  keywords: ["Crate", "Discogs", "Music", "AI", "Analyzer", "Bpm"],
-  description: "Join the Crate waitlist",
+  keywords: ['Crate', 'Discogs', 'Music', 'AI', 'Analyzer', 'Bpm'],
+  description: 'Your AI-powered music collection analyzer',
+  openGraph: {
+    type: 'website',
+    title: 'Crate',
+    description: 'Your AI-powered music collection analyzer',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
+interface RootLayoutProps {
   children: React.ReactNode;
-}>) {
+}
+
+const RootLayout = ({ children }: Readonly<RootLayoutProps>) => {
   return (
-    // <StrictMode>
-      <html lang="en">
-        <body className={inter.className}>
-        {children}
+    <html lang="en">
+      <body
+        className={inter.className}
+        style={{
+          backgroundImage: 'radial-gradient(#FFDC58 1px, transparent 1px)',
+          backgroundSize: '10px 10px',
+        }}
+      >
+        <ErrorBoundary fallback={<GlobalError />}>
+          <AuthProvider>
+            <Suspense fallback={<LoadingSpinner />}>
+              <Navigation />
+            </Suspense>
+            <main className="min-h-[calc(100vh-4rem)]">
+              <ErrorBoundary>
+                <Suspense fallback={<LoadingSpinner />}>{children}</Suspense>
+              </ErrorBoundary>
+            </main>
+          </AuthProvider>
+        </ErrorBoundary>
+        <Toaster />
       </body>
     </html>
-    // </StrictMode>
   );
-}
+};
+
+export default RootLayout;

@@ -5,14 +5,16 @@ const config: Config = {
   content: [
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
+    './features/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
   ],
   theme: {
     extend: {
       colors: {
-        main: '#FFDC58',
+        main: '#FFDC58', // Bright yellow
         mainAccent: '#ffc800',
+        mainAccent2: '#f6a313', // RGB 246,163,19
         overlay: 'rgba(0,0,0,0.8)',
         bg: '#FEF2E8',
         text: '#000',

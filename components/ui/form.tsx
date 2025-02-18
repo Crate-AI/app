@@ -10,7 +10,7 @@ import {
 } from 'react-hook-form';
 import * as React from 'react';
 import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/utils';
 
 const Form = FormProvider;
 
@@ -92,7 +92,11 @@ const FormLabel = React.forwardRef<
   return (
     <Label
       ref={ref}
-      className={cn('font-mono text-medium-title', error && 'text-red-500', className)}
+      className={cn(
+        'font-mono text-medium-title',
+        error && 'text-red-500',
+        className,
+      )}
       htmlFor={formItemId}
       {...props}
     />
@@ -104,14 +108,17 @@ const FormControl = React.forwardRef<
   React.ElementRef<typeof Slot>,
   React.ComponentPropsWithoutRef<typeof Slot>
 >(({ ...props }, ref) => {
-  const { error, formItemId, formDescriptionId, formMessageId } = useFormField();
+  const { error, formItemId, formDescriptionId, formMessageId } =
+    useFormField();
 
   return (
     <Slot
       ref={ref}
       id={formItemId}
       aria-describedby={
-        !error ? `${formDescriptionId}` : `${formDescriptionId} ${formMessageId}`
+        !error
+          ? `${formDescriptionId}`
+          : `${formDescriptionId} ${formMessageId}`
       }
       aria-invalid={!!error}
       className="font-mono text-small-title"
@@ -131,7 +138,10 @@ const FormDescription = React.forwardRef<
     <p
       ref={ref}
       id={formDescriptionId}
-      className={cn('text-small-subtitle font-mono text-text dark:text-darkText', className)}
+      className={cn(
+        'text-small-subtitle font-mono text-text dark:text-darkText',
+        className,
+      )}
       {...props}
     />
   );

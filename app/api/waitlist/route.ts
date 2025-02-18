@@ -1,15 +1,18 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '@/lib/supabase/client';
 
 // Define the POST handler
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    
+
     const { email, user_type } = data;
 
     if (!email || !user_type) {
-      return NextResponse.json({ error: 'Email and user type are required' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Email and user type are required' },
+        { status: 400 },
+      );
     }
 
     const { error } = await supabase
@@ -20,9 +23,15 @@ export async function POST(request: Request) {
       throw error;
     }
 
-    return NextResponse.json({ message: 'Successfully added to waitlist!' }, { status: 200 });
+    return NextResponse.json(
+      { message: 'Successfully added to waitlist!' },
+      { status: 200 },
+    );
   } catch (error) {
     console.error('Error adding to waitlist:', error);
-    return NextResponse.json({ error: 'Failed to add to waitlist' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to add to waitlist' },
+      { status: 500 },
+    );
   }
 }
