@@ -1,16 +1,23 @@
 import { NextResponse } from 'next/server';
 import { DiscogsSDK } from '@crate.ai/discogs-sdk';
-import { cookies, headers } from 'next/headers';
+import { cookies } from 'next/headers';
 import { CollectionUtils } from '@/lib/database/serverUtils/collection';
 import { createClient } from '@/lib/database/server';
-import { CollectionResponse, Release } from '@crate.ai/discogs-sdk/dist/collection/types';
+import {
+  CollectionResponse,
+  Release,
+} from '@crate.ai/discogs-sdk/dist/collection/types';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * Fetches the user's collection from Discogs and ingests it into the database.
+ * If the collection is already in the database, it will be returned from there, unless the `refreshCollection` flag is set in the request body in which case the collection will be fetched from Discogs and ingested into the database.
+ * @param request - The incoming request
+ * @returns The user's collection
+ */
 export async function GET(request: Request) {
   try {
-    const headersList = headers();
-    const ip = headersList.get('x-forwarded-for') || 'unknown';
     const accessToken = cookies().get('access_token')?.value;
     const accessTokenSecret = cookies().get('access_token_secret')?.value;
     const userData = cookies().get('user_data')?.value;
@@ -24,6 +31,9 @@ export async function GET(request: Request) {
       );
     }
 
+    const data = await request.json();
+    const { refreshCollection }: { refreshCollection: string | undefined } =
+      data;
     const userDataJson = JSON.parse(decodeURIComponent(userData));
     const username = userDataJson?.username;
 
@@ -38,10 +48,15 @@ export async function GET(request: Request) {
     await tokenManager.setAccessToken(accessToken);
     await tokenManager.setAccessTokenSecret(accessTokenSecret);
 
-    // check if collection is already in the database
+    // check if collection is already in the database,
+    // and it's  not being refreshed
     const existingCollection = await getCollection();
 
-    if (existingCollection && existingCollection.length > 0) {
+    if (
+      existingCollection &&
+      existingCollection.length > 0 &&
+      !refreshCollection
+    ) {
       const collectionResponse: CollectionResponse = {
         pagination: {
           page: 1,

@@ -10,7 +10,8 @@ interface CollectionData {
   };
 }
 
-export function useDiscogsCollection() {
+// FIXME: make this param optional
+export function useDiscogsCollection({ refresh }: { refresh?: boolean }) {
   const [collectionData, setCollectionData] = useState<CollectionData>({
     collection: [],
   });
@@ -21,7 +22,9 @@ export function useDiscogsCollection() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch('/api/external/discogs/collection');
+      const response = await fetch('/api/external/discogs/collection', {
+        body: JSON.stringify({ refreshCollection: refresh }),
+      });
       if (!response.ok) throw new Error('Failed to fetch collection');
 
       const data = await response.json();
