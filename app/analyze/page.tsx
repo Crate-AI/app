@@ -21,7 +21,6 @@ const Home: NextPage = () => {
         async (audioBuffer) => {
           const topCandidates =
             await realtimeBpm.analyzeFullBuffer(audioBuffer);
-          console.log('topCandidates', topCandidates);
         },
       );
     });
@@ -35,7 +34,6 @@ const Home: NextPage = () => {
 
     // Simulate upload or processing logic
     setTimeout(() => {
-      console.log('File uploaded:', file?.name);
       setUploadPending(false);
     }, 2000);
   };
