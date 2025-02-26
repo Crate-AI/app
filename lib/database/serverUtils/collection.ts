@@ -72,9 +72,18 @@ export const CollectionUtils = (supabase: SupabaseClient<Database>) => {
       basic_release_data: r,
     }));
 
+    // remove duplicate discogs_release_ids
+    const uniqueCombinedReleaseInfo = combinedReleaseInfo.filter(
+      (release, index, self) =>
+        index ===
+        self.findIndex(
+          (t) => t.discogs_release_id === release.discogs_release_id,
+        ),
+    );
+
     const { error: releaseError } = await supabase
       .from('discogs_releases')
-      .upsert(combinedReleaseInfo);
+      .upsert(uniqueCombinedReleaseInfo);
 
     if (releaseError) {
       throw new Error(releaseError.message);
@@ -88,9 +97,9 @@ export const CollectionUtils = (supabase: SupabaseClient<Database>) => {
     const { error: userReleaseError } = await supabase
       .from('user_releases')
       .upsert(
-        collection.releases.map((r) => ({
+        uniqueCombinedReleaseInfo.map((r) => ({
           user_id: userData.user.id,
-          discogs_release_id: r.id.toString(),
+          discogs_release_id: r.discogs_release_id,
         })),
       );
 
