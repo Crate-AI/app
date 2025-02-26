@@ -31,9 +31,10 @@ export async function GET(request: Request) {
       );
     }
 
-    const data = await request.json();
-    const { refreshCollection }: { refreshCollection: string | undefined } =
-      data;
+    // Extract query parameter from the URL
+    const url = new URL(request.url);
+    const refreshCollection = url.searchParams.get('refreshCollection');
+
     const userDataJson = JSON.parse(decodeURIComponent(userData));
     const username = userDataJson?.username;
 
