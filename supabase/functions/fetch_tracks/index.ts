@@ -95,7 +95,6 @@ async function processReleaseTracks(release: any) {
           .join(', '),
         artist: release.artists.map((artist: any) => artist.name).join(', '),
         duration: track.duration,
-        bpm: Math.floor(Math.random() * (140 - 115) + 115),
       };
 
       const videoId = await getTrackYoutubeId(track, release);
