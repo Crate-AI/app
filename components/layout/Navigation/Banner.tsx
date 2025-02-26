@@ -55,7 +55,7 @@ export default function Banner({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
-  /* const { refresh } = useDiscogsCollection(); // Use hook at component level */
+  const { refetch } = useDiscogsCollection();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -110,7 +110,9 @@ export default function Banner({
             <UserDropdownMenu
               isOpen={isModalOpen}
               onClose={() => setIsModalOpen(false)}
-              onRefresh={() => {}}
+              onRefresh={() => {
+                refetch({ refreshCollection: true });
+              }}
               ref={dropdownRef}
             />
           </div>
