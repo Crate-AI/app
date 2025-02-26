@@ -11,19 +11,30 @@ interface CollectionData {
 }
 
 // FIXME: make this param optional
-export function useDiscogsCollection({ refresh }: { refresh?: boolean }) {
+export function useDiscogsCollection() {
   const [collectionData, setCollectionData] = useState<CollectionData>({
     collection: [],
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchCollection = async () => {
+  const fetchCollection = async (options?: { refreshCollection?: boolean }) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch('/api/external/discogs/collection', {
-        body: JSON.stringify({ refreshCollection: refresh }),
+      // Create URL with query parameter if refreshCollection is provided
+      const url = new URL(
+        '/api/external/discogs/collection',
+        window.location.origin,
+      );
+      if (options?.refreshCollection !== undefined) {
+        url.searchParams.append(
+          'refreshCollection',
+          options.refreshCollection.toString(),
+        );
+      }
+      const response = await fetch(url.toString(), {
+        method: 'GET', // Explicitly setting GET method since we're using query params
       });
       if (!response.ok) throw new Error('Failed to fetch collection');
 
