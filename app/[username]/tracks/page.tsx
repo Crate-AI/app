@@ -9,9 +9,9 @@ export default function TracksPage() {
   return (
     <ErrorBoundary>
       <AiLayout>
-        <div className="container mx-auto py-8 px-4 lg:px-8 overflow-visible">
+        <div className="mx-auto py-8 px-4 lg:px-8 overflow-visible">
           <CollectionNav />
-          <h1 className="text-2xl font-bold mb-4">Track Collection</h1>
+          <h1 className="text-2xl font-bold mb-4 ml-8">Track Collection</h1>
           <TracksTable />
         </div>
       </AiLayout>

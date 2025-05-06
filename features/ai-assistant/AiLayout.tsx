@@ -106,14 +106,6 @@ export default function AiLayout({ children }: AiLayoutProps) {
                 <h2 className="text-lg font-semibold">DJ Assistant</h2>
                 <Sparkles className="h-4 w-4 text-yellow-500 animate-pulse" />
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 rounded-full hover:bg-accent/10"
-                onClick={() => setIsChatOpen(false)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
             </div>
             
             <ChatInterface 

@@ -14,7 +14,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
     return (
       <div className="relative w-full p-[4px]">
         <Search 
-          className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" 
+          className="absolute left-7 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" 
         />
         <Input
           ref={ref}
@@ -23,7 +23,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className={cn(
-            "w-full pl-9 pr-8",
+            "w-full pl-12 pr-8",
             "transition-shadow duration-300",
             "hover:shadow-hover",
             "focus:shadow-focus"
