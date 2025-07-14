@@ -91,7 +91,7 @@ export default function AiLayout({ children }: AiLayoutProps) {
           className={cn(
             'fixed right-0 transition-all duration-300 ease-in-out',
             'border-l shadow-xl bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60',
-            'top-[164px] bottom-0 z-40',
+            'top-16 bottom-0 z-40',
             {
               'w-full sm:w-[350px] xl:w-[400px]': isChatOpen,
               'translate-x-0': isChatOpen,

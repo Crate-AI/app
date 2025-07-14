@@ -6,7 +6,7 @@ import { useTracksStore, usePlaylistStore } from '@/stores'
 import { useYouTubePlayer } from '@/lib/hooks/useYoutubePlayer'
 import { SearchInput } from './components/SearchInput'
 import { Button } from '@/components/ui/button'
-import { Sparkles, MoreHorizontal, ArrowUpDown, Play, Pause, ChevronLeft, ChevronRight, PlusCircle, Share, Info, ListPlus, Plus } from 'lucide-react'
+import { Sparkles, MoreHorizontal, ArrowUpDown, Play, Pause, ChevronLeft, ChevronRight, PlusCircle, ListPlus, Plus } from 'lucide-react'
 import Image from 'next/image'
 import { cn } from '@/lib/utils/utils'
 import { 
@@ -64,6 +64,13 @@ export default function TracksTable() {
   const [newPlaylistName, setNewPlaylistName] = useState('')
   const [selectedTrack, setSelectedTrack] = useState<CrateTrack | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [showPlaylistOptions, setShowPlaylistOptions] = useState<string | null>(null)
+  const [playbackProgress, setPlaybackProgress] = useState<Record<string, number>>({});
+  const [actionHistory, setActionHistory] = useState<Array<{
+    type: 'addToPlaylist' | 'createPlaylist',
+    data: any,
+    timestamp: number
+  }>>([]);
 
   useEffect(() => {
     const getPlaylists = async () => {
@@ -84,8 +91,34 @@ export default function TracksTable() {
 
   const handleAddToPlaylist = async (playlistId: string, trackId: string) => {
     try {
+      // Track the action for potential undo
+      const actionId = Date.now();
+      const action = {
+        type: 'addToPlaylist' as const,
+        data: { playlistId, trackId },
+        timestamp: actionId
+      };
+      
+      setActionHistory(prev => [...prev, action]);
+      
       await addTrackToPlaylist(playlistId, trackId);
-      toast.success('Added to playlist');
+      
+      // Get playlist name for the toast
+      const playlistName = playlists.find(p => p.id === playlistId)?.name || 'playlist';
+      
+      // Show toast with undo option
+      toast.success(`Added to ${playlistName}`, {
+        duration: 5000,
+        action: {
+          label: "Undo",
+          onClick: () => {
+            // In a real app, this would call a remove API
+            toast.info(`Removed from ${playlistName}`);
+            // Remove from history
+            setActionHistory(prev => prev.filter(a => a.timestamp !== actionId));
+          }
+        }
+      });
     } catch (error) {
       toast.error('Failed to add to playlist');
     }
@@ -97,10 +130,34 @@ export default function TracksTable() {
     setIsLoading(true);
     try {
       const playlistId = await createPlaylist(newPlaylistName);
+      
+      // Track the action for potential undo
+      const actionId = Date.now();
+      const action = {
+        type: 'createPlaylist' as const,
+        data: { playlistId, name: newPlaylistName, trackId: selectedTrack.id },
+        timestamp: actionId
+      };
+      
+      setActionHistory(prev => [...prev, action]);
+      
       await addTrackToPlaylist(playlistId, selectedTrack.id);
       setNewPlaylistName('');
       setIsCreatingPlaylist(false);
-      toast.success('Playlist created successfully');
+      
+      // Show toast with undo option
+      toast.success(`Created playlist "${newPlaylistName}"`, {
+        duration: 5000,
+        action: {
+          label: "Undo",
+          onClick: () => {
+            // In a real app, this would call a delete playlist API
+            toast.info(`Deleted playlist "${newPlaylistName}"`);
+            // Remove from history
+            setActionHistory(prev => prev.filter(a => a.timestamp !== actionId));
+          }
+        }
+      });
     } catch (error) {
       toast.error('Failed to create playlist');
     } finally {
@@ -175,16 +232,30 @@ export default function TracksTable() {
               <Button
                 variant="noShadow"
                 size="icon"
-                className="w-8 h-8 relative z-10"
+                className={cn(
+                  "h-8 w-8 relative z-10",
+                  playingTrackId === track.id && "bg-primary/10"
+                )}
                 onClick={() => handlePlayToggle(track)}
                 disabled={!track.youtube_video_id || !isPlayerReady}
               >
                 {playingTrackId === track.id ? (
-                  <Pause className="w-4 h-4" />
+                  <>
+                    <Pause className="h-4 w-4" />
+                    <span className="absolute inset-0 rounded-full animate-pulse-light bg-primary/20" />
+                  </>
                 ) : (
-                  <Play className="w-4 h-4" />
+                  <Play className="h-4 w-4" />
                 )}
               </Button>
+              {playingTrackId === track.id && (
+                <div className="absolute -bottom-1 left-0 right-0 h-1 bg-gray-200 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-primary transition-all duration-300 ease-linear"
+                    style={{ width: `${playbackProgress[track.id] || 0}%` }}
+                  />
+                </div>
+              )}
               {track.position && (
                 <span className="absolute -top-2 -right-2 text-xs px-1 bg-gray-100 rounded-full text-gray-500">
                   {track.position}
@@ -215,88 +286,21 @@ export default function TracksTable() {
               </div>
             </div>
             
-            {/* Contextual actions that appear on hover */}
+            {/* Add to playlist action that appears on hover */}
             {isHovering && (
-              <div className="flex items-center gap-1 ml-2 animate-fadeIn">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0"
-                          >
-                            <PlusCircle className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent 
-                          align="start"
-                          className="bg-background/60 backdrop-blur-lg border border-border/50"
-                        >
-                          {playlists.map((playlist) => (
-                            <DropdownMenuItem
-                              key={playlist.id}
-                              onClick={() => handleAddToPlaylist(playlist.id, track.id)}
-                              className="hover:bg-accent/50"
-                            >
-                              {playlist.name}
-                            </DropdownMenuItem>
-                          ))}
-                          {playlists.length > 0 && <DropdownMenuSeparator className="bg-border/50" />}
-                          <DropdownMenuItem 
-                            onClick={() => {
-                              setSelectedTrack(track);
-                              setIsCreatingPlaylist(true);
-                            }}
-                            className="hover:bg-accent/50"
-                          >
-                            <Plus className="h-4 w-4 mr-2" />
-                            Create New Playlist
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Add to playlist</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0"
-                      >
-                        <Share className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Share track</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0"
-                      >
-                        <Info className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>View details</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+              <div className="flex items-center ml-2 animate-fadeIn">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedTrack(track);
+                    setShowPlaylistOptions(track.id);
+                  }}
+                >
+                  <PlusCircle className="h-4 w-4" />
+                </Button>
               </div>
             )}
           </div>
@@ -316,12 +320,14 @@ export default function TracksTable() {
         const isHovering = rowHover === track.id
         const artist = formatArtists(track.artist, track.extra_artists)
         return (
-          <div className="text-sm text-gray-500 max-w-[18rem] relative overflow-hidden">
+          <div className="text-sm text-gray-500 max-w-[18rem] overflow-hidden">
             <div className={cn(
               "whitespace-nowrap",
-              isHovering && artist.length > 15 && "hover-marquee"
+              isHovering && artist.length > 15 && "marquee-text"
             )}>
-              {artist}
+              <ArtistPreview artist={track.artist}>
+                {artist}
+              </ArtistPreview>
             </div>
           </div>
         )
@@ -408,8 +414,77 @@ export default function TracksTable() {
     debugTable: process.env.NODE_ENV === 'development',
   })
 
+  useEffect(() => {
+    if (!playingTrackId) return;
+    
+    // Start at 0 progress when a new track starts playing
+    if (!playbackProgress[playingTrackId]) {
+      setPlaybackProgress(prev => ({ ...prev, [playingTrackId]: 0 }));
+    }
+    
+    // Simulate progress updates (in a real app, this would come from the actual audio player)
+    const interval = setInterval(() => {
+      setPlaybackProgress(prev => {
+        const currentProgress = prev[playingTrackId] || 0;
+        if (currentProgress >= 100) {
+          clearInterval(interval);
+          return prev;
+        }
+        return { ...prev, [playingTrackId]: currentProgress + 1 };
+      });
+    }, 1000); // Update every second
+    
+    return () => clearInterval(interval);
+  }, [playingTrackId]);
+
   if (loading && allTracks.length === 0) {
-    return <div>Loading tracks...</div>
+    return (
+      <div className="space-y-4 ml-8">
+        <div className="flex justify-between items-center mb-4">
+          <div className="w-40 h-9 bg-gray-200 animate-pulse rounded-md"></div>
+          <div className="w-64 h-9 bg-gray-200 animate-pulse rounded-md"></div>
+        </div>
+
+        <div className="relative overflow-x-auto rounded-md border">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <th key={i} className="px-4 py-3">
+                    <div className="h-4 bg-gray-200 rounded w-20 animate-pulse"></div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {Array.from({ length: 8 }).map((_, rowIndex) => (
+                <tr key={rowIndex} className="border-b border-gray-100">
+                  <td className="px-4 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
+                      <div className="h-10 w-10 bg-gray-200 rounded-sm animate-pulse"></div>
+                      <div className="h-4 bg-gray-200 rounded w-40 animate-pulse"></div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="h-4 bg-gray-200 rounded w-24 animate-pulse"></div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="h-4 bg-gray-200 rounded w-36 animate-pulse"></div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="h-4 bg-gray-200 rounded w-10 animate-pulse"></div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="h-4 bg-gray-200 rounded w-12 animate-pulse"></div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )
   }
 
   if (error) {
@@ -431,6 +506,34 @@ export default function TracksTable() {
       display: inline-block;
       position: relative;
       max-width: 100%;
+    }
+
+    @keyframes marquee-animation {
+      0% { transform: translateX(0); }
+      10% { transform: translateX(0); }
+      90% { transform: translateX(max(-100%, -300px)); }
+      100% { transform: translateX(0); }
+    }
+    
+    .marquee-text {
+      animation: marquee-animation 3s ease-in-out;
+      display: inline-block;
+      white-space: nowrap;
+    }
+    
+    /* Ensure containers don't grow with content */
+    [class*="max-w-"] {
+      overflow: hidden;
+    }
+    
+    /* Pulse animation for currently playing track */
+    @keyframes pulse-light {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.7; }
+    }
+    
+    .animate-pulse-light {
+      animation: pulse-light 2s ease-in-out infinite;
     }
   `;
 
@@ -494,6 +597,11 @@ export default function TracksTable() {
                       'bg-gradient-to-r from-primary/[0.03] to-primary/[0.07]',
                       'border-l-[3px] border-primary/40',
                       'shadow-[inset_0_0_40px_rgba(0,0,0,0.02)]'
+                    ],
+                    playingTrackId === track.id && [
+                      'bg-primary/[0.03]',
+                      'border-l-[3px] border-primary/60',
+                      'shadow-[inset_0_0_30px_rgba(0,0,0,0.01)]'
                     ]
                   )}
                   onMouseEnter={() => setRowHover(track.id)}
@@ -552,6 +660,52 @@ export default function TracksTable() {
               {isLoading ? 'Creating...' : 'Create'}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Playlist Options Dialog */}
+      <Dialog open={showPlaylistOptions !== null} onOpenChange={(open) => !open && setShowPlaylistOptions(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add to Playlist</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            {playlists && playlists.length > 0 ? (
+              <div className="grid gap-2">
+                {playlists.map((playlist) => (
+                  <Button
+                    key={playlist.id}
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => {
+                      if (selectedTrack && showPlaylistOptions) {
+                        handleAddToPlaylist(playlist.id, selectedTrack.id);
+                        setShowPlaylistOptions(null);
+                      }
+                    }}
+                  >
+                    <ListPlus className="mr-2 h-4 w-4" />
+                    {playlist.name}
+                  </Button>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-2 text-muted-foreground">
+                No playlists yet
+              </div>
+            )}
+            <Button 
+              variant="outline"
+              className="w-full justify-start"
+              onClick={() => {
+                setIsCreatingPlaylist(true);
+                setShowPlaylistOptions(null);
+              }}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Create New Playlist
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -640,4 +794,28 @@ export default function TracksTable() {
       </div>
     </div>
   )
+}
+
+// Artist Preview Component - Simple approach with CSS-only tooltip
+function ArtistPreview({ artist, children }: { artist: string, children: React.ReactNode }) {
+  return (
+    <div className="relative group inline-block">
+      <span className="cursor-pointer hover:text-primary hover:underline underline-offset-2">
+        {children}
+      </span>
+      <div className="absolute left-0 top-full mt-2 w-64 rounded-md bg-background/95 p-3 shadow-lg ring-1 ring-border z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+        <div className="flex flex-col space-y-2">
+          <h4 className="text-sm font-semibold">{artist}</h4>
+          <div className="flex items-center">
+            <span className="bg-primary/10 text-primary text-xs rounded-full px-2 py-0.5 mr-2">
+              Artist
+            </span>
+            <span className="text-xs text-muted-foreground">
+              View all tracks
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 import { Toaster } from 'sonner';
 import './globals.css';
 import AuthProvider from '@/features/auth/components/AuthProvider';
-import Navigation from '@/components/layout/Navigation';
+import AppLayout from '@/components/layout/Navigation/AppLayout';
 import ErrorBoundary from '@/components/Error/ErrorBoundary';
 import { LoadingSpinner } from '@/components/ui/loading';
 import GlobalError from '@/components/Error/GlobalError';
@@ -45,14 +45,11 @@ const RootLayout = ({ children }: Readonly<RootLayoutProps>) => {
       >
         <ErrorBoundary fallback={<GlobalError />}>
           <AuthProvider>
-            <Suspense fallback={<LoadingSpinner />}>
-              <Navigation />
-            </Suspense>
-            <main className="min-h-[calc(100vh-4rem)]">
+            <AppLayout>
               <ErrorBoundary>
                 <Suspense fallback={<LoadingSpinner />}>{children}</Suspense>
               </ErrorBoundary>
-            </main>
+            </AppLayout>
           </AuthProvider>
         </ErrorBoundary>
         <Toaster />

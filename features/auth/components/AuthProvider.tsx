@@ -25,12 +25,8 @@ interface AuthProviderProps {
 function AuthProviderContent({ children }: AuthProviderProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { 
-    setUserIdentity, 
-    setSupabaseUser,
-    setIsLoading 
-  } = useAuthStore();
-  
+  const { setUserIdentity, setSupabaseUser, setIsLoading } = useAuthStore();
+
   const [error, setError] = useState<string | null>(null);
 
   const handleAuthError = (error: unknown) => {
@@ -38,14 +34,20 @@ function AuthProviderContent({ children }: AuthProviderProps) {
     const newUrl = new URL(window.location.href);
     newUrl.searchParams.delete('error');
     router.replace(newUrl.pathname);
-    
+
     // Handle both string errors and Error objects
-    const errorMessage = error instanceof Error ? error.message : 
-      typeof error === 'string' ? error : 'An error occurred during authentication';
-    
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : typeof error === 'string'
+          ? error
+          : 'An error occurred during authentication';
+
     setError(
-      ERROR_MESSAGES[errorMessage as AuthError] || 
-      (process.env.NODE_ENV === 'development' ? errorMessage : 'An error occurred during authentication')
+      ERROR_MESSAGES[errorMessage as AuthError] ||
+        (process.env.NODE_ENV === 'development'
+          ? errorMessage
+          : 'An error occurred during authentication'),
     );
   };
 
@@ -75,7 +77,6 @@ function AuthProviderContent({ children }: AuthProviderProps) {
 
         const error = searchParams.get('error');
         if (error) throw error;
-        
       } catch (error) {
         handleAuthError(error);
       } finally {
@@ -84,11 +85,15 @@ function AuthProviderContent({ children }: AuthProviderProps) {
     };
 
     // Set up auth listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      handleAuthStateChange
-    );
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(handleAuthStateChange);
 
-    initAuth();
+    // Wrap initAuth in a promise catch to prevent unhandled rejections
+    initAuth().catch((error) => {
+      console.error('Unhandled auth initialization error:', error);
+      handleAuthError(error);
+    });
 
     return () => {
       subscription.unsubscribe();

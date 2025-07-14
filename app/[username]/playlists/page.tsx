@@ -5,7 +5,7 @@ import { PlaylistCard } from '@/features/playlists/components/PlaylistCard';
 import { Playlist } from '@/features/playlists/components/Playlist';
 import { usePlaylistStore } from '@/stores';
 import { PlaylistWithTracks } from "@/types";
-import { CollectionNav } from '@/components/layout/CollectionNav';
+import { PageHeader } from '@/components/layout/Navigation/Breadcrumbs';
 
 const PlaylistPage = () => {
   const [expandedPlaylistId, setExpandedPlaylistId] = useState<string | null>(null);
@@ -24,14 +24,14 @@ const PlaylistPage = () => {
   };
 
   return (
-    <div className="min-h-screen py-8">
-      <div className="container mx-auto px-4">
-        <CollectionNav />
-        <h1 className="text-medium-title font-heading font-bold mb-8 text-text">
-          Playlists
-        </h1>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+    <>
+      <PageHeader 
+        title="Playlists" 
+        description="Create and manage your music playlists"
+      />
+      <div className="min-h-screen py-8">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {playlists.map((playlist) => (
             <PlaylistCard
               key={playlist.id}
@@ -47,8 +47,9 @@ const PlaylistPage = () => {
             <Playlist activePlaylistId={expandedPlaylistId} />
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
