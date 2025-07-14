@@ -52,7 +52,23 @@ const RootLayout = ({ children }: Readonly<RootLayoutProps>) => {
             </AppLayout>
           </AuthProvider>
         </ErrorBoundary>
-        <Toaster />
+        <Toaster 
+          position="top-center"
+          expand={false}
+          closeButton
+          richColors
+          toastOptions={{
+            style: {
+              border: '2px solid black',
+              borderRadius: '12px',
+              fontSize: '14px',
+              fontWeight: '500',
+              backgroundColor: 'white',
+              color: '#1a1a1a',
+            },
+            className: 'shadow-light',
+          }}
+        />
       </body>
     </html>
   );

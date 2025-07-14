@@ -160,15 +160,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
           </button>
         </div>
       )}
-
-      {/* Keyboard Shortcuts Helper (Development) */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="fixed bottom-4 left-4 bg-gray-900 text-white p-2 rounded text-xs opacity-75 pointer-events-none">
-          <div>⌘B: Toggle sidebar</div>
-          <div>⌘K: Search</div>
-          <div>ESC: Close menu</div>
-        </div>
-      )}
     </div>
   );
 } 

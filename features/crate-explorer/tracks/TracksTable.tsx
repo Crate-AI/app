@@ -2,8 +2,7 @@
 
 import { useEffect, useMemo, useState, useRef } from 'react'
 import { CrateTrack } from '@/types'
-import { useTracksStore, usePlaylistStore } from '@/stores'
-import { useYouTubePlayer } from '@/lib/hooks/useYoutubePlayer'
+import { useTracksStore, usePlaylistStore, usePlayerStore } from '@/stores'
 import { SearchInput } from './components/SearchInput'
 import { Button } from '@/components/ui/button'
 import { Sparkles, MoreHorizontal, ArrowUpDown, Play, Pause, ChevronLeft, ChevronRight, PlusCircle, ListPlus, Plus } from 'lucide-react'
@@ -48,6 +47,7 @@ import { toast } from 'sonner'
 export default function TracksTable() {
   const { allTracks, suggestedTrackIds } = useTracksStore()
   const { createPlaylist, addTrackToPlaylist, fetchPlaylists } = usePlaylistStore()
+  const { playingTrackId, isReady, isPlaying, togglePlayPause, initializePlayer } = usePlayerStore()
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -56,7 +56,6 @@ export default function TracksTable() {
     pageIndex: 0,
     pageSize: 10,
   })
-  const { playingTrackId, isPlayerReady, handlePlayToggle } = useYouTubePlayer()
   const searchInputRef = useRef<HTMLInputElement>(null)
   const [rowHover, setRowHover] = useState<string | null>(null)
   const [playlists, setPlaylists] = useState<any[]>([])
@@ -71,6 +70,30 @@ export default function TracksTable() {
     data: any,
     timestamp: number
   }>>([]);
+
+  // Initialize player when component mounts
+  useEffect(() => {
+    initializePlayer();
+  }, [initializePlayer]);
+
+  const handlePlayToggle = async (track: CrateTrack) => {
+    if (!track.youtube_video_id) {
+      toast.error('No audio available for this track');
+      return;
+    }
+    
+    if (!isReady) {
+      toast.error('Player is still loading...');
+      return;
+    }
+
+    try {
+      togglePlayPause(track);
+    } catch (error) {
+      console.error('Error playing track:', error);
+      toast.error('Failed to play track');
+    }
+  };
 
   useEffect(() => {
     const getPlaylists = async () => {
@@ -237,9 +260,9 @@ export default function TracksTable() {
                   playingTrackId === track.id && "bg-primary/10"
                 )}
                 onClick={() => handlePlayToggle(track)}
-                disabled={!track.youtube_video_id || !isPlayerReady}
+                disabled={!track.youtube_video_id || !isReady}
               >
-                {playingTrackId === track.id ? (
+                {playingTrackId === track.id && isPlaying ? (
                   <>
                     <Pause className="h-4 w-4" />
                     <span className="absolute inset-0 rounded-full animate-pulse-light bg-primary/20" />
@@ -381,7 +404,7 @@ export default function TracksTable() {
       ),
       cell: ({getValue}) => <div className="text-sm text-gray-500">{getValue() || '-'}</div>
     })
-  ], [playingTrackId, isPlayerReady, rowHover, handlePlayToggle, handleAddToPlaylist, playlists])
+  ], [playingTrackId, isReady, isPlaying, rowHover, handlePlayToggle, handleAddToPlaylist, playlists])
 
   const globalFilter: FilterFn<CrateTrack> = (row, columnId, value) => {
     const searchLower = value.toLowerCase()
