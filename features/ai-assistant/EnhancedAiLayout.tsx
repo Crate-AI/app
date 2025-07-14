@@ -32,8 +32,17 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth < 768;
+      const tablet = window.innerWidth < 1024;
       setIsMobile(mobile);
-      setChatPosition(mobile ? 'overlay' : 'sidebar');
+      
+      // More sophisticated positioning logic
+      if (mobile) {
+        setChatPosition('overlay');
+      } else if (tablet) {
+        setChatPosition('bottom');
+      } else {
+        setChatPosition('sidebar');
+      }
     };
 
     checkMobile();
@@ -114,9 +123,9 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
         {/* Main Content */}
         <div
           className={cn(
-            'transition-all duration-300 ease-in-out',
+            'transition-all duration-300 ease-in-out pb-20 min-h-screen',
             chatPosition === 'sidebar' && isChatOpen && 'lg:mr-[450px] xl:mr-[500px]',
-            chatPosition === 'bottom' && isChatOpen && 'pb-[400px]'
+            chatPosition === 'bottom' && isChatOpen && 'pb-[420px]'
           )}
         >
           {children}
@@ -134,11 +143,13 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
         {chatPosition !== 'bottom' && (
           <Card
             className={cn(
-              'fixed right-0 top-16 bottom-0 transition-all duration-300 ease-in-out z-50',
+              'fixed right-0 transition-all duration-300 ease-in-out z-50',
               'border-l-2 border-black shadow-light bg-bg',
               {
-                'w-full sm:w-[450px] xl:w-[500px]': isChatOpen && chatPosition === 'sidebar',
-                'w-full h-full': isChatOpen && chatPosition === 'overlay',
+                // Sidebar positioning - account for persistent player
+                'top-16 bottom-20 w-full sm:w-[450px] xl:w-[500px]': isChatOpen && chatPosition === 'sidebar',
+                // Overlay positioning - full screen on mobile
+                'top-16 bottom-20 w-full': isChatOpen && chatPosition === 'overlay',
                 'translate-x-0': isChatOpen,
                 'translate-x-full': !isChatOpen
               }
@@ -159,7 +170,7 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
         {chatPosition === 'bottom' && (
           <Card
             className={cn(
-              'fixed bottom-0 left-0 right-0 transition-all duration-300 ease-in-out z-50',
+              'fixed bottom-20 left-0 right-0 transition-all duration-300 ease-in-out z-50',
               'border-t-2 border-black shadow-light bg-bg',
               {
                 'h-[400px]': isChatOpen,
@@ -180,10 +191,10 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
         )}
 
         {/* Chat Toggle Button */}
-        <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end space-y-3">
+        <div className="fixed bottom-28 right-6 z-50 flex flex-col items-end space-y-3">
           {/* Quick Info Badge - Only show when closed and has tracks */}
           {!isChatOpen && tracks.length > 0 && (
-            <div className="bg-bg border-2 border-black rounded-base px-3 py-2 shadow-light">
+            <div className="bg-bg border-2 border-black rounded-base px-3 py-2 shadow-light animate-in fade-in-50 slide-in-from-right-2">
               <div className="flex items-center space-x-2">
                 <Bot className="w-4 h-4 text-black" />
                 <span className="text-sm font-medium text-text">{tracks.length} tracks ready</span>
@@ -198,6 +209,7 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
               "h-14 w-14 rounded-base shadow-light border-2 border-black transition-all duration-200",
               "bg-main hover:bg-mainAccent text-black font-medium",
               "hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none",
+              "animate-in fade-in-50 slide-in-from-right-2",
               isChatOpen && "rotate-180"
             )}
           >
@@ -211,8 +223,8 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
 
         {/* Keyboard Shortcut Hint - Separate positioned element */}
         {!isChatOpen && (
-          <div className="fixed bottom-6 right-24 z-40 hidden lg:block">
-            <div className="bg-bg border-2 border-black rounded-base px-3 py-2 shadow-light opacity-80 hover:opacity-100 transition-opacity">
+          <div className="fixed bottom-28 right-24 z-40 hidden lg:block">
+            <div className="bg-bg border-2 border-black rounded-base px-3 py-2 shadow-light opacity-80 hover:opacity-100 transition-opacity animate-in fade-in-50 slide-in-from-right-2 delay-300">
               <div className="flex items-center space-x-2 text-xs text-text whitespace-nowrap">
                 <span>Press</span>
                 <kbd className="px-1.5 py-0.5 bg-white border border-black rounded-base text-xs font-mono">⌘/</kbd>

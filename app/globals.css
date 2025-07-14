@@ -73,3 +73,53 @@
     @apply border-border;
   }
 }
+
+@layer components {
+  /* Enhanced click feedback for interactive elements */
+  .interactive-element {
+    @apply transition-all duration-150 ease-out;
+  }
+  
+  .interactive-element:active {
+    @apply scale-95;
+  }
+  
+  /* Play button enhancements */
+  .play-button {
+    @apply transition-all duration-150 ease-out;
+  }
+  
+  .play-button:active {
+    @apply scale-90 bg-mainAccent;
+  }
+  
+  /* Icon button enhancements */
+  .icon-button {
+    @apply transition-all duration-150 ease-out;
+  }
+  
+  .icon-button:active {
+    @apply scale-90 bg-mainAccent;
+  }
+  
+  /* Track row enhancements */
+  .track-row {
+    @apply transition-all duration-150 ease-out;
+  }
+  
+  .track-row:active {
+    @apply bg-mainAccent/10 scale-[0.99];
+  }
+  
+  /* Remove default button tap highlight on mobile */
+  button,
+  [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Custom tap highlight using our yellow color */
+  button:active,
+  [role="button"]:active {
+    background-color: rgba(255, 200, 0, 0.2);
+  }
+}

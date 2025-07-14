@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils/utils';
 import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
+import PersistentPlayer from '@/components/ui/persistent-player';
 import { X } from 'lucide-react';
 
 interface AppLayoutProps {
@@ -132,7 +133,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       {/* Main Content */}
       <main
         className={cn(
-          "pt-16 transition-all duration-300 min-h-screen",
+          "pt-16 transition-all duration-300 min-h-screen pb-20",
           isMobile ? "ml-0" : (sidebarCollapsed ? "ml-16" : "ml-64")
         )}
       >
@@ -147,19 +148,22 @@ export default function AppLayout({ children }: AppLayoutProps) {
           {/* Quick access button for mobile */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="w-12 h-12 bg-primary text-white rounded-full shadow-lg flex items-center justify-center hover:bg-primary/90 transition-colors"
+            className="w-12 h-12 bg-main text-black rounded-full shadow-lg flex items-center justify-center hover:bg-mainAccent transition-colors border-2 border-black"
             aria-label="Toggle navigation"
           >
             {mobileMenuOpen ? (
-              <X className="w-6 h-6" />
+              <X className="w-6 h-6 active:text-main transition-colors" />
             ) : (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 active:text-main transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             )}
           </button>
         </div>
       )}
+      
+      {/* Persistent Music Player */}
+      <PersistentPlayer />
     </div>
   );
 } 

@@ -225,13 +225,14 @@ const MessageBubble = ({
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-8 w-full`}>
       <div className={`flex items-start space-x-4 max-w-full ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`}>
-        <div className="w-8 h-8 flex-shrink-0 border-2 border-black rounded-base flex items-center justify-center">
+        <div className="w-8 h-8 flex-shrink-0">
           {isUser ? (
-            <div className="w-8 h-8 bg-mainAccent border-2 border-black rounded-base flex items-center justify-center">
-              <span className="text-black font-medium text-sm">
+            <Avatar className="w-8 h-8">
+              <AvatarImage src={userAvatar} />
+              <AvatarFallback className="bg-mainAccent text-black border-2 border-black text-sm">
                 {userAvatar?.charAt(0)?.toUpperCase() || 'U'}
-              </span>
-            </div>
+              </AvatarFallback>
+            </Avatar>
           ) : (
             <div className="w-8 h-8 bg-main border-2 border-black rounded-base flex items-center justify-center">
               <Bot className="w-4 h-4 text-black" />
@@ -411,7 +412,7 @@ export default function EnhancedChatInterface({
   return (
     <div className="flex flex-col h-full bg-bg max-w-full overflow-hidden">
       {/* Header */}
-      <div className="p-4 border-b-2 border-black bg-bg flex-shrink-0">
+      <div className="p-4 border-b-2 border-black bg-bg flex-shrink-0 sticky top-0 z-10">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3 flex-1 min-w-0">
             <div className="w-10 h-10 bg-main border-2 border-black rounded-base flex items-center justify-center shadow-light flex-shrink-0">
@@ -499,14 +500,14 @@ export default function EnhancedChatInterface({
       </div>
 
       {/* Input */}
-      <div className="p-4 border-t-2 border-black bg-bg flex-shrink-0">
+      <div className="p-4 border-t-2 border-black bg-bg flex-shrink-0 sticky bottom-0 z-10">
         <form onSubmit={onSubmit} className="flex space-x-3">
           <Input
             value={input}
             onChange={handleInputChange}
             placeholder="Ask about tracks, mixing tips, or BPM matching..."
             disabled={isLoading}
-            className="flex-1 border-2 border-black bg-white focus:ring-main focus:border-main text-text h-11"
+            className="flex-1 border-2 border-black bg-white focus:ring-main focus:border-main text-text h-11 rounded-base"
           />
           <TooltipProvider>
             <Tooltip>
@@ -514,7 +515,7 @@ export default function EnhancedChatInterface({
                 <Button 
                   type="submit" 
                   disabled={isLoading || !input.trim()}
-                  className="h-11 px-4 bg-main hover:bg-mainAccent border-2 border-black text-text shadow-light hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none transition-all flex-shrink-0"
+                  className="h-11 px-4 bg-main hover:bg-mainAccent border-2 border-black text-text shadow-light hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none transition-all flex-shrink-0 rounded-base"
                 >
                   <Send className="w-4 h-4" />
                 </Button>

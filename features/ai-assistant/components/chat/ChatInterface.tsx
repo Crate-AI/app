@@ -157,11 +157,8 @@ export default function ChatInterface({ tracks, onTracksFilter }: ChatInterfaceP
         </div>
       </div>
 
-      <form 
-        onSubmit={onSubmit} 
-        className="p-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 fixed bottom-0 left-0 right-0 border-t border-border"
-      >
-        <div className="flex gap-2 max-w-[1200px] mx-auto">
+      <div className="p-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t border-border">
+        <form onSubmit={onSubmit} className="flex gap-2 max-w-[1200px] mx-auto">
           <Input
             value={input}
             onChange={handleInputChange}
@@ -181,8 +178,8 @@ export default function ChatInterface({ tracks, onTracksFilter }: ChatInterfaceP
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   )
 }

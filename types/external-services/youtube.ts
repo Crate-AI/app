@@ -11,6 +11,11 @@ export interface YouTubePlayer {
   pauseVideo(): void;
   stopVideo(): void;
   getPlayerState(): number;
+  setVolume(volume: number): void;
+  getVolume(): number;
+  seekTo(seconds: number, allowSeekAhead?: boolean): void;
+  getCurrentTime(): number;
+  getDuration(): number;
 }
 
 export interface YouTubeConfig {

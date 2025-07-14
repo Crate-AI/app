@@ -53,7 +53,7 @@ export default function AiLayout({ children }: AiLayoutProps) {
       <div className="relative min-h-screen">
         <div
           className={cn(
-            'transition-all duration-300 ease-in-out',
+            'transition-all duration-300 ease-in-out pb-20 min-h-screen',
             {
               'lg:mr-[350px] xl:mr-[400px]': isChatOpen,
               'mr-0': !isChatOpen
@@ -73,9 +73,9 @@ export default function AiLayout({ children }: AiLayoutProps) {
           variant="outline"
           size="icon"
           className={cn(
-            "fixed lg:bottom-20 bottom-16 lg:right-8 right-4 h-12 w-12 rounded-full shadow-lg z-50",
-            "bg-background hover:bg-accent transition-all duration-200",
-            "hover:scale-110 active:scale-95",
+            "fixed bottom-28 right-6 h-12 w-12 rounded-base shadow-light z-50",
+            "bg-main hover:bg-mainAccent border-2 border-black text-black transition-all duration-200",
+            "hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none",
             isChatOpen && "rotate-180"
           )}
           onClick={() => setIsChatOpen(!isChatOpen)}
@@ -90,8 +90,8 @@ export default function AiLayout({ children }: AiLayoutProps) {
         <Card
           className={cn(
             'fixed right-0 transition-all duration-300 ease-in-out',
-            'border-l shadow-xl bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60',
-            'top-16 bottom-0 z-40',
+            'border-l-2 border-black shadow-light bg-bg',
+            'top-16 bottom-20 z-40',
             {
               'w-full sm:w-[350px] xl:w-[400px]': isChatOpen,
               'translate-x-0': isChatOpen,

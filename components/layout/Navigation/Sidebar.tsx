@@ -14,7 +14,9 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import Image from 'next/image';
 
 interface SidebarProps {
   collapsed?: boolean;
@@ -26,8 +28,14 @@ export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
   const { userIdentity } = useAuthStore();
   const [isCollapsed, setIsCollapsed] = useState(collapsed);
 
+  // Sync internal state with prop
+  useEffect(() => {
+    setIsCollapsed(collapsed);
+  }, [collapsed]);
+
   const handleToggle = () => {
-    setIsCollapsed(!isCollapsed);
+    const newCollapsed = !isCollapsed;
+    setIsCollapsed(newCollapsed);
     onToggle?.();
   };
 
@@ -77,8 +85,15 @@ export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         {!isCollapsed && (
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <Music className="w-5 h-5 text-white" />
+            <div className="w-8 h-8 flex items-center justify-center">
+              <Image
+                src="/logo.svg"
+                alt="Crate Logo"
+                width={32}
+                height={32}
+                priority
+                className="w-8 h-8"
+              />
             </div>
             <span className="font-semibold text-gray-900">Crate</span>
           </div>
@@ -89,9 +104,9 @@ export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
           aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {isCollapsed ? (
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-4 h-4 active:text-main transition-colors" />
           ) : (
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-4 h-4 active:text-main transition-colors" />
           )}
         </button>
       </div>
@@ -111,13 +126,13 @@ export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
               className={cn(
                 "group flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 relative",
                 isActive 
-                  ? "bg-primary text-white shadow-sm" 
+                  ? "text-black" 
                   : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
               )}
             >
               <Icon className={cn(
-                "w-5 h-5 shrink-0 transition-colors",
-                isActive ? "text-white" : "text-gray-500 group-hover:text-gray-700"
+                "w-5 h-5 shrink-0 transition-colors active:text-main",
+                isActive ? "text-main" : "text-gray-500 group-hover:text-gray-700"
               )} />
               
               {!isCollapsed && (
@@ -148,11 +163,12 @@ export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
           "flex items-center space-x-3 px-3 py-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer",
           isCollapsed && "justify-center"
         )}>
-          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-            <span className="text-white font-medium text-sm">
+          <Avatar className="w-8 h-8">
+            <AvatarImage src={userIdentity.avatarUrl} />
+            <AvatarFallback className="bg-main text-black border-2 border-black text-sm">
               {userIdentity.username.charAt(0).toUpperCase()}
-            </span>
-          </div>
+            </AvatarFallback>
+          </Avatar>
           
           {!isCollapsed && (
             <div className="flex-1 min-w-0">

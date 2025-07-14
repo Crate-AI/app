@@ -91,17 +91,17 @@ export default function TopBar({
         )}
       >
       {/* Mobile Menu Button */}
-      <button
-        onClick={onMobileMenuToggle}
-        className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
-        aria-label="Toggle mobile menu"
-      >
-        {mobileMenuOpen ? (
-          <X className="w-5 h-5" />
-        ) : (
-          <Menu className="w-5 h-5" />
-        )}
-      </button>
+              <button
+          onClick={onMobileMenuToggle}
+          className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          aria-label="Toggle mobile menu"
+        >
+          {mobileMenuOpen ? (
+            <X className="w-5 h-5 active:text-main transition-colors" />
+          ) : (
+            <Menu className="w-5 h-5 active:text-main transition-colors" />
+          )}
+        </button>
 
       {/* Search Bar */}
       <div className="flex-1 max-w-2xl mx-4">
@@ -113,7 +113,7 @@ export default function TopBar({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setCommandPaletteOpen(true)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm cursor-pointer"
+            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main focus:border-main text-sm cursor-pointer transition-all active:bg-mainAccent/10"
             readOnly
           />
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2 hidden sm:flex items-center space-x-1">
@@ -133,7 +133,7 @@ export default function TopBar({
               size="sm"
               className="p-2 hover:bg-gray-100"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 active:text-main transition-colors" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
@@ -158,7 +158,7 @@ export default function TopBar({
           size="sm"
           className="p-2 hover:bg-gray-100 relative"
         >
-          <Bell className="w-4 h-4" />
+          <Bell className="w-4 h-4 active:text-main transition-colors" />
           {/* Notification indicator */}
           <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full text-xs"></span>
         </Button>
@@ -173,7 +173,7 @@ export default function TopBar({
               >
                 <Avatar className="w-8 h-8">
                   <AvatarImage src={userIdentity.avatarUrl} />
-                  <AvatarFallback>
+                  <AvatarFallback className="bg-main text-black border-2 border-black">
                     {userIdentity.username.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>

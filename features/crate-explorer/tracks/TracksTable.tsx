@@ -47,7 +47,7 @@ import { toast } from 'sonner'
 export default function TracksTable() {
   const { allTracks, suggestedTrackIds } = useTracksStore()
   const { createPlaylist, addTrackToPlaylist, fetchPlaylists } = usePlaylistStore()
-  const { playingTrackId, isReady, isPlaying, togglePlayPause, initializePlayer } = usePlayerStore()
+  const { playingTrackId, isReady, isPlaying, togglePlayPause, initializePlayer, addToQueue } = usePlayerStore()
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -88,11 +88,24 @@ export default function TracksTable() {
     }
 
     try {
+      // Set up the queue with all tracks if not already set or if queue is empty
+      const { queue, setQueue } = usePlayerStore.getState();
+      if (queue.length === 0) {
+        const trackIndex = allTracks.findIndex(t => t.id === track.id);
+        setQueue(allTracks, trackIndex);
+        toast.success(`Added ${allTracks.length} tracks to queue`);
+      }
+      
       togglePlayPause(track);
     } catch (error) {
       console.error('Error playing track:', error);
       toast.error('Failed to play track');
     }
+  };
+
+  const handleAddToQueue = (track: CrateTrack) => {
+    addToQueue(track);
+    toast.success(`Added "${track.title}" to queue`);
   };
 
   useEffect(() => {
@@ -257,7 +270,7 @@ export default function TracksTable() {
                 size="icon"
                 className={cn(
                   "h-8 w-8 relative z-10",
-                  playingTrackId === track.id && "bg-primary/10"
+                  playingTrackId === track.id && "bg-main/20"
                 )}
                 onClick={() => handlePlayToggle(track)}
                 disabled={!track.youtube_video_id || !isReady}
@@ -265,7 +278,7 @@ export default function TracksTable() {
                 {playingTrackId === track.id && isPlaying ? (
                   <>
                     <Pause className="h-4 w-4" />
-                    <span className="absolute inset-0 rounded-full animate-pulse-light bg-primary/20" />
+                    <span className="absolute inset-0 rounded-full animate-pulse-light bg-main/30" />
                   </>
                 ) : (
                   <Play className="h-4 w-4" />
@@ -274,7 +287,7 @@ export default function TracksTable() {
               {playingTrackId === track.id && (
                 <div className="absolute -bottom-1 left-0 right-0 h-1 bg-gray-200 rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-primary transition-all duration-300 ease-linear"
+                    className="h-full bg-main transition-all duration-300 ease-linear"
                     style={{ width: `${playbackProgress[track.id] || 0}%` }}
                   />
                 </div>
@@ -311,7 +324,19 @@ export default function TracksTable() {
             
             {/* Add to playlist action that appears on hover */}
             {isHovering && (
-              <div className="flex items-center ml-2 animate-fadeIn">
+              <div className="flex items-center ml-2 animate-fadeIn space-x-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAddToQueue(track);
+                  }}
+                  title="Add to queue"
+                >
+                  <ListPlus className="h-4 w-4" />
+                </Button>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -321,6 +346,7 @@ export default function TracksTable() {
                     setSelectedTrack(track);
                     setShowPlaylistOptions(track.id);
                   }}
+                  title="Add to playlist"
                 >
                   <PlusCircle className="h-4 w-4" />
                 </Button>
@@ -617,13 +643,13 @@ export default function TracksTable() {
                   className={cn(
                     'hover:bg-accent/5 group relative transition-all duration-300',
                     isSuggested && [
-                      'bg-gradient-to-r from-primary/[0.03] to-primary/[0.07]',
-                      'border-l-[3px] border-primary/40',
+                      'bg-gradient-to-r from-main/[0.03] to-main/[0.07]',
+                      'border-l-[3px] border-main/40',
                       'shadow-[inset_0_0_40px_rgba(0,0,0,0.02)]'
                     ],
                     playingTrackId === track.id && [
-                      'bg-primary/[0.03]',
-                      'border-l-[3px] border-primary/60',
+                      'bg-main/[0.03]',
+                      'border-l-[3px] border-main/60',
                       'shadow-[inset_0_0_30px_rgba(0,0,0,0.01)]'
                     ]
                   )}
@@ -637,10 +663,10 @@ export default function TracksTable() {
                   ))}
                   
                   {isFirstSuggested && (
-                    <div className="absolute -top-px left-0 right-0 h-px bg-primary/10" />
+                    <div className="absolute -top-px left-0 right-0 h-px bg-main/10" />
                   )}
                   {isLastSuggested && (
-                    <div className="absolute -bottom-px left-0 right-0 h-px bg-primary/10" />
+                    <div className="absolute -bottom-px left-0 right-0 h-px bg-main/10" />
                   )}
                 </tr>
               )
