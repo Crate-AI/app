@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect } from "react";
-import { Play, Pause, Trash2 } from "lucide-react";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils/utils";
-import { usePlaylistStore, usePlayerStore } from "@/stores";
-import { formatDuration } from "@/lib/utils/format";
-import { Button } from "@/components/ui/button";
+import { useEffect } from 'react';
+import { Play, Pause, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { cn } from '@/lib/utils/utils';
+import { usePlaylistStore, usePlayerStore } from '@/stores';
+import { formatDuration } from '@/lib/utils/format';
+import { Button } from '@/components/ui/button';
 
 interface PlaylistProps {
   activePlaylistId: string;
@@ -14,10 +14,11 @@ interface PlaylistProps {
 
 export const Playlist = ({ activePlaylistId }: PlaylistProps) => {
   const { playlists, removeTrackFromPlaylist } = usePlaylistStore();
-  const { initializePlayer, playingTrackId, isPlaying, togglePlayPause } = usePlayerStore();
-  
-  const activePlaylist = playlists.find(p => p.id === activePlaylistId);
-  
+  const { initializePlayer, playingTrackId, isPlaying, togglePlayPause } =
+    usePlayerStore();
+
+  const activePlaylist = playlists.find((p) => p.id === activePlaylistId);
+
   useEffect(() => {
     initializePlayer();
   }, [initializePlayer]);
@@ -41,7 +42,7 @@ export const Playlist = ({ activePlaylistId }: PlaylistProps) => {
           {activePlaylist.title}
         </h2>
       </div>
-      
+
       <table className="min-w-full divide-y divide-border">
         <thead className="bg-bg">
           <tr>

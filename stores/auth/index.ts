@@ -33,8 +33,8 @@ export const useAuthStore = create<AuthStore>()(
       },
       isAuthenticated: () => {
         const state = get();
-        return !!(state.userIdentity);
-      }
+        return !!state.userIdentity;
+      },
     }),
     {
       name: 'auth-storage',

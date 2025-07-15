@@ -20,11 +20,11 @@ export async function requestDiscogsAuth(): Promise<{
 }> {
   try {
     // Try NEXT_PUBLIC_BASE_URL first, then fall back to VERCEL_URL
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (
-      process.env.VERCEL_URL 
+    const baseUrl =
+      process.env.NEXT_PUBLIC_BASE_URL ||
+      (process.env.VERCEL_URL
         ? `https://${process.env.VERCEL_URL}`
-        : 'http://localhost:3000'
-    );
+        : 'http://localhost:3000');
 
     const response = await fetch(`${baseUrl}/api/auth/discogs/request-token`, {
       headers: {
@@ -49,19 +49,21 @@ export async function requestDiscogsAuth(): Promise<{
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      path: '/',  // Ensure cookie is available for all paths
+      path: '/', // Ensure cookie is available for all paths
     });
 
     cookies().set('request_token_secret', data.requestTokenSecret, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      path: '/',  // Ensure cookie is available for all paths
+      path: '/', // Ensure cookie is available for all paths
     });
 
     return { authorizationUrl: data.authUrl };
   } catch (error) {
     console.error('Error in requestDiscogsAuth:', error);
-    throw error instanceof Error ? error : new Error('Failed to start Discogs authentication');
+    throw error instanceof Error
+      ? error
+      : new Error('Failed to start Discogs authentication');
   }
 }

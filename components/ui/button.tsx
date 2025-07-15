@@ -11,17 +11,21 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-main border-2 border-border dark:border-darkBorder shadow-light dark:shadow-dark hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none dark:hover:shadow-none',
-        noShadow: 'bg-main border-2 border-border dark:border-darkBorder',
-        link: 'underline-offset-4 text-text dark:text-darkText hover:underline',
+          'bg-main border-2 border-border dark:border-darkBorder shadow-light dark:shadow-dark hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none dark:hover:shadow-none active:bg-mainAccent active:scale-95 active:translate-x-boxShadowX active:translate-y-boxShadowY active:shadow-none',
+        noShadow:
+          'bg-main border-2 border-border dark:border-darkBorder active:bg-mainAccent active:scale-95',
+        link: 'underline-offset-4 text-text dark:text-darkText hover:underline active:text-mainAccent2',
         neutral:
-          'bg-white dark:bg-darkBg dark:text-darkText border-2 border-border dark:border-darkBorder shadow-light dark:shadow-dark hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none dark:hover:shadow-none',
+          'bg-white dark:bg-darkBg dark:text-darkText border-2 border-border dark:border-darkBorder shadow-light dark:shadow-dark hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none dark:hover:shadow-none active:bg-main active:scale-95 active:translate-x-boxShadowX active:translate-y-boxShadowY active:shadow-none',
         reverse:
-          'bg-main border-2 border-border dark:border-darkBorder hover:translate-x-reverseBoxShadowX hover:translate-y-reverseBoxShadowY hover:shadow-light dark:hover:shadow-dark',
-        chat: 'bg-main border-2 border-border dark:border-darkBorder hover:translate-x-reverseBoxShadowX hover:translate-y-reverseBoxShadowY hover:shadow-light dark:hover:shadow-dark',
-        outline: 'bg-main border-2 border-border dark:border-darkBorder hover:translate-x-reverseBoxShadowX hover:translate-y-reverseBoxShadowY hover:shadow-light dark:hover:shadow-dark',
-        ghost: 'bg-transparent border-2 border-border dark:border-darkBorder hover:translate-x-reverseBoxShadowX hover:translate-y-reverseBoxShadowY hover:shadow-light dark:hover:shadow-dark',
-        destructive: 'bg-red-500 text-white hover:bg-red-600',
+          'bg-main border-2 border-border dark:border-darkBorder hover:translate-x-reverseBoxShadowX hover:translate-y-reverseBoxShadowY hover:shadow-light dark:hover:shadow-dark active:bg-mainAccent active:scale-95 active:translate-x-0 active:translate-y-0 active:shadow-none',
+        chat: 'bg-main border-2 border-border dark:border-darkBorder hover:translate-x-reverseBoxShadowX hover:translate-y-reverseBoxShadowY hover:shadow-light dark:hover:shadow-dark active:bg-mainAccent active:scale-95 active:translate-x-0 active:translate-y-0 active:shadow-none',
+        outline:
+          'bg-main border-2 border-border dark:border-darkBorder hover:translate-x-reverseBoxShadowX hover:translate-y-reverseBoxShadowY hover:shadow-light dark:hover:shadow-dark active:bg-mainAccent active:scale-95 active:translate-x-0 active:translate-y-0 active:shadow-none',
+        ghost:
+          'bg-transparent border-2 border-border dark:border-darkBorder hover:translate-x-reverseBoxShadowX hover:translate-y-reverseBoxShadowY hover:shadow-light dark:hover:shadow-dark active:bg-main active:scale-95 active:translate-x-0 active:translate-y-0 active:shadow-none',
+        destructive:
+          'bg-red-500 text-white hover:bg-red-600 active:bg-red-700 active:scale-95',
       },
       size: {
         default: 'h-10 px-4 py-2',

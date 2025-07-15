@@ -2,13 +2,16 @@ import { supabase } from './client';
 
 export async function auth() {
   try {
-    const { data: { session }, error } = await supabase.auth.getSession();
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
     if (error) {
       return null;
     }
     if (!session) {
       return null;
-    };
+    }
     return session.user;
   } catch (error) {
     console.error('Auth error:', error);
@@ -18,13 +21,15 @@ export async function auth() {
 
 export async function initializeAuth() {
   try {
-    const { data: { session }, error } = await supabase.auth.getSession();
-    
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
+
     if (error) {
       return null;
     }
 
-    
     if (!session) {
       return null;
     }
@@ -33,4 +38,4 @@ export async function initializeAuth() {
   } catch (error) {
     return null;
   }
-} 
+}

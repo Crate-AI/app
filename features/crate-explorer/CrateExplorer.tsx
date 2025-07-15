@@ -1,12 +1,10 @@
-'use client'
+'use client';
 
 import { useState, useEffect } from 'react';
 import useDiscogsSearch from '@/lib/hooks/useDiscogsSearch';
 import { useDiscogsCollection } from '@/lib/hooks/useDiscogsCollection';
 import ViewToggle from './components/ViewToggle';
-import type {
-  CrateExplorerProps,
-} from '@/types';
+import type { CrateExplorerProps } from '@/types';
 import ViewToggleButtons from './components/ViewToggleButtons';
 import SearchView from './components/SearchView';
 import CollectionView from './components/CollectionView';

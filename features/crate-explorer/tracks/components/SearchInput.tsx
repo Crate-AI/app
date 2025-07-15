@@ -1,21 +1,19 @@
-import { forwardRef } from 'react'
-import { Search, X } from 'lucide-react'
-import { Input } from '@/components/ui/input'
-import { cn } from '@/lib/utils/utils'
+import { forwardRef } from 'react';
+import { Search, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils/utils';
 
 interface SearchInputProps {
-  value: string
-  onChange: (value: string) => void
-  placeholder?: string
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
 }
 
 export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
   ({ value, onChange, placeholder = 'Search tracks...' }, ref) => {
     return (
       <div className="relative w-full p-[4px]">
-        <Search 
-          className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" 
-        />
+        <Search className="absolute left-7 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
         <Input
           ref={ref}
           type="text"
@@ -23,10 +21,10 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className={cn(
-            "w-full pl-9 pr-8",
-            "transition-shadow duration-300",
-            "hover:shadow-hover",
-            "focus:shadow-focus"
+            'w-full pl-12 pr-8',
+            'transition-shadow duration-300',
+            'hover:shadow-hover',
+            'focus:shadow-focus',
           )}
         />
         {value && (
@@ -38,6 +36,6 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           </button>
         )}
       </div>
-    )
-  }
-) 
+    );
+  },
+);

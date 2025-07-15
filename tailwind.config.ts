@@ -47,6 +47,15 @@ const config: Config = {
         'small-title': ['12px', 'auto'],
         'small-subtitle': ['10px', 'auto'],
       },
+      animation: {
+        marquee: 'marquee 5s linear infinite',
+      },
+      keyframes: {
+        marquee: {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(-100%)' },
+        },
+      },
     },
   },
   plugins: [require('tailwindcss-animate')],

@@ -1,181 +1,969 @@
-'use client'
+'use client';
 
-import { useEffect, useMemo, useState, useRef } from 'react'
-import { CrateTrack } from '@/types'
-import { useTracksStore , usePlaylistStore } from '@/stores'
-import { OrderingConfig } from '@/types'
-import { useYouTubePlayer } from '@/lib/hooks/useYoutubePlayer'
-import { SearchInput } from './components/SearchInput'
-import { TrackRow } from './components/TrackRow'
-import { TableHeader } from './components/TableHeader'
+import { useEffect, useMemo, useState, useRef } from 'react';
+import { CrateTrack } from '@/types';
+import { useTracksStore, usePlaylistStore, usePlayerStore } from '@/stores';
+import { SearchInput } from './components/SearchInput';
+import { Button } from '@/components/ui/button';
+import {
+  Sparkles,
+  MoreHorizontal,
+  ArrowUpDown,
+  Play,
+  Pause,
+  ChevronLeft,
+  ChevronRight,
+  PlusCircle,
+  ListPlus,
+  Plus,
+} from 'lucide-react';
+import Image from 'next/image';
+import { cn } from '@/lib/utils/utils';
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+  getSortedRowModel,
+  SortingState,
+  getFilteredRowModel,
+  FilterFn,
+  getPaginationRowModel,
+  PaginationState,
+} from '@tanstack/react-table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
 
 export default function TracksTable() {
-  const { allTracks, suggestedTrackIds } = useTracksStore()
-  const { createPlaylist, addTrackToPlaylist, fetchPlaylists } = usePlaylistStore()
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [orderingConfig, setOrderingConfig] = useState<OrderingConfig>({
-    orderBy: 'manual',
-    direction: 'asc'
-  })
-  const { playingTrackId, isPlayerReady, handlePlayToggle } = useYouTubePlayer()
-  const searchInputRef = useRef<HTMLInputElement>(null)
+  const { allTracks, suggestedTrackIds } = useTracksStore();
+  const { createPlaylist, addTrackToPlaylist, fetchPlaylists } =
+    usePlaylistStore();
+  const {
+    playingTrackId,
+    isReady,
+    isPlaying,
+    togglePlayPause,
+    initializePlayer,
+    addToQueue,
+  } = usePlayerStore();
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const [rowHover, setRowHover] = useState<string | null>(null);
+  const [playlists, setPlaylists] = useState<any[]>([]);
+  const [isCreatingPlaylist, setIsCreatingPlaylist] = useState(false);
+  const [newPlaylistName, setNewPlaylistName] = useState('');
+  const [selectedTrack, setSelectedTrack] = useState<CrateTrack | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPlaylistOptions, setShowPlaylistOptions] = useState<string | null>(
+    null,
+  );
+  const [playbackProgress, setPlaybackProgress] = useState<
+    Record<string, number>
+  >({});
+  const [actionHistory, setActionHistory] = useState<
+    Array<{
+      type: 'addToPlaylist' | 'createPlaylist';
+      data: any;
+      timestamp: number;
+    }>
+  >([]);
+
+  // Initialize player when component mounts
+  useEffect(() => {
+    initializePlayer();
+  }, [initializePlayer]);
+
+  const handlePlayToggle = async (track: CrateTrack) => {
+    if (!track.youtube_video_id) {
+      toast.error('No audio available for this track');
+      return;
+    }
+
+    if (!isReady) {
+      toast.error('Player is still loading...');
+      return;
+    }
+
+    try {
+      // Set up the queue with all tracks if not already set or if queue is empty
+      const { queue, setQueue } = usePlayerStore.getState();
+      if (queue.length === 0) {
+        const trackIndex = allTracks.findIndex((t) => t.id === track.id);
+        setQueue(allTracks, trackIndex);
+        toast.success(`Added ${allTracks.length} tracks to queue`);
+      }
+
+      togglePlayPause(track);
+    } catch (error) {
+      console.error('Error playing track:', error);
+      toast.error('Failed to play track');
+    }
+  };
+
+  const handleAddToQueue = (track: CrateTrack) => {
+    addToQueue(track);
+    toast.success(`Added "${track.title}" to queue`);
+  };
 
   useEffect(() => {
-    fetchPlaylists().catch(error => {
-      console.error('Error fetching playlists:', error);
-      setError('Failed to fetch playlists');
-    });
+    const getPlaylists = async () => {
+      try {
+        const fetchedPlaylists = await fetchPlaylists();
+        // Safely set playlists if they exist
+        if (Array.isArray(fetchedPlaylists)) {
+          setPlaylists(fetchedPlaylists);
+        }
+      } catch (error) {
+        console.error('Error fetching playlists:', error);
+        setError('Failed to fetch playlists');
+      }
+    };
+
+    getPlaylists();
   }, [fetchPlaylists]);
 
   const handleAddToPlaylist = async (playlistId: string, trackId: string) => {
-    await addTrackToPlaylist(playlistId, trackId);
-  }
-
-  const handleCreateNewPlaylist = async (name: string, track: CrateTrack) => {
     try {
-      const playlistId = await createPlaylist(name);
-      await addTrackToPlaylist(playlistId, track.id);
-    } catch (error) {
-      throw error;
-    }
-  }
+      // Track the action for potential undo
+      const actionId = Date.now();
+      const action = {
+        type: 'addToPlaylist' as const,
+        data: { playlistId, trackId },
+        timestamp: actionId,
+      };
 
-  const handleSort = (column: OrderingConfig['orderBy']) => {
-    setOrderingConfig(prev => ({
-      orderBy: column,
-      direction: prev.orderBy === column && prev.direction === 'asc' ? 'desc' : 'asc'
-    }))
-  }
+      setActionHistory((prev) => [...prev, action]);
+
+      await addTrackToPlaylist(playlistId, trackId);
+
+      // Get playlist name for the toast
+      const playlistName =
+        playlists.find((p) => p.id === playlistId)?.name || 'playlist';
+
+      // Show toast with undo option
+      toast.success(`Added to ${playlistName}`, {
+        duration: 5000,
+        action: {
+          label: 'Undo',
+          onClick: () => {
+            // In a real app, this would call a remove API
+            toast.info(`Removed from ${playlistName}`);
+            // Remove from history
+            setActionHistory((prev) =>
+              prev.filter((a) => a.timestamp !== actionId),
+            );
+          },
+        },
+      });
+    } catch (error) {
+      toast.error('Failed to add to playlist');
+    }
+  };
+
+  const handleCreateNewPlaylist = async () => {
+    if (!newPlaylistName.trim() || isLoading || !selectedTrack) return;
+
+    setIsLoading(true);
+    try {
+      const playlistId = await createPlaylist(newPlaylistName);
+
+      // Track the action for potential undo
+      const actionId = Date.now();
+      const action = {
+        type: 'createPlaylist' as const,
+        data: { playlistId, name: newPlaylistName, trackId: selectedTrack.id },
+        timestamp: actionId,
+      };
+
+      setActionHistory((prev) => [...prev, action]);
+
+      await addTrackToPlaylist(playlistId, selectedTrack.id);
+      setNewPlaylistName('');
+      setIsCreatingPlaylist(false);
+
+      // Show toast with undo option
+      toast.success(`Created playlist "${newPlaylistName}"`, {
+        duration: 5000,
+        action: {
+          label: 'Undo',
+          onClick: () => {
+            // In a real app, this would call a delete playlist API
+            toast.info(`Deleted playlist "${newPlaylistName}"`);
+            // Remove from history
+            setActionHistory((prev) =>
+              prev.filter((a) => a.timestamp !== actionId),
+            );
+          },
+        },
+      });
+    } catch (error) {
+      toast.error('Failed to create playlist');
+    } finally {
+      setIsLoading(false);
+      setSelectedTrack(null);
+    }
+  };
 
   useEffect(() => {
     if (allTracks.length > 0) {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [allTracks])
+  }, [allTracks]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault()
-        searchInputRef.current?.focus()
+        e.preventDefault();
+        searchInputRef.current?.focus();
       }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Function to handle creating AI-suggested playlist
+  const handleCreateAiPlaylist = async () => {
+    try {
+      const aiPlaylistName = `AI Mix ${new Date().toLocaleDateString()}`;
+      const playlistId = await createPlaylist(aiPlaylistName);
+
+      // Add suggested tracks to the playlist
+      const tracksToAdd = table
+        .getFilteredRowModel()
+        .rows.map((row) => row.original)
+        .filter((track) => suggestedTrackIds.has(track.id))
+        .slice(0, 10);
+
+      for (const track of tracksToAdd) {
+        await addTrackToPlaylist(playlistId, track.id);
+      }
+    } catch (error) {
+      console.error('Error creating AI playlist:', error);
+      setError('Failed to create AI playlist');
+    }
+  };
+
+  const formatArtists = (artist: string, extraArtists: string | null) => {
+    if (!extraArtists) return artist;
+    return `${artist}, ${extraArtists}`;
+  };
+
+  const formatList = (list: string | null) => {
+    if (!list) return '-';
+    return list.split(',').join(', ');
+  };
+
+  const columnHelper = createColumnHelper<CrateTrack>();
+
+  const columns = useMemo(
+    () => [
+      // Combined Play/Position column with contextual actions
+      columnHelper.display({
+        id: 'playActions',
+        header: 'Track',
+        cell: ({ row }) => {
+          const track = row.original;
+          const isHovering = rowHover === track.id;
+
+          return (
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <Button
+                  variant="noShadow"
+                  size="icon"
+                  className={cn(
+                    'h-8 w-8 relative z-10',
+                    playingTrackId === track.id && 'bg-main/20',
+                  )}
+                  onClick={() => handlePlayToggle(track)}
+                  disabled={!track.youtube_video_id || !isReady}
+                >
+                  {playingTrackId === track.id && isPlaying ? (
+                    <>
+                      <Pause className="h-4 w-4" />
+                      <span className="absolute inset-0 rounded-full animate-pulse-light bg-main/30" />
+                    </>
+                  ) : (
+                    <Play className="h-4 w-4" />
+                  )}
+                </Button>
+                {playingTrackId === track.id && (
+                  <div className="absolute -bottom-1 left-0 right-0 h-1 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-main transition-all duration-300 ease-linear"
+                      style={{ width: `${playbackProgress[track.id] || 0}%` }}
+                    />
+                  </div>
+                )}
+                {track.position && (
+                  <span className="absolute -top-2 -right-2 text-xs px-1 bg-gray-100 rounded-full text-gray-500">
+                    {track.position}
+                  </span>
+                )}
+              </div>
+
+              {track.artwork ? (
+                <div className="h-10 w-10 flex-shrink-0">
+                  <Image
+                    src={track.artwork}
+                    alt={track.title}
+                    width={40}
+                    height={40}
+                    className="h-10 w-10 rounded-sm object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="h-10 w-10 flex-shrink-0 bg-gray-100 rounded-sm" />
+              )}
+
+              <div className="text-sm font-medium text-gray-900 max-w-[16rem] relative overflow-hidden">
+                <div
+                  className={cn(
+                    'whitespace-nowrap',
+                    isHovering && track.title.length > 30 && 'hover-marquee',
+                  )}
+                >
+                  {track.title}
+                </div>
+              </div>
+
+              {/* Add to playlist action that appears on hover */}
+              {isHovering && (
+                <div className="flex items-center ml-2 animate-fadeIn space-x-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddToQueue(track);
+                    }}
+                    title="Add to queue"
+                  >
+                    <ListPlus className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedTrack(track);
+                      setShowPlaylistOptions(track.id);
+                    }}
+                    title="Add to playlist"
+                  >
+                    <PlusCircle className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          );
+        },
+      }),
+      columnHelper.accessor((row) => row.artist, {
+        id: 'artist',
+        header: ({ column }) => (
+          <div
+            className="flex items-center cursor-pointer"
+            onClick={() => column.toggleSorting()}
+          >
+            <span>Artist</span>
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </div>
+        ),
+        cell: ({ row }) => {
+          const track = row.original;
+          const isHovering = rowHover === track.id;
+          const artist = formatArtists(track.artist, track.extra_artists);
+          return (
+            <div className="text-sm text-gray-500 max-w-[18rem] overflow-hidden">
+              <div
+                className={cn(
+                  'whitespace-nowrap',
+                  isHovering && artist.length > 15 && 'marquee-text',
+                )}
+              >
+                <ArtistPreview artist={track.artist}>{artist}</ArtistPreview>
+              </div>
+            </div>
+          );
+        },
+      }),
+      columnHelper.accessor((row) => row.genres, {
+        id: 'genre_style',
+        header: ({ column }) => (
+          <div
+            className="flex items-center cursor-pointer"
+            onClick={() => column.toggleSorting()}
+          >
+            <span>Genre/Style</span>
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </div>
+        ),
+        cell: ({ row }) => {
+          const track = row.original;
+          const isHovering = rowHover === track.id;
+          const genreStyle = [
+            track.genres && formatList(track.genres),
+            track.styles && formatList(track.styles),
+          ]
+            .filter(Boolean)
+            .join(' / ');
+
+          return (
+            <div className="text-sm text-gray-500 max-w-[18rem] relative overflow-hidden">
+              <div
+                className={cn(
+                  'whitespace-nowrap',
+                  isHovering && genreStyle.length > 20 && 'hover-marquee',
+                )}
+              >
+                {genreStyle}
+              </div>
+            </div>
+          );
+        },
+      }),
+      columnHelper.accessor((row) => row.bpm, {
+        id: 'bpm',
+        header: ({ column }) => (
+          <div
+            className="flex items-center cursor-pointer"
+            onClick={() => column.toggleSorting()}
+          >
+            <span>BPM</span>
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </div>
+        ),
+        cell: ({ getValue }) => (
+          <div className="text-sm text-gray-500">{getValue() || '-'}</div>
+        ),
+      }),
+      columnHelper.accessor((row) => row.duration, {
+        id: 'duration',
+        header: ({ column }) => (
+          <div
+            className="flex items-center cursor-pointer"
+            onClick={() => column.toggleSorting()}
+          >
+            <span>Duration</span>
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </div>
+        ),
+        cell: ({ getValue }) => (
+          <div className="text-sm text-gray-500">{getValue() || '-'}</div>
+        ),
+      }),
+    ],
+    [
+      playingTrackId,
+      isReady,
+      isPlaying,
+      rowHover,
+      handlePlayToggle,
+      handleAddToPlaylist,
+      playlists,
+    ],
+  );
+
+  const globalFilter: FilterFn<CrateTrack> = (row, columnId, value) => {
+    const searchLower = value.toLowerCase();
+    const track = row.original;
+    return (
+      track.title.toLowerCase().includes(searchLower) ||
+      track.artist.toLowerCase().includes(searchLower) ||
+      (track.genres?.toLowerCase() || '').includes(searchLower) ||
+      (track.styles?.toLowerCase() || '').includes(searchLower)
+    );
+  };
+
+  const table = useReactTable({
+    data: allTracks,
+    columns,
+    state: {
+      sorting,
+      globalFilter: searchQuery,
+      pagination,
+    },
+    globalFilterFn: globalFilter,
+    onSortingChange: setSorting,
+    onGlobalFilterChange: setSearchQuery,
+    onPaginationChange: setPagination,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    manualPagination: false,
+    debugTable: process.env.NODE_ENV === 'development',
+  });
+
+  useEffect(() => {
+    if (!playingTrackId) return;
+
+    // Start at 0 progress when a new track starts playing
+    if (!playbackProgress[playingTrackId]) {
+      setPlaybackProgress((prev) => ({ ...prev, [playingTrackId]: 0 }));
     }
 
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [])
+    // Simulate progress updates (in a real app, this would come from the actual audio player)
+    const interval = setInterval(() => {
+      setPlaybackProgress((prev) => {
+        const currentProgress = prev[playingTrackId] || 0;
+        if (currentProgress >= 100) {
+          clearInterval(interval);
+          return prev;
+        }
+        return { ...prev, [playingTrackId]: currentProgress + 1 };
+      });
+    }, 1000); // Update every second
 
-  const sortedTracks = useMemo(() => {
-    const filteredTracks = searchQuery 
-      ? allTracks.filter(track => 
-          track.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          track.artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          track.genres?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          track.styles?.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      : allTracks
-
-    const suggested = filteredTracks.filter(t => suggestedTrackIds.has(t.id))
-    const regular = filteredTracks.filter(t => !suggestedTrackIds.has(t.id))
-    
-    const sortByConfig = (tracks: CrateTrack[]) => {
-      switch (orderingConfig.orderBy) {
-        case 'title':
-          return tracks.sort((a, b) => {
-            const diff = a.title.localeCompare(b.title)
-            return orderingConfig.direction === 'asc' ? diff : -diff
-          })
-        case 'artist':
-          return tracks.sort((a, b) => {
-            const diff = a.artist.localeCompare(b.artist)
-            return orderingConfig.direction === 'asc' ? diff : -diff
-          })
-        case 'bpm':
-          return tracks.sort((a, b) => {
-            const diff = Number(a.bpm) - Number(b.bpm)
-            return orderingConfig.direction === 'asc' ? diff : -diff
-          })
-        case 'genre':
-          return tracks.sort((a, b) => {
-            const aGenre = (a.genres?.[0] || '').toLowerCase()
-            const bGenre = (b.genres?.[0] || '').toLowerCase()
-            const diff = aGenre.localeCompare(bGenre)
-            return orderingConfig.direction === 'asc' ? diff : -diff
-          })
-        case 'style':
-          return tracks.sort((a, b) => {
-            const aStyle = (a.styles?.[0] || '').toLowerCase()
-            const bStyle = (b.styles?.[0] || '').toLowerCase()
-            const diff = aStyle.localeCompare(bStyle)
-            return orderingConfig.direction === 'asc' ? diff : -diff
-          })
-        case 'duration':
-          return tracks.sort((a, b) => {
-            const diff = Number(a.duration) - Number(b.duration)
-            return orderingConfig.direction === 'asc' ? diff : -diff
-          })
-        default:
-          return tracks
-      }
-    }
-
-    return suggestedTrackIds.size > 0 
-      ? [...sortByConfig(suggested), ...regular]
-      : sortByConfig([...suggested, ...regular])
-  }, [allTracks, suggestedTrackIds, orderingConfig, searchQuery])
+    return () => clearInterval(interval);
+  }, [playingTrackId]);
 
   if (loading && allTracks.length === 0) {
-    return <div>Loading tracks...</div>
+    return (
+      <div className="space-y-4 ml-8">
+        <div className="flex justify-between items-center mb-4">
+          <div className="w-40 h-9 bg-gray-200 animate-pulse rounded-md"></div>
+          <div className="w-64 h-9 bg-gray-200 animate-pulse rounded-md"></div>
+        </div>
+
+        <div className="relative overflow-x-auto rounded-md border">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <th key={i} className="px-4 py-3">
+                    <div className="h-4 bg-gray-200 rounded w-20 animate-pulse"></div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {Array.from({ length: 8 }).map((_, rowIndex) => (
+                <tr key={rowIndex} className="border-b border-gray-100">
+                  <td className="px-4 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
+                      <div className="h-10 w-10 bg-gray-200 rounded-sm animate-pulse"></div>
+                      <div className="h-4 bg-gray-200 rounded w-40 animate-pulse"></div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="h-4 bg-gray-200 rounded w-24 animate-pulse"></div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="h-4 bg-gray-200 rounded w-36 animate-pulse"></div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="h-4 bg-gray-200 rounded w-10 animate-pulse"></div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="h-4 bg-gray-200 rounded w-12 animate-pulse"></div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-red-500">{error}</div>
+    return <div className="text-red-500">{error}</div>;
   }
 
+  // Add a custom CSS block at the end of the component
+  const marqueeStyles = `
+    @keyframes limited-marquee {
+      0% { transform: translateX(0); }
+      20% { transform: translateX(0); }
+      80% { transform: translateX(calc(-100% + 100%)); }
+      100% { transform: translateX(0); }
+    }
+    
+    .hover-marquee {
+      animation: limited-marquee 3s ease-in-out;
+      animation-iteration-count: 1;
+      display: inline-block;
+      position: relative;
+      max-width: 100%;
+    }
+
+    @keyframes marquee-animation {
+      0% { transform: translateX(0); }
+      10% { transform: translateX(0); }
+      90% { transform: translateX(max(-100%, -300px)); }
+      100% { transform: translateX(0); }
+    }
+    
+    .marquee-text {
+      animation: marquee-animation 3s ease-in-out;
+      display: inline-block;
+      white-space: nowrap;
+    }
+    
+    /* Ensure containers don't grow with content */
+    [class*="max-w-"] {
+      overflow: hidden;
+    }
+    
+    /* Pulse animation for currently playing track */
+    @keyframes pulse-light {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.7; }
+    }
+    
+    .animate-pulse-light {
+      animation: pulse-light 2s ease-in-out infinite;
+    }
+  `;
+
   return (
-    <div className="space-y-4">
-      <div className="flex justify-end items-center mb-4">
-        <SearchInput 
+    <div className="space-y-4 ml-8">
+      <style jsx>{marqueeStyles}</style>
+      <div className="flex justify-between items-center mb-4">
+        <div>
+          {suggestedTrackIds.size > 0 && (
+            <Button
+              onClick={handleCreateAiPlaylist}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <Sparkles className="h-4 w-4" />
+              <span>Create AI Playlist</span>
+            </Button>
+          )}
+        </div>
+        <SearchInput
           ref={searchInputRef}
-          value={searchQuery} 
-          onChange={setSearchQuery} 
+          value={searchQuery}
+          onChange={setSearchQuery}
         />
       </div>
 
-      <div className="relative overflow-x-auto">
+      <div className="relative overflow-x-auto rounded-md border">
         <table className="min-w-full divide-y divide-gray-200">
-          <TableHeader 
-            onSort={handleSort}
-          />
-          <tbody className="bg-white divide-y divide-gray-200">
-            {sortedTracks.map((track, index) => (
-              <TrackRow
-                key={track.id}
-                track={track}
-                index={index}
-                isSuggested={suggestedTrackIds.has(track.id)}
-                isFirstSuggested={
-                  suggestedTrackIds.has(track.id) &&
-                  !suggestedTrackIds.has(sortedTracks[index - 1]?.id)
-                }
-                isLastSuggested={
-                  suggestedTrackIds.has(track.id) &&
-                  !suggestedTrackIds.has(sortedTracks[index + 1]?.id)
-                }
-                playingTrackId={playingTrackId}
-                isPlayerReady={isPlayerReady}
-                onPlayToggle={handlePlayToggle}
-                onAddToPlaylist={handleAddToPlaylist}
-                onCreateNewPlaylist={handleCreateNewPlaylist}
-                isPlaying={playingTrackId === track.id}
-                onPlayPause={() => handlePlayToggle(track)}
-              />
+          <thead className="bg-gray-50">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    scope="col"
+                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                  </th>
+                ))}
+              </tr>
             ))}
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {table.getRowModel().rows.map((row) => {
+              const track = row.original;
+              const isSuggested = suggestedTrackIds.has(track.id);
+              const isFirstSuggested =
+                isSuggested &&
+                (row.index === 0 ||
+                  !suggestedTrackIds.has(
+                    table.getRowModel().rows[row.index - 1]?.original.id,
+                  ));
+              const isLastSuggested =
+                isSuggested &&
+                (row.index === table.getRowModel().rows.length - 1 ||
+                  !suggestedTrackIds.has(
+                    table.getRowModel().rows[row.index + 1]?.original.id,
+                  ));
+
+              return (
+                <tr
+                  key={track.id}
+                  className={cn(
+                    'hover:bg-accent/5 group relative transition-all duration-300',
+                    isSuggested && [
+                      'bg-gradient-to-r from-main/[0.03] to-main/[0.07]',
+                      'border-l-[3px] border-main/40',
+                      'shadow-[inset_0_0_40px_rgba(0,0,0,0.02)]',
+                    ],
+                    playingTrackId === track.id && [
+                      'bg-main/[0.03]',
+                      'border-l-[3px] border-main/60',
+                      'shadow-[inset_0_0_30px_rgba(0,0,0,0.01)]',
+                    ],
+                  )}
+                  onMouseEnter={() => setRowHover(track.id)}
+                  onMouseLeave={() => setRowHover(null)}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <td key={cell.id} className="px-4 py-4 whitespace-nowrap">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </td>
+                  ))}
+
+                  {isFirstSuggested && (
+                    <div className="absolute -top-px left-0 right-0 h-px bg-main/10" />
+                  )}
+                  {isLastSuggested && (
+                    <div className="absolute -bottom-px left-0 right-0 h-px bg-main/10" />
+                  )}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
+
+      {/* Create New Playlist Dialog */}
+      <Dialog open={isCreatingPlaylist} onOpenChange={setIsCreatingPlaylist}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Playlist</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <Input
+              placeholder="Playlist name"
+              value={newPlaylistName}
+              onChange={(e) => setNewPlaylistName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && newPlaylistName.trim() && !isLoading)
+                  handleCreateNewPlaylist();
+                if (e.key === 'Escape') setIsCreatingPlaylist(false);
+              }}
+              disabled={isLoading}
+              autoFocus
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsCreatingPlaylist(false)}
+              disabled={isLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCreateNewPlaylist}
+              disabled={!newPlaylistName.trim() || isLoading}
+            >
+              {isLoading ? 'Creating...' : 'Create'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Playlist Options Dialog */}
+      <Dialog
+        open={showPlaylistOptions !== null}
+        onOpenChange={(open) => !open && setShowPlaylistOptions(null)}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add to Playlist</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            {playlists && playlists.length > 0 ? (
+              <div className="grid gap-2">
+                {playlists.map((playlist) => (
+                  <Button
+                    key={playlist.id}
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => {
+                      if (selectedTrack && showPlaylistOptions) {
+                        handleAddToPlaylist(playlist.id, selectedTrack.id);
+                        setShowPlaylistOptions(null);
+                      }
+                    }}
+                  >
+                    <ListPlus className="mr-2 h-4 w-4" />
+                    {playlist.name}
+                  </Button>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-2 text-muted-foreground">
+                No playlists yet
+              </div>
+            )}
+            <Button
+              variant="outline"
+              className="w-full justify-start"
+              onClick={() => {
+                setIsCreatingPlaylist(true);
+                setShowPlaylistOptions(null);
+              }}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Create New Playlist
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Pagination Controls - Fixed position at the bottom */}
+      <div className="flex items-center justify-between sticky bottom-4 bg-white border rounded-md p-2 shadow-sm">
+        <div className="flex items-center gap-2">
+          <p className="text-sm text-gray-500">
+            Page{' '}
+            <strong>
+              {table.getState().pagination.pageIndex + 1} of{' '}
+              {table.getPageCount()}
+            </strong>
+          </p>
+          <p className="text-sm text-gray-500 hidden md:block">
+            | Displaying {table.getRowModel().rows.length} of{' '}
+            {table.getFilteredRowModel().rows.length} tracks
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            <span className="text-sm text-gray-500 hidden sm:inline">
+              Rows per page:
+            </span>
+            <Select
+              value={String(table.getState().pagination.pageSize)}
+              onValueChange={(value) => {
+                table.setPageSize(Number(value));
+              }}
+            >
+              <SelectTrigger className="h-8 w-[70px]">
+                <SelectValue
+                  placeholder={table.getState().pagination.pageSize}
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {[5, 10, 20, 30, 50].map((pageSize) => (
+                  <SelectItem key={pageSize} value={String(pageSize)}>
+                    {pageSize}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.setPageIndex(0)}
+              disabled={!table.getCanPreviousPage()}
+              className="hidden sm:flex h-8 w-8 p-0 lg:flex"
+            >
+              <span className="sr-only">Go to first page</span>
+              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+              className="h-8 w-8 p-0"
+            >
+              <span className="sr-only">Go to previous page</span>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+              className="h-8 w-8 p-0"
+            >
+              <span className="sr-only">Go to next page</span>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+              disabled={!table.getCanNextPage()}
+              className="hidden sm:flex h-8 w-8 p-0 lg:flex"
+            >
+              <span className="sr-only">Go to last page</span>
+              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
     </div>
-  )
+  );
+}
+
+// Artist Preview Component - Simple approach with CSS-only tooltip
+function ArtistPreview({
+  artist,
+  children,
+}: {
+  artist: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="relative group inline-block">
+      <span className="cursor-pointer hover:text-primary hover:underline underline-offset-2">
+        {children}
+      </span>
+      <div className="absolute left-0 top-full mt-2 w-64 rounded-md bg-background/95 p-3 shadow-lg ring-1 ring-border z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+        <div className="flex flex-col space-y-2">
+          <h4 className="text-sm font-semibold">{artist}</h4>
+          <div className="flex items-center">
+            <span className="bg-primary/10 text-primary text-xs rounded-full px-2 py-0.5 mr-2">
+              Artist
+            </span>
+            <span className="text-xs text-muted-foreground">
+              View all tracks
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

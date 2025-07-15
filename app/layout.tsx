@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 import { Toaster } from 'sonner';
 import './globals.css';
 import AuthProvider from '@/features/auth/components/AuthProvider';
-import Navigation from '@/components/layout/Navigation';
+import AppLayout from '@/components/layout/Navigation/AppLayout';
 import ErrorBoundary from '@/components/Error/ErrorBoundary';
 import { LoadingSpinner } from '@/components/ui/loading';
 import GlobalError from '@/components/Error/GlobalError';
@@ -45,17 +45,30 @@ const RootLayout = ({ children }: Readonly<RootLayoutProps>) => {
       >
         <ErrorBoundary fallback={<GlobalError />}>
           <AuthProvider>
-            <Suspense fallback={<LoadingSpinner />}>
-              <Navigation />
-            </Suspense>
-            <main className="min-h-[calc(100vh-4rem)]">
+            <AppLayout>
               <ErrorBoundary>
                 <Suspense fallback={<LoadingSpinner />}>{children}</Suspense>
               </ErrorBoundary>
-            </main>
+            </AppLayout>
           </AuthProvider>
         </ErrorBoundary>
-        <Toaster />
+        <Toaster
+          position="top-center"
+          expand={false}
+          closeButton
+          richColors
+          toastOptions={{
+            style: {
+              border: '2px solid black',
+              borderRadius: '12px',
+              fontSize: '14px',
+              fontWeight: '500',
+              backgroundColor: 'white',
+              color: '#1a1a1a',
+            },
+            className: 'shadow-light',
+          }}
+        />
       </body>
     </html>
   );
