@@ -18,7 +18,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  
+
   // Enable keyboard navigation
   useKeyboardNavigation();
 
@@ -27,7 +27,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
     const handleResize = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-      
+
       // On mobile, always start with sidebar collapsed
       if (mobile) {
         setSidebarCollapsed(true);
@@ -72,7 +72,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
       if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
         event.preventDefault();
         // Focus search input
-        const searchInput = document.querySelector('input[placeholder*="Search"]') as HTMLInputElement;
+        const searchInput = document.querySelector(
+          'input[placeholder*="Search"]',
+        ) as HTMLInputElement;
         searchInput?.focus();
       }
 
@@ -95,7 +97,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
     <div className="min-h-screen bg-gray-50">
       {/* Mobile Menu Overlay */}
       {isMobile && mobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
           onClick={() => setMobileMenuOpen(false)}
         />
@@ -105,13 +107,15 @@ export default function AppLayout({ children }: AppLayoutProps) {
       <div
         id="sidebar"
         className={cn(
-          "fixed left-0 top-0 h-full transition-transform duration-300 z-50",
-          isMobile ? (
-            mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-          ) : "translate-x-0"
+          'fixed left-0 top-0 h-full transition-transform duration-300 z-50',
+          isMobile
+            ? mobileMenuOpen
+              ? 'translate-x-0'
+              : '-translate-x-full'
+            : 'translate-x-0',
         )}
       >
-        <Sidebar 
+        <Sidebar
           collapsed={!isMobile && sidebarCollapsed}
           onToggle={() => {
             if (isMobile) {
@@ -124,7 +128,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </div>
 
       {/* Top Bar */}
-      <TopBar 
+      <TopBar
         sidebarCollapsed={sidebarCollapsed}
         onMobileMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
         mobileMenuOpen={mobileMenuOpen}
@@ -133,13 +137,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
       {/* Main Content */}
       <main
         className={cn(
-          "pt-16 transition-all duration-300 min-h-screen pb-20",
-          isMobile ? "ml-0" : (sidebarCollapsed ? "ml-16" : "ml-64")
+          'pt-16 transition-all duration-300 min-h-screen pb-20',
+          isMobile ? 'ml-0' : sidebarCollapsed ? 'ml-16' : 'ml-64',
         )}
       >
-        <div className="p-6 max-w-7xl mx-auto">
-          {children}
-        </div>
+        <div className="p-6 max-w-7xl mx-auto">{children}</div>
       </main>
 
       {/* Mobile Navigation Helper */}
@@ -154,16 +156,26 @@ export default function AppLayout({ children }: AppLayoutProps) {
             {mobileMenuOpen ? (
               <X className="w-6 h-6 active:text-main transition-colors" />
             ) : (
-              <svg className="w-6 h-6 active:text-main transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              <svg
+                className="w-6 h-6 active:text-main transition-colors"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
               </svg>
             )}
           </button>
         </div>
       )}
-      
+
       {/* Persistent Music Player */}
       <PersistentPlayer />
     </div>
   );
-} 
+}

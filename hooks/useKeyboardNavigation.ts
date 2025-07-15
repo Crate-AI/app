@@ -104,17 +104,22 @@ function showKeyboardShortcuts() {
   ];
 
   const modal = document.createElement('div');
-  modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
+  modal.className =
+    'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
   modal.innerHTML = `
     <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
       <h3 class="text-lg font-semibold mb-4">Keyboard Shortcuts</h3>
       <div class="space-y-2">
-        ${shortcuts.map(({ key, description }) => `
+        ${shortcuts
+          .map(
+            ({ key, description }) => `
           <div class="flex items-center justify-between">
             <span class="text-sm text-gray-600">${description}</span>
             <kbd class="px-2 py-1 bg-gray-100 rounded text-xs font-mono">${key}</kbd>
           </div>
-        `).join('')}
+        `,
+          )
+          .join('')}
       </div>
       <div class="mt-6 flex justify-end">
         <button class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90">
@@ -145,4 +150,4 @@ function showKeyboardShortcuts() {
   document.addEventListener('keydown', handleEscape);
 
   document.body.appendChild(modal);
-} 
+}

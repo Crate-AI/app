@@ -5,7 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { Music, Plus, Check } from 'lucide-react';
 import { CrateTrack } from '@/types';
@@ -22,12 +28,12 @@ export default function PlaylistCreationModal({
   isOpen,
   onClose,
   suggestedTracks,
-  onPlaylistCreated
+  onPlaylistCreated,
 }: PlaylistCreationModalProps) {
   const [playlistName, setPlaylistName] = useState('');
   const [description, setDescription] = useState('');
   const [selectedTracks, setSelectedTracks] = useState<Set<string>>(
-    new Set(suggestedTracks.map(track => track.id))
+    new Set(suggestedTracks.map((track) => track.id)),
   );
   const [isCreating, setIsCreating] = useState(false);
 
@@ -63,7 +69,9 @@ export default function PlaylistCreationModal({
         },
         body: JSON.stringify({
           title: playlistName,
-          description: description || `AI-generated playlist with ${selectedTracks.size} tracks`,
+          description:
+            description ||
+            `AI-generated playlist with ${selectedTracks.size} tracks`,
         }),
       });
 
@@ -74,26 +82,28 @@ export default function PlaylistCreationModal({
       const playlist = await playlistResponse.json();
 
       // Add selected tracks to the playlist
-      const trackPromises = Array.from(selectedTracks).map(trackId =>
+      const trackPromises = Array.from(selectedTracks).map((trackId) =>
         fetch(`/api/music/playlists/${playlist.id}/tracks`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ trackId }),
-        })
+        }),
       );
 
       await Promise.all(trackPromises);
 
-      toast.success(`Created playlist "${playlistName}" with ${selectedTracks.size} tracks`);
+      toast.success(
+        `Created playlist "${playlistName}" with ${selectedTracks.size} tracks`,
+      );
       onPlaylistCreated?.(playlist.id);
       onClose();
-      
+
       // Reset form
       setPlaylistName('');
       setDescription('');
-      setSelectedTracks(new Set(suggestedTracks.map(track => track.id)));
+      setSelectedTracks(new Set(suggestedTracks.map((track) => track.id)));
     } catch (error) {
       console.error('Error creating playlist:', error);
       toast.error('Failed to create playlist. Please try again.');
@@ -106,14 +116,18 @@ export default function PlaylistCreationModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col bg-bg border-2 border-black shadow-light">
         <DialogHeader>
-          <DialogTitle className="text-text font-heading">Create Playlist from AI Suggestions</DialogTitle>
+          <DialogTitle className="text-text font-heading">
+            Create Playlist from AI Suggestions
+          </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 flex-1 overflow-hidden flex flex-col">
           {/* Playlist Info */}
           <div className="space-y-3">
             <div>
-              <Label htmlFor="playlist-name" className="text-text font-medium">Playlist Name</Label>
+              <Label htmlFor="playlist-name" className="text-text font-medium">
+                Playlist Name
+              </Label>
               <Input
                 id="playlist-name"
                 value={playlistName}
@@ -123,11 +137,18 @@ export default function PlaylistCreationModal({
               />
             </div>
             <div>
-              <Label htmlFor="playlist-description" className="text-text font-medium">Description (Optional)</Label>
+              <Label
+                htmlFor="playlist-description"
+                className="text-text font-medium"
+              >
+                Description (Optional)
+              </Label>
               <textarea
                 id="playlist-description"
                 value={description}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  setDescription(e.target.value)
+                }
                 placeholder="Describe your playlist..."
                 className="mt-1 resize-none flex min-h-[60px] w-full rounded-base border-2 border-black bg-white px-3 py-2 text-sm text-text placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-main focus:border-main"
                 rows={2}
@@ -138,12 +159,16 @@ export default function PlaylistCreationModal({
           {/* Track Selection */}
           <div className="flex-1 overflow-hidden flex flex-col">
             <div className="flex items-center justify-between mb-3">
-              <Label className="text-text font-medium">Select Tracks ({selectedTracks.size}/{suggestedTracks.length})</Label>
+              <Label className="text-text font-medium">
+                Select Tracks ({selectedTracks.size}/{suggestedTracks.length})
+              </Label>
               <div className="flex space-x-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setSelectedTracks(new Set(suggestedTracks.map(t => t.id)))}
+                  onClick={() =>
+                    setSelectedTracks(new Set(suggestedTracks.map((t) => t.id)))
+                  }
                   className="border-2 border-black bg-white hover:bg-main hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none shadow-light transition-all"
                 >
                   Select All
@@ -166,9 +191,7 @@ export default function PlaylistCreationModal({
                   <Card
                     key={track.id}
                     className={`cursor-pointer transition-all border-2 border-black rounded-base shadow-light hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none ${
-                      isSelected 
-                        ? 'bg-main' 
-                        : 'bg-white hover:bg-bg'
+                      isSelected ? 'bg-main' : 'bg-white hover:bg-bg'
                     }`}
                     onClick={() => toggleTrackSelection(track.id)}
                   >
@@ -182,8 +205,12 @@ export default function PlaylistCreationModal({
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-sm truncate text-text font-heading">{track.title}</h4>
-                          <p className="text-xs text-gray-600 truncate">{track.artist}</p>
+                          <h4 className="font-medium text-sm truncate text-text font-heading">
+                            {track.title}
+                          </h4>
+                          <p className="text-xs text-gray-600 truncate">
+                            {track.artist}
+                          </p>
                           <div className="flex items-center space-x-2 mt-1">
                             {track.bpm && (
                               <span className="bg-white border border-black text-xs px-2 py-0.5 rounded-base text-text font-mono">
@@ -207,16 +234,16 @@ export default function PlaylistCreationModal({
         </div>
 
         <DialogFooter>
-          <Button 
-            variant="outline" 
-            onClick={onClose} 
+          <Button
+            variant="outline"
+            onClick={onClose}
             disabled={isCreating}
             className="border-2 border-black bg-white hover:bg-gray-100 text-text shadow-light hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none transition-all"
           >
             Cancel
           </Button>
-          <Button 
-            onClick={handleCreatePlaylist} 
+          <Button
+            onClick={handleCreatePlaylist}
             disabled={isCreating}
             className="bg-main hover:bg-mainAccent border-2 border-black text-text font-medium shadow-light hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none transition-all"
           >
@@ -236,4 +263,4 @@ export default function PlaylistCreationModal({
       </DialogContent>
     </Dialog>
   );
-} 
+}

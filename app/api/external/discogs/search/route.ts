@@ -1,11 +1,7 @@
 import { NextResponse } from 'next/server';
 import { DiscogsSDK } from '@crate.ai/discogs-sdk';
 import { cookies } from 'next/headers';
-import type {
-  SearchParams,
-  SearchResult,
-  SearchResponse,
-} from '@/types';
+import type { SearchParams, SearchResult, SearchResponse } from '@/types';
 
 function buildSearchParams(originalQuery: string): SearchParams {
   const terms = originalQuery.trim().split(/\s+/);

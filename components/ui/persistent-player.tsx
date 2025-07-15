@@ -4,20 +4,20 @@ import { useState, useEffect } from 'react';
 import { usePlayerStore } from '@/stores';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { 
-  Play, 
-  Pause, 
-  SkipBack, 
-  SkipForward, 
-  Shuffle, 
-  Repeat, 
-  Volume2, 
-  VolumeX, 
+import {
+  Play,
+  Pause,
+  SkipBack,
+  SkipForward,
+  Shuffle,
+  Repeat,
+  Volume2,
+  VolumeX,
   List,
   X,
   Music,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
 } from 'lucide-react';
 import { cn } from '@/lib/utils/utils';
 import { CrateTrack } from '@/types';
@@ -44,7 +44,7 @@ const PersistentPlayer = () => {
     clearQueue,
     removeFromQueue,
     setQueue,
-    seekTo
+    seekTo,
   } = usePlayerStore();
 
   const [isExpanded, setIsExpanded] = useState(false);
@@ -72,7 +72,7 @@ const PersistentPlayer = () => {
   };
 
   const handleTrackClick = (track: CrateTrack, index: number) => {
-    const trackIndex = queue.findIndex(t => t.id === track.id);
+    const trackIndex = queue.findIndex((t) => t.id === track.id);
     if (trackIndex !== -1) {
       setQueue(queue, trackIndex);
       togglePlayPause(track);
@@ -112,7 +112,9 @@ const PersistentPlayer = () => {
         <div className="max-h-96 overflow-y-auto bg-white border-t-2 border-black">
           <div className="p-4">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-text">Queue ({queue.length} tracks)</h3>
+              <h3 className="text-lg font-semibold text-text">
+                Queue ({queue.length} tracks)
+              </h3>
               <div className="flex items-center space-x-2">
                 <Button
                   variant="outline"
@@ -136,8 +138,8 @@ const PersistentPlayer = () => {
                 <div
                   key={track.id}
                   className={cn(
-                    "flex items-center space-x-3 p-3 rounded-base border-2 border-black hover:bg-mainAccent/10 transition-colors cursor-pointer track-row",
-                    index === currentIndex && "bg-main/20"
+                    'flex items-center space-x-3 p-3 rounded-base border-2 border-black hover:bg-mainAccent/10 transition-colors cursor-pointer track-row',
+                    index === currentIndex && 'bg-main/20',
                   )}
                   onClick={() => handleTrackClick(track, index)}
                 >
@@ -148,7 +150,7 @@ const PersistentPlayer = () => {
                       <Play className="w-4 h-4 text-black" />
                     )}
                   </div>
-                  
+
                   {track.artwork ? (
                     <Image
                       src={track.artwork}
@@ -162,7 +164,7 @@ const PersistentPlayer = () => {
                       <Music className="w-4 h-4 text-gray-500" />
                     </div>
                   )}
-                  
+
                   <div className="flex-1 min-w-0">
                     <div className="font-medium text-sm truncate text-text">
                       {track.title}
@@ -171,11 +173,11 @@ const PersistentPlayer = () => {
                       {track.artist}
                     </div>
                   </div>
-                  
+
                   <div className="text-xs text-gray-500">
                     {track.duration || '0:00'}
                   </div>
-                  
+
                   <Button
                     variant="ghost"
                     size="sm"
@@ -213,7 +215,7 @@ const PersistentPlayer = () => {
                   disabled={!duration}
                   className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer disabled:cursor-not-allowed"
                   style={{
-                    background: `linear-gradient(to right, #fddd00 0%, #fddd00 ${progressPercentage}%, #e5e5e5 ${progressPercentage}%, #e5e5e5 100%)`
+                    background: `linear-gradient(to right, #fddd00 0%, #fddd00 ${progressPercentage}%, #e5e5e5 ${progressPercentage}%, #e5e5e5 100%)`,
                   }}
                 />
               </div>
@@ -237,7 +239,7 @@ const PersistentPlayer = () => {
                   <Music className="w-5 h-5 text-black" />
                 </div>
               )}
-              
+
               <div className="flex-1 min-w-0">
                 <div className="font-medium text-sm truncate text-text">
                   {currentTrack?.title || 'No track selected'}
@@ -271,13 +273,15 @@ const PersistentPlayer = () => {
                 size="sm"
                 onClick={toggleShuffle}
                 className={cn(
-                  "h-8 w-8 p-0 border border-black rounded-base icon-button",
-                  isShuffleEnabled ? "bg-main hover:bg-mainAccent" : "bg-white hover:bg-gray-100"
+                  'h-8 w-8 p-0 border border-black rounded-base icon-button',
+                  isShuffleEnabled
+                    ? 'bg-main hover:bg-mainAccent'
+                    : 'bg-white hover:bg-gray-100',
                 )}
               >
                 <Shuffle className="w-4 h-4" />
               </Button>
-              
+
               <Button
                 variant="ghost"
                 size="sm"
@@ -287,7 +291,7 @@ const PersistentPlayer = () => {
               >
                 <SkipBack className="w-4 h-4" />
               </Button>
-              
+
               <Button
                 variant="ghost"
                 size="sm"
@@ -301,7 +305,7 @@ const PersistentPlayer = () => {
                   <Play className="w-5 h-5 text-black" />
                 )}
               </Button>
-              
+
               <Button
                 variant="ghost"
                 size="sm"
@@ -311,14 +315,16 @@ const PersistentPlayer = () => {
               >
                 <SkipForward className="w-4 h-4" />
               </Button>
-              
+
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={toggleRepeat}
                 className={cn(
-                  "h-8 w-8 p-0 border border-black rounded-base icon-button",
-                  isRepeatEnabled ? "bg-main hover:bg-mainAccent" : "bg-white hover:bg-gray-100"
+                  'h-8 w-8 p-0 border border-black rounded-base icon-button',
+                  isRepeatEnabled
+                    ? 'bg-main hover:bg-mainAccent'
+                    : 'bg-white hover:bg-gray-100',
                 )}
               >
                 <Repeat className="w-4 h-4" />
@@ -339,25 +345,29 @@ const PersistentPlayer = () => {
                   <Volume2 className="w-4 h-4" />
                 )}
               </Button>
-              
+
               <div className="w-16">
                 <input
                   type="range"
                   min="0"
                   max="100"
                   value={volume}
-                  onChange={(e) => handleVolumeChange([parseInt(e.target.value)])}
+                  onChange={(e) =>
+                    handleVolumeChange([parseInt(e.target.value)])
+                  }
                   className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer interactive-element"
                 />
               </div>
-              
+
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowQueue(!showQueue)}
                 className={cn(
-                  "h-8 w-8 p-0 border border-black rounded-base icon-button",
-                  showQueue ? "bg-main hover:bg-mainAccent" : "bg-white hover:bg-gray-100"
+                  'h-8 w-8 p-0 border border-black rounded-base icon-button',
+                  showQueue
+                    ? 'bg-main hover:bg-mainAccent'
+                    : 'bg-white hover:bg-gray-100',
                 )}
               >
                 <List className="w-4 h-4" />
@@ -370,4 +380,4 @@ const PersistentPlayer = () => {
   );
 };
 
-export default PersistentPlayer; 
+export default PersistentPlayer;

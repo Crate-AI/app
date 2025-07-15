@@ -1,15 +1,15 @@
 'use client';
 
-import ErrorBoundary from '@/components/Error/ErrorBoundary'
-import TracksTable from '@/features/crate-explorer/tracks/TracksTable'
-import EnhancedAiLayout from '@/features/ai-assistant/EnhancedAiLayout'
-import { PageHeader } from '@/components/layout/Navigation/Breadcrumbs'
+import ErrorBoundary from '@/components/Error/ErrorBoundary';
+import TracksTable from '@/features/crate-explorer/tracks/TracksTable';
+import EnhancedAiLayout from '@/features/ai-assistant/EnhancedAiLayout';
+import { PageHeader } from '@/components/layout/Navigation/Breadcrumbs';
 
 export default function TracksPage() {
   return (
     <ErrorBoundary>
-      <PageHeader 
-        title="Track Collection" 
+      <PageHeader
+        title="Track Collection"
         description="Browse and manage your music tracks"
       />
       <EnhancedAiLayout>
@@ -18,5 +18,5 @@ export default function TracksPage() {
         </div>
       </EnhancedAiLayout>
     </ErrorBoundary>
-  )
-} 
+  );
+}

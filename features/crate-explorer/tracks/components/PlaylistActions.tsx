@@ -1,61 +1,67 @@
-import { ListPlus, Plus } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { CrateTrack } from '@/types'
-import { toast } from 'sonner'
-import { useAuthStore } from '@/stores'
+import { ListPlus, Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { CrateTrack } from '@/types';
+import { toast } from 'sonner';
+import { useAuthStore } from '@/stores';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator
-} from '@/components/ui/dropdown-menu'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { useState } from 'react'
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { useState } from 'react';
 
 interface PlaylistActionsProps {
-  track: CrateTrack
-  playlists: Array<{ id: string; name: string }>
-  onAddToPlaylist: (playlistId: string, trackId: string) => void
-  onCreateNewPlaylist: (name: string, track: CrateTrack) => void
+  track: CrateTrack;
+  playlists: Array<{ id: string; name: string }>;
+  onAddToPlaylist: (playlistId: string, trackId: string) => void;
+  onCreateNewPlaylist: (name: string, track: CrateTrack) => void;
 }
 
 export function PlaylistActions({
   track,
   playlists,
   onAddToPlaylist,
-  onCreateNewPlaylist
+  onCreateNewPlaylist,
 }: PlaylistActionsProps) {
-  const [isCreatingPlaylist, setIsCreatingPlaylist] = useState(false)
-  const [newPlaylistName, setNewPlaylistName] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const { isAuthenticated } = useAuthStore()
+  const [isCreatingPlaylist, setIsCreatingPlaylist] = useState(false);
+  const [newPlaylistName, setNewPlaylistName] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const { isAuthenticated } = useAuthStore();
 
   const handleCreateNewPlaylist = async () => {
-    if (!newPlaylistName.trim() || isLoading) return
-    
-    setIsLoading(true)
+    if (!newPlaylistName.trim() || isLoading) return;
+
+    setIsLoading(true);
     try {
-      await onCreateNewPlaylist(newPlaylistName, track)
-      setNewPlaylistName('')
-      setIsCreatingPlaylist(false)
-      toast.success('Playlist created successfully')
+      await onCreateNewPlaylist(newPlaylistName, track);
+      setNewPlaylistName('');
+      setIsCreatingPlaylist(false);
+      toast.success('Playlist created successfully');
     } catch (error) {
-      toast.error('Failed to create playlist')
+      toast.error('Failed to create playlist');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleAddToPlaylist = (playlistId: string) => {
     if (!isAuthenticated()) {
       toast.error('Please sign in to add tracks to playlists');
       return;
     }
-    
+
     onAddToPlaylist(playlistId, track.id);
-  }
+  };
 
   return (
     <>
@@ -65,7 +71,7 @@ export function PlaylistActions({
             <ListPlus className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent 
+        <DropdownMenuContent
           align="start"
           className="bg-background/60 backdrop-blur-lg border border-border/50"
         >
@@ -78,8 +84,10 @@ export function PlaylistActions({
               {playlist.name}
             </DropdownMenuItem>
           ))}
-          {playlists.length > 0 && <DropdownMenuSeparator className="bg-border/50" />}
-          <DropdownMenuItem 
+          {playlists.length > 0 && (
+            <DropdownMenuSeparator className="bg-border/50" />
+          )}
+          <DropdownMenuItem
             onClick={() => setIsCreatingPlaylist(true)}
             className="hover:bg-accent/50"
           >
@@ -100,8 +108,9 @@ export function PlaylistActions({
               value={newPlaylistName}
               onChange={(e) => setNewPlaylistName(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && newPlaylistName.trim() && !isLoading) handleCreateNewPlaylist()
-                if (e.key === 'Escape') setIsCreatingPlaylist(false)
+                if (e.key === 'Enter' && newPlaylistName.trim() && !isLoading)
+                  handleCreateNewPlaylist();
+                if (e.key === 'Escape') setIsCreatingPlaylist(false);
               }}
               disabled={isLoading}
               autoFocus
@@ -115,7 +124,7 @@ export function PlaylistActions({
             >
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={handleCreateNewPlaylist}
               disabled={!newPlaylistName.trim() || isLoading}
             >
@@ -125,5 +134,5 @@ export function PlaylistActions({
         </DialogContent>
       </Dialog>
     </>
-  )
-} 
+  );
+}

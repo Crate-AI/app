@@ -52,7 +52,7 @@ const RootLayout = ({ children }: Readonly<RootLayoutProps>) => {
             </AppLayout>
           </AuthProvider>
         </ErrorBoundary>
-        <Toaster 
+        <Toaster
           position="top-center"
           expand={false}
           closeButton

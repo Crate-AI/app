@@ -3,15 +3,15 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-  Zap, 
-  TrendingUp, 
-  Music, 
-  Clock, 
-  Shuffle, 
+import {
+  Zap,
+  TrendingUp,
+  Music,
+  Clock,
+  Shuffle,
   Target,
   Waves,
-  Volume2
+  Volume2,
 } from 'lucide-react';
 import { CrateTrack } from '@/types';
 
@@ -38,15 +38,16 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Find tracks with similar tempo',
     icon: Clock,
     prompt: 'Show me tracks around 128 BPM that mix well together',
-    category: 'tempo'
+    category: 'tempo',
   },
   {
     id: 'tempo-progression',
     title: 'Tempo Building',
     description: 'Build energy with increasing BPM',
     icon: TrendingUp,
-    prompt: 'Help me build a set starting at 120 BPM and gradually increasing to 130+ BPM',
-    category: 'tempo'
+    prompt:
+      'Help me build a set starting at 120 BPM and gradually increasing to 130+ BPM',
+    category: 'tempo',
   },
 
   // Energy-based actions
@@ -56,7 +57,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'High-energy tracks for the dance floor',
     icon: Zap,
     prompt: 'What are my best peak time tracks with high energy?',
-    category: 'energy'
+    category: 'energy',
   },
   {
     id: 'warm-up',
@@ -64,7 +65,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Chill tracks to start the night',
     icon: Waves,
     prompt: 'Suggest tracks for a warm-up set to get the crowd moving',
-    category: 'energy'
+    category: 'energy',
   },
 
   // Genre-based actions
@@ -74,7 +75,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Deep house and tech house tracks',
     icon: Music,
     prompt: 'Show me house tracks that create a groovy, deep vibe',
-    category: 'genre'
+    category: 'genre',
   },
   {
     id: 'techno-power',
@@ -82,7 +83,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Hard-hitting techno tracks',
     icon: Volume2,
     prompt: 'Find powerful techno tracks for an underground club set',
-    category: 'genre'
+    category: 'genre',
   },
 
   // Mixing-focused actions
@@ -91,17 +92,19 @@ const QUICK_ACTIONS: QuickAction[] = [
     title: 'Mix Ideas',
     description: 'Get track pairing suggestions',
     icon: Target,
-    prompt: 'Suggest 3 tracks that would mix perfectly together and explain why',
-    category: 'mixing'
+    prompt:
+      'Suggest 3 tracks that would mix perfectly together and explain why',
+    category: 'mixing',
   },
   {
     id: 'random-discovery',
     title: 'Surprise Me',
     description: 'Discover hidden gems',
     icon: Shuffle,
-    prompt: 'Surprise me with some hidden gems from my collection that I might have overlooked',
-    category: 'mixing'
-  }
+    prompt:
+      'Surprise me with some hidden gems from my collection that I might have overlooked',
+    category: 'mixing',
+  },
 ];
 
 const CATEGORY_COLORS = {
@@ -111,12 +114,18 @@ const CATEGORY_COLORS = {
   mixing: 'bg-purple-500/10 text-purple-700 border-purple-200',
 };
 
-export default function QuickActions({ tracks, onActionSelect, className }: QuickActionsProps) {
+export default function QuickActions({
+  tracks,
+  onActionSelect,
+  className,
+}: QuickActionsProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const categories = Array.from(new Set(QUICK_ACTIONS.map(action => action.category)));
-  const filteredActions = selectedCategory 
-    ? QUICK_ACTIONS.filter(action => action.category === selectedCategory)
+  const categories = Array.from(
+    new Set(QUICK_ACTIONS.map((action) => action.category)),
+  );
+  const filteredActions = selectedCategory
+    ? QUICK_ACTIONS.filter((action) => action.category === selectedCategory)
     : QUICK_ACTIONS;
 
   return (
@@ -131,7 +140,7 @@ export default function QuickActions({ tracks, onActionSelect, className }: Quic
         {/* Category Filter */}
         <div className="flex flex-wrap gap-2">
           <Button
-            variant={selectedCategory === null ? "default" : "outline"}
+            variant={selectedCategory === null ? 'default' : 'outline'}
             size="sm"
             onClick={() => setSelectedCategory(null)}
             className="h-7 text-xs"
@@ -141,7 +150,7 @@ export default function QuickActions({ tracks, onActionSelect, className }: Quic
           {categories.map((category) => (
             <Button
               key={category}
-              variant={selectedCategory === category ? "default" : "outline"}
+              variant={selectedCategory === category ? 'default' : 'outline'}
               size="sm"
               onClick={() => setSelectedCategory(category)}
               className="h-7 text-xs capitalize"
@@ -163,7 +172,9 @@ export default function QuickActions({ tracks, onActionSelect, className }: Quic
                 className="h-auto p-3 justify-start text-left"
               >
                 <div className="flex items-start space-x-3 w-full">
-                  <div className={`p-2 rounded-lg ${CATEGORY_COLORS[action.category]}`}>
+                  <div
+                    className={`p-2 rounded-lg ${CATEGORY_COLORS[action.category]}`}
+                  >
                     <Icon className="w-4 h-4" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -185,10 +196,15 @@ export default function QuickActions({ tracks, onActionSelect, className }: Quic
             {tracks.length > 0 && (
               <>
                 <div>
-                  BPM range: {Math.min(...tracks.filter(t => t.bpm).map(t => t.bpm!))} - {Math.max(...tracks.filter(t => t.bpm).map(t => t.bpm!))} BPM
+                  BPM range:{' '}
+                  {Math.min(...tracks.filter((t) => t.bpm).map((t) => t.bpm!))}{' '}
+                  -{' '}
+                  {Math.max(...tracks.filter((t) => t.bpm).map((t) => t.bpm!))}{' '}
+                  BPM
                 </div>
                 <div>
-                  Genres: {new Set(tracks.flatMap(t => t.genres || [])).size} unique
+                  Genres: {new Set(tracks.flatMap((t) => t.genres || [])).size}{' '}
+                  unique
                 </div>
               </>
             )}
@@ -197,4 +213,4 @@ export default function QuickActions({ tracks, onActionSelect, className }: Quic
       </CardContent>
     </Card>
   );
-} 
+}

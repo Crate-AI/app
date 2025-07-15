@@ -1,14 +1,35 @@
 'use client';
 
 import { useCallback, useRef, useEffect, useState } from 'react';
-import { Send, Bot, Music, Play, Pause, Plus, Sparkles, MoreVertical, Copy, MessageSquare } from 'lucide-react';
+import {
+  Send,
+  Bot,
+  Music,
+  Play,
+  Pause,
+  Plus,
+  Sparkles,
+  MoreVertical,
+  Copy,
+  MessageSquare,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { CrateTrack } from '@/types';
 import { useChat } from 'ai/react';
 import { cn } from '@/lib/utils/utils';
@@ -50,8 +71,10 @@ const parseTracksFromMessage = (content: string): TrackSuggestion | null => {
     }
 
     // Fallback to regex parsing
-    const trackMatches = content.matchAll(/["'](.+?)["']\s*-\s*(.+?)\s*(?:\(|$)(\d+)?\s*(?:BPM)?(?:\)|$)/gi);
-    const tracks = Array.from(trackMatches).map(match => ({
+    const trackMatches = content.matchAll(
+      /["'](.+?)["']\s*-\s*(.+?)\s*(?:\(|$)(\d+)?\s*(?:BPM)?(?:\)|$)/gi,
+    );
+    const tracks = Array.from(trackMatches).map((match) => ({
       title: match[1].trim(),
       artist: match[2].trim(),
       bpm: match[3] ? parseInt(match[3]) : undefined,
@@ -61,7 +84,7 @@ const parseTracksFromMessage = (content: string): TrackSuggestion | null => {
       return {
         tracks,
         explanation: content,
-        context: 'track_suggestions'
+        context: 'track_suggestions',
       };
     }
 
@@ -73,40 +96,47 @@ const parseTracksFromMessage = (content: string): TrackSuggestion | null => {
 };
 
 // Enhanced track matching with fuzzy search
-const findMatchingTrack = (suggestion: ParsedTrack, tracks: CrateTrack[]): CrateTrack | null => {
+const findMatchingTrack = (
+  suggestion: ParsedTrack,
+  tracks: CrateTrack[],
+): CrateTrack | null => {
   // Exact title match
-  let match = tracks.find(t => 
-    t.title.toLowerCase().trim() === suggestion.title.toLowerCase().trim()
+  let match = tracks.find(
+    (t) =>
+      t.title.toLowerCase().trim() === suggestion.title.toLowerCase().trim(),
   );
 
   if (match) return match;
 
   // Artist + title match
-  match = tracks.find(t => 
-    t.title.toLowerCase().includes(suggestion.title.toLowerCase()) &&
-    t.artist.toLowerCase().includes(suggestion.artist.toLowerCase())
+  match = tracks.find(
+    (t) =>
+      t.title.toLowerCase().includes(suggestion.title.toLowerCase()) &&
+      t.artist.toLowerCase().includes(suggestion.artist.toLowerCase()),
   );
 
   if (match) return match;
 
   // Fuzzy title match
-  match = tracks.find(t => {
+  match = tracks.find((t) => {
     const titleWords = suggestion.title.toLowerCase().split(' ');
     const trackTitle = t.title.toLowerCase();
-    return titleWords.some(word => trackTitle.includes(word) && word.length > 2);
+    return titleWords.some(
+      (word) => trackTitle.includes(word) && word.length > 2,
+    );
   });
 
-     return match || null;
+  return match || null;
 };
 
 // Suggested prompts for better user guidance
 const SUGGESTED_PROMPTS = [
-  "Find tracks around 128 BPM for a house set",
-  "Suggest tracks that mix well with techno",
-  "Show me tracks for a chill downtempo session",
-  "Find high-energy tracks above 140 BPM",
-  "What tracks work well for peak time?",
-  "Suggest tracks with similar vibes to deep house"
+  'Find tracks around 128 BPM for a house set',
+  'Suggest tracks that mix well with techno',
+  'Show me tracks for a chill downtempo session',
+  'Find high-energy tracks above 140 BPM',
+  'What tracks work well for peak time?',
+  'Suggest tracks with similar vibes to deep house',
 ];
 
 const TypingIndicator = () => (
@@ -120,14 +150,20 @@ const TypingIndicator = () => (
         <div className="w-2 h-2 bg-mainAccent rounded-full animate-bounce [animation-delay:-0.15s]" />
         <div className="w-2 h-2 bg-mainAccent rounded-full animate-bounce" />
       </div>
-      <span className="text-sm text-text ml-2 font-medium">DJ Assistant is thinking...</span>
+      <span className="text-sm text-text ml-2 font-medium">
+        DJ Assistant is thinking...
+      </span>
     </div>
   </div>
 );
 
-const TrackCard = ({ track, onPlay, onAddToPlaylist }: { 
-  track: CrateTrack; 
-  onPlay: () => void; 
+const TrackCard = ({
+  track,
+  onPlay,
+  onAddToPlaylist,
+}: {
+  track: CrateTrack;
+  onPlay: () => void;
   onAddToPlaylist: () => void;
 }) => {
   const { isPlaying, playingTrackId, isReady } = usePlayerStore();
@@ -143,8 +179,12 @@ const TrackCard = ({ track, onPlay, onAddToPlaylist }: {
               <Music className="w-6 h-6 text-black" />
             </div>
             <div className="flex-1 min-w-0">
-              <h4 className="font-medium text-sm truncate text-text font-heading mb-1">{track.title}</h4>
-              <p className="text-xs text-gray-600 truncate mb-2">{track.artist}</p>
+              <h4 className="font-medium text-sm truncate text-text font-heading mb-1">
+                {track.title}
+              </h4>
+              <p className="text-xs text-gray-600 truncate mb-2">
+                {track.artist}
+              </p>
               <div className="flex items-center gap-2 flex-wrap">
                 {track.bpm && (
                   <span className="bg-white border border-black text-xs px-2 py-1 rounded-base text-text font-mono">
@@ -166,10 +206,10 @@ const TrackCard = ({ track, onPlay, onAddToPlaylist }: {
               onClick={onPlay}
               disabled={!hasAudio || !isReady}
               className={cn(
-                "h-8 w-8 p-0 border border-black rounded-base transition-all hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none shadow-light",
-                hasAudio && isReady 
-                  ? "bg-main hover:bg-mainAccent" 
-                  : "bg-gray-200 cursor-not-allowed"
+                'h-8 w-8 p-0 border border-black rounded-base transition-all hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none shadow-light',
+                hasAudio && isReady
+                  ? 'bg-main hover:bg-mainAccent'
+                  : 'bg-gray-200 cursor-not-allowed',
               )}
             >
               {isCurrentlyPlaying ? (
@@ -180,16 +220,19 @@ const TrackCard = ({ track, onPlay, onAddToPlaylist }: {
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button 
-                  size="sm" 
-                  variant="ghost" 
+                <Button
+                  size="sm"
+                  variant="ghost"
                   className="h-8 w-8 p-0 bg-white hover:bg-bg border border-black rounded-base transition-all hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none shadow-light"
                 >
                   <MoreVertical className="w-4 h-4 text-black" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-bg border-2 border-black rounded-base shadow-light">
-                <DropdownMenuItem 
+              <DropdownMenuContent
+                align="end"
+                className="bg-bg border-2 border-black rounded-base shadow-light"
+              >
+                <DropdownMenuItem
                   onClick={onAddToPlaylist}
                   className="hover:bg-main text-text"
                 >
@@ -205,15 +248,15 @@ const TrackCard = ({ track, onPlay, onAddToPlaylist }: {
   );
 };
 
-const MessageBubble = ({ 
-  message, 
-  userAvatar, 
+const MessageBubble = ({
+  message,
+  userAvatar,
   matchedTracks = [],
   onTrackPlay,
   onTrackAddToPlaylist,
-  onCreatePlaylist
-}: { 
-  message: any; 
+  onCreatePlaylist,
+}: {
+  message: any;
   userAvatar?: string;
   matchedTracks?: CrateTrack[];
   onTrackPlay: (track: CrateTrack) => void;
@@ -221,10 +264,14 @@ const MessageBubble = ({
   onCreatePlaylist: (tracks: CrateTrack[]) => void;
 }) => {
   const isUser = message.role === 'user';
-  
+
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-8 w-full`}>
-      <div className={`flex items-start space-x-4 max-w-full ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`}>
+    <div
+      className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-8 w-full`}
+    >
+      <div
+        className={`flex items-start space-x-4 max-w-full ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`}
+      >
         <div className="w-8 h-8 flex-shrink-0">
           {isUser ? (
             <Avatar className="w-8 h-8">
@@ -239,28 +286,30 @@ const MessageBubble = ({
             </div>
           )}
         </div>
-        
-        <div className={`space-y-3 ${isUser ? 'items-end' : 'items-start'} flex flex-col flex-1 min-w-0`}>
+
+        <div
+          className={`space-y-3 ${isUser ? 'items-end' : 'items-start'} flex flex-col flex-1 min-w-0`}
+        >
           <div
             className={cn(
               'rounded-base px-4 py-3 max-w-full break-words border-2 border-black shadow-light',
-              isUser
-                ? 'bg-main text-text'
-                : 'bg-white text-text'
+              isUser ? 'bg-main text-text' : 'bg-white text-text',
             )}
           >
             <div className="whitespace-pre-wrap text-sm leading-relaxed">
               {message.content}
             </div>
           </div>
-          
+
           {/* Track suggestions */}
           {!isUser && matchedTracks.length > 0 && (
             <div className="w-full space-y-3 max-w-full">
               <div className="flex items-center justify-between p-3 bg-bg border-2 border-black rounded-base">
                 <div className="flex items-center space-x-2 text-sm text-text">
                   <Sparkles className="w-4 h-4 text-mainAccent2" />
-                  <span className="font-medium">Found {matchedTracks.length} matching tracks</span>
+                  <span className="font-medium">
+                    Found {matchedTracks.length} matching tracks
+                  </span>
                 </div>
                 <Button
                   size="sm"
@@ -290,11 +339,11 @@ const MessageBubble = ({
   );
 };
 
-export default function EnhancedChatInterface({ 
-  tracks, 
-  onTracksFilter, 
-  isOpen, 
-  onClose 
+export default function EnhancedChatInterface({
+  tracks,
+  onTracksFilter,
+  isOpen,
+  onClose,
 }: EnhancedChatInterfaceProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { userIdentity } = useAuthStore();
@@ -302,7 +351,9 @@ export default function EnhancedChatInterface({
   const { setOrderingConfig } = useTrackSorting(tracks);
   const { togglePlayPause, initializePlayer, isReady } = usePlayerStore();
   const [showSuggestions, setShowSuggestions] = useState(true);
-  const [matchedTracksMap, setMatchedTracksMap] = useState<Map<string, CrateTrack[]>>(new Map());
+  const [matchedTracksMap, setMatchedTracksMap] = useState<
+    Map<string, CrateTrack[]>
+  >(new Map());
   const [playlistModalOpen, setPlaylistModalOpen] = useState(false);
   const [playlistTracks, setPlaylistTracks] = useState<CrateTrack[]>([]);
 
@@ -313,48 +364,56 @@ export default function EnhancedChatInterface({
     }
   }, [initializePlayer, isReady]);
 
-  const processTrackSuggestions = useCallback((content: string, messageId: string) => {
-    try {
-      const suggestion = parseTracksFromMessage(content);
-      if (suggestion) {
-        const matchedTracks = suggestion.tracks
-          .map(track => findMatchingTrack(track, tracks))
-          .filter(Boolean) as CrateTrack[];
+  const processTrackSuggestions = useCallback(
+    (content: string, messageId: string) => {
+      try {
+        const suggestion = parseTracksFromMessage(content);
+        if (suggestion) {
+          const matchedTracks = suggestion.tracks
+            .map((track) => findMatchingTrack(track, tracks))
+            .filter(Boolean) as CrateTrack[];
 
-        if (matchedTracks.length > 0) {
-          setMatchedTracksMap(prev => new Map(prev.set(messageId, matchedTracks)));
-          setSuggestedTracks(matchedTracks);
-          setOrderingConfig({ orderBy: 'suggested', direction: 'asc' });
-          onTracksFilter(matchedTracks);
-          toast.success(`Found ${matchedTracks.length} matching tracks in your collection`);
-        } else {
-          toast.error('No matching tracks found in your collection');
+          if (matchedTracks.length > 0) {
+            setMatchedTracksMap(
+              (prev) => new Map(prev.set(messageId, matchedTracks)),
+            );
+            setSuggestedTracks(matchedTracks);
+            setOrderingConfig({ orderBy: 'suggested', direction: 'asc' });
+            onTracksFilter(matchedTracks);
+            toast.success(
+              `Found ${matchedTracks.length} matching tracks in your collection`,
+            );
+          } else {
+            toast.error('No matching tracks found in your collection');
+          }
         }
+      } catch (error) {
+        console.error('Failed to process track suggestions:', error);
+        toast.error('Failed to process track suggestions');
       }
-    } catch (error) {
-      console.error('Failed to process track suggestions:', error);
-      toast.error('Failed to process track suggestions');
-    }
-  }, [tracks, onTracksFilter, setOrderingConfig, setSuggestedTracks]);
+    },
+    [tracks, onTracksFilter, setOrderingConfig, setSuggestedTracks],
+  );
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
-    api: '/api/ai/chat',
-    body: { 
-      tracks: tracks.map(track => ({
-        title: track.title,
-        artist: track.artist,
-        bpm: track.bpm,
-        genres: track.genres
-      }))
-    },
-    onFinish: (message) => {
-      processTrackSuggestions(message.content, message.id);
-    },
-    onError: (error) => {
-      console.error('Chat error:', error);
-      toast.error('Failed to get AI response. Please try again.');
-    }
-  });
+  const { messages, input, handleInputChange, handleSubmit, isLoading } =
+    useChat({
+      api: '/api/ai/chat',
+      body: {
+        tracks: tracks.map((track) => ({
+          title: track.title,
+          artist: track.artist,
+          bpm: track.bpm,
+          genres: track.genres,
+        })),
+      },
+      onFinish: (message) => {
+        processTrackSuggestions(message.content, message.id);
+      },
+      onError: (error) => {
+        console.error('Chat error:', error);
+        toast.error('Failed to get AI response. Please try again.');
+      },
+    });
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -380,15 +439,17 @@ export default function EnhancedChatInterface({
       return;
     }
 
-         try {
-       const { playingTrackId } = usePlayerStore.getState();
-       const isCurrentlyPlaying = playingTrackId === track.id;
-       togglePlayPause(track);
-       toast.success(`${isCurrentlyPlaying ? 'Pausing' : 'Playing'} ${track.title}`);
-     } catch (error) {
-       console.error('Error playing track:', error);
-       toast.error('Failed to play track');
-     }
+    try {
+      const { playingTrackId } = usePlayerStore.getState();
+      const isCurrentlyPlaying = playingTrackId === track.id;
+      togglePlayPause(track);
+      toast.success(
+        `${isCurrentlyPlaying ? 'Pausing' : 'Playing'} ${track.title}`,
+      );
+    } catch (error) {
+      console.error('Error playing track:', error);
+      toast.error('Failed to play track');
+    }
   };
 
   const handleTrackAddToPlaylist = (track: CrateTrack) => {
@@ -419,16 +480,18 @@ export default function EnhancedChatInterface({
               <Bot className="w-5 h-5 text-black" />
             </div>
             <div className="min-w-0">
-              <h2 className="font-semibold text-sm text-text font-heading">DJ Assistant</h2>
+              <h2 className="font-semibold text-sm text-text font-heading">
+                DJ Assistant
+              </h2>
               <p className="text-xs text-gray-600">
                 {tracks.length} tracks loaded • Ready to help
               </p>
             </div>
           </div>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={onClose} 
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
             className="h-8 w-8 p-0 hover:bg-mainAccent border border-black rounded-base flex-shrink-0"
           >
             <MoreVertical className="w-4 h-4 text-black" />
@@ -445,14 +508,14 @@ export default function EnhancedChatInterface({
               <MessageBubble
                 message={{
                   role: 'assistant',
-                  content: `Hey there! 👋 I'm your AI DJ assistant. I can help you find perfect tracks for your sets, suggest mixing ideas, and analyze your collection.\n\nI know about all ${tracks.length} tracks in your library. What would you like to explore today?`
+                  content: `Hey there! 👋 I'm your AI DJ assistant. I can help you find perfect tracks for your sets, suggest mixing ideas, and analyze your collection.\n\nI know about all ${tracks.length} tracks in your library. What would you like to explore today?`,
                 }}
                 matchedTracks={[]}
                 onTrackPlay={handleTrackPlay}
                 onTrackAddToPlaylist={handleTrackAddToPlaylist}
                 onCreatePlaylist={handleCreatePlaylistFromSuggestions}
               />
-              
+
               {/* Suggested prompts */}
               {showSuggestions && (
                 <div className="space-y-4 mt-8 max-w-full">
@@ -494,7 +557,7 @@ export default function EnhancedChatInterface({
 
           {/* Typing indicator */}
           {isLoading && <TypingIndicator />}
-          
+
           <div ref={messagesEndRef} />
         </div>
       </div>
@@ -512,8 +575,8 @@ export default function EnhancedChatInterface({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   disabled={isLoading || !input.trim()}
                   className="h-11 px-4 bg-main hover:bg-mainAccent border-2 border-black text-text shadow-light hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none transition-all flex-shrink-0 rounded-base"
                 >
@@ -539,4 +602,4 @@ export default function EnhancedChatInterface({
       />
     </div>
   );
-} 
+}

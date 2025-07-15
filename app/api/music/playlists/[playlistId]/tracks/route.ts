@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 
 export async function POST(
   request: Request,
-  { params }: { params: { playlistId: string } }
+  { params }: { params: { playlistId: string } },
 ) {
   try {
     const cookieStore = cookies();
@@ -13,7 +13,7 @@ export async function POST(
     // Get user data from cookie
     const userDataCookie = cookieStore.get('user_data');
     const userData = userDataCookie ? JSON.parse(userDataCookie.value) : null;
-    
+
     if (!userData?.userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -30,7 +30,7 @@ export async function POST(
       console.error('Error verifying playlist ownership:', playlistError);
       return NextResponse.json(
         { error: 'Playlist not found or unauthorized' },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -38,7 +38,7 @@ export async function POST(
     if (!trackId) {
       return NextResponse.json(
         { error: 'Track ID is required' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -55,8 +55,8 @@ export async function POST(
       throw positionError;
     }
 
-    const nextPosition = currentTracks?.[0]?.position 
-      ? currentTracks[0].position + 1 
+    const nextPosition = currentTracks?.[0]?.position
+      ? currentTracks[0].position + 1
       : 0;
 
     // Add track to playlist
@@ -65,7 +65,7 @@ export async function POST(
       .insert({
         playlist_id: params.playlistId,
         track_id: trackId,
-        position: nextPosition
+        position: nextPosition,
       });
 
     if (insertError) {
@@ -75,17 +75,20 @@ export async function POST(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error in POST /api/music/playlists/[playlistId]/tracks:', error);
+    console.error(
+      'Error in POST /api/music/playlists/[playlistId]/tracks:',
+      error,
+    );
     return NextResponse.json(
       { error: (error as Error).message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { playlistId: string } }
+  { params }: { params: { playlistId: string } },
 ) {
   try {
     const cookieStore = cookies();
@@ -94,7 +97,7 @@ export async function DELETE(
     // Get user data from cookie
     const userDataCookie = cookieStore.get('user_data');
     const userData = userDataCookie ? JSON.parse(userDataCookie.value) : null;
-    
+
     if (!userData?.userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -111,7 +114,7 @@ export async function DELETE(
       console.error('Error verifying playlist ownership:', playlistError);
       return NextResponse.json(
         { error: 'Playlist not found or unauthorized' },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -119,7 +122,7 @@ export async function DELETE(
     if (!trackId) {
       return NextResponse.json(
         { error: 'Track ID is required' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -136,7 +139,7 @@ export async function DELETE(
     console.error('Error removing track from playlist:', error);
     return NextResponse.json(
       { error: (error as Error).message },
-      { status: 500 }
+      { status: 500 },
     );
   }
-} 
+}

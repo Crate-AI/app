@@ -1,7 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Sparkles, Bot, Loader2, MessageCircle, ChevronUp, ChevronDown } from 'lucide-react';
+import {
+  X,
+  Sparkles,
+  Bot,
+  Loader2,
+  MessageCircle,
+  ChevronUp,
+  ChevronDown,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils/utils';
@@ -19,7 +27,9 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
-  const [chatPosition, setChatPosition] = useState<'sidebar' | 'overlay' | 'bottom'>('sidebar');
+  const [chatPosition, setChatPosition] = useState<
+    'sidebar' | 'overlay' | 'bottom'
+  >('sidebar');
   const { allTracks: tracks, setAllTracks } = useTracksStore();
   const { initializePlayer } = usePlayerStore();
 
@@ -34,7 +44,7 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
       const mobile = window.innerWidth < 768;
       const tablet = window.innerWidth < 1024;
       setIsMobile(mobile);
-      
+
       // More sophisticated positioning logic
       if (mobile) {
         setChatPosition('overlay');
@@ -54,7 +64,9 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
   useEffect(() => {
     async function fetchTracks() {
       try {
-        const res = await fetch('/api/music/tracks', { credentials: 'include' });
+        const res = await fetch('/api/music/tracks', {
+          credentials: 'include',
+        });
         if (!res.ok) throw new Error('Failed to fetch tracks');
         const data = await res.json();
         if (!data.tracks) {
@@ -68,7 +80,7 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
         setIsLoading(false);
       }
     }
-    
+
     if (tracks.length === 0) {
       fetchTracks();
     } else {
@@ -111,7 +123,9 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center space-y-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">Loading AI assistant...</p>
+          <p className="text-sm text-muted-foreground">
+            Loading AI assistant...
+          </p>
         </div>
       </div>
     );
@@ -124,8 +138,10 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
         <div
           className={cn(
             'transition-all duration-300 ease-in-out pb-20 min-h-screen',
-            chatPosition === 'sidebar' && isChatOpen && 'lg:mr-[450px] xl:mr-[500px]',
-            chatPosition === 'bottom' && isChatOpen && 'pb-[420px]'
+            chatPosition === 'sidebar' &&
+              isChatOpen &&
+              'lg:mr-[450px] xl:mr-[500px]',
+            chatPosition === 'bottom' && isChatOpen && 'pb-[420px]',
           )}
         >
           {children}
@@ -133,7 +149,7 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
 
         {/* Mobile Overlay */}
         {isMobile && isChatOpen && (
-          <div 
+          <div
             className="fixed inset-0 bg-black/50 z-40 md:hidden"
             onClick={closeChat}
           />
@@ -147,12 +163,14 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
               'border-l-2 border-black shadow-light bg-bg',
               {
                 // Sidebar positioning - account for persistent player
-                'top-16 bottom-20 w-full sm:w-[450px] xl:w-[500px]': isChatOpen && chatPosition === 'sidebar',
+                'top-16 bottom-20 w-full sm:w-[450px] xl:w-[500px]':
+                  isChatOpen && chatPosition === 'sidebar',
                 // Overlay positioning - full screen on mobile
-                'top-16 bottom-20 w-full': isChatOpen && chatPosition === 'overlay',
+                'top-16 bottom-20 w-full':
+                  isChatOpen && chatPosition === 'overlay',
                 'translate-x-0': isChatOpen,
-                'translate-x-full': !isChatOpen
-              }
+                'translate-x-full': !isChatOpen,
+              },
             )}
           >
             {isChatOpen && (
@@ -175,8 +193,8 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
               {
                 'h-[400px]': isChatOpen,
                 'translate-y-0': isChatOpen,
-                'translate-y-full': !isChatOpen
-              }
+                'translate-y-full': !isChatOpen,
+              },
             )}
           >
             {isChatOpen && (
@@ -197,7 +215,9 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
             <div className="bg-bg border-2 border-black rounded-base px-3 py-2 shadow-light animate-in fade-in-50 slide-in-from-right-2">
               <div className="flex items-center space-x-2">
                 <Bot className="w-4 h-4 text-black" />
-                <span className="text-sm font-medium text-text">{tracks.length} tracks ready</span>
+                <span className="text-sm font-medium text-text">
+                  {tracks.length} tracks ready
+                </span>
               </div>
             </div>
           )}
@@ -206,11 +226,11 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
           <Button
             onClick={toggleChat}
             className={cn(
-              "h-14 w-14 rounded-base shadow-light border-2 border-black transition-all duration-200",
-              "bg-main hover:bg-mainAccent text-black font-medium",
-              "hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none",
-              "animate-in fade-in-50 slide-in-from-right-2",
-              isChatOpen && "rotate-180"
+              'h-14 w-14 rounded-base shadow-light border-2 border-black transition-all duration-200',
+              'bg-main hover:bg-mainAccent text-black font-medium',
+              'hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none',
+              'animate-in fade-in-50 slide-in-from-right-2',
+              isChatOpen && 'rotate-180',
             )}
           >
             {isChatOpen ? (
@@ -227,15 +247,15 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
             <div className="bg-bg border-2 border-black rounded-base px-3 py-2 shadow-light opacity-80 hover:opacity-100 transition-opacity animate-in fade-in-50 slide-in-from-right-2 delay-300">
               <div className="flex items-center space-x-2 text-xs text-text whitespace-nowrap">
                 <span>Press</span>
-                <kbd className="px-1.5 py-0.5 bg-white border border-black rounded-base text-xs font-mono">⌘/</kbd>
+                <kbd className="px-1.5 py-0.5 bg-white border border-black rounded-base text-xs font-mono">
+                  ⌘/
+                </kbd>
                 <span>to open chat</span>
               </div>
             </div>
           </div>
         )}
-
-
       </div>
     </ErrorBoundary>
   );
-} 
+}

@@ -4,7 +4,14 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/stores';
 import { cn } from '@/lib/utils/utils';
-import { ChevronRight, Home, Music, ListMusic, Search, Brain } from 'lucide-react';
+import {
+  ChevronRight,
+  Home,
+  Music,
+  ListMusic,
+  Search,
+  Brain,
+} from 'lucide-react';
 
 interface BreadcrumbItem {
   label: string;
@@ -33,7 +40,7 @@ export default function Breadcrumbs() {
     // Handle different path patterns
     if (pathSegments.length > 1) {
       const section = pathSegments[1];
-      
+
       switch (section) {
         case 'tracks':
           breadcrumbs.push({
@@ -42,14 +49,14 @@ export default function Breadcrumbs() {
             icon: Music,
           });
           break;
-        
+
         case 'playlists':
           breadcrumbs.push({
             label: 'Playlists',
             href: `/${userIdentity.username}/playlists`,
             icon: ListMusic,
           });
-          
+
           // Handle specific playlist
           if (pathSegments.length > 2) {
             const playlistId = pathSegments[2];
@@ -59,7 +66,7 @@ export default function Breadcrumbs() {
             });
           }
           break;
-        
+
         case 'collection':
           breadcrumbs.push({
             label: 'Collection',
@@ -78,7 +85,7 @@ export default function Breadcrumbs() {
         href: '/analyze',
         icon: Brain,
       });
-      
+
       if (pathSegments.length > 1) {
         const subSection = pathSegments[1];
         switch (subSection) {
@@ -113,18 +120,20 @@ export default function Breadcrumbs() {
         {breadcrumbs.map((item, index) => {
           const isLast = index === breadcrumbs.length - 1;
           const Icon = item.icon;
-          
+
           return (
             <li key={item.href || item.label} className="flex items-center">
               {index > 0 && (
                 <ChevronRight className="w-4 h-4 mx-2 text-gray-400" />
               )}
-              
+
               {isLast ? (
-                <span className={cn(
-                  "flex items-center font-medium",
-                  item.current ? "text-gray-900" : "text-gray-600"
-                )}>
+                <span
+                  className={cn(
+                    'flex items-center font-medium',
+                    item.current ? 'text-gray-900' : 'text-gray-600',
+                  )}
+                >
                   {Icon && <Icon className="w-4 h-4 mr-2" />}
                   {item.label}
                 </span>
@@ -146,14 +155,14 @@ export default function Breadcrumbs() {
 }
 
 // Additional component for page titles with breadcrumbs
-export function PageHeader({ 
-  title, 
-  description, 
-  children 
-}: { 
-  title: string; 
-  description?: string; 
-  children?: React.ReactNode; 
+export function PageHeader({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description?: string;
+  children?: React.ReactNode;
 }) {
   return (
     <div className="mb-8">
@@ -166,11 +175,9 @@ export function PageHeader({
           )}
         </div>
         {children && (
-          <div className="flex items-center space-x-3">
-            {children}
-          </div>
+          <div className="flex items-center space-x-3">{children}</div>
         )}
       </div>
     </div>
   );
-} 
+}

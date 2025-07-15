@@ -1,5 +1,9 @@
 import { create } from 'zustand';
-import type { YouTubePlayer as YTPlayer, YouTubeEvent, CrateTrack } from '@/types';
+import type {
+  YouTubePlayer as YTPlayer,
+  YouTubeEvent,
+  CrateTrack,
+} from '@/types';
 
 interface PlayerState {
   player: YTPlayer | null;
@@ -13,12 +17,12 @@ interface PlayerState {
   isRepeatEnabled: boolean;
   shuffledIndices: number[];
   volume: number;
-  
+
   // Progress tracking
   currentTime: number;
   duration: number;
   timeUpdateInterval: NodeJS.Timeout | null;
-  
+
   // Core player actions
   initializePlayer: () => Promise<void>;
   setPlayer: (player: YTPlayer) => void;
@@ -27,27 +31,27 @@ interface PlayerState {
   playTrack: (track: CrateTrack) => void;
   pauseTrack: () => void;
   togglePlayPause: (track: CrateTrack) => void;
-  
+
   // Queue management
   setQueue: (tracks: CrateTrack[], startIndex?: number) => void;
   addToQueue: (track: CrateTrack) => void;
   removeFromQueue: (trackId: string) => void;
   clearQueue: () => void;
-  
+
   // Playback controls
   playNext: () => void;
   playPrevious: () => void;
   toggleShuffle: () => void;
   toggleRepeat: () => void;
   setVolume: (volume: number) => void;
-  
+
   // Progress controls
   setCurrentTime: (time: number) => void;
   setDuration: (duration: number) => void;
   seekTo: (time: number) => void;
   startTimeTracking: () => void;
   stopTimeTracking: () => void;
-  
+
   // Utilities
   reset: () => void;
 }
@@ -124,7 +128,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
             }
             const isPlaying = event.data === 1;
             set({ isPlaying });
-            
+
             // Handle time tracking based on playback state
             const { startTimeTracking, stopTimeTracking } = get();
             if (isPlaying) {
@@ -132,9 +136,10 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
             } else {
               stopTimeTracking();
             }
-            
+
             // Auto-play next track when current track ends
-            if (event.data === 0) { // YT.PlayerState.ENDED
+            if (event.data === 0) {
+              // YT.PlayerState.ENDED
               setTimeout(() => {
                 const { playNext } = get();
                 playNext();
@@ -165,13 +170,16 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   playTrack: (track) => {
     const { player, isReady, startTimeTracking } = get();
     if (!player || !isReady || !track.youtube_video_id) return;
-    
-    player.loadVideoById({ videoId: track.youtube_video_id, suggestedQuality: 'highres' });
+
+    player.loadVideoById({
+      videoId: track.youtube_video_id,
+      suggestedQuality: 'highres',
+    });
     player.playVideo();
-    set({ 
-      playingTrackId: track.id, 
-      currentTrack: track, 
-      isPlaying: true 
+    set({
+      playingTrackId: track.id,
+      currentTrack: track,
+      isPlaying: true,
     });
     startTimeTracking();
   },
@@ -179,16 +187,24 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   pauseTrack: () => {
     const { player, stopTimeTracking } = get();
     if (!player) return;
-    
+
     player.pauseVideo();
     set({ isPlaying: false });
     stopTimeTracking();
   },
 
   togglePlayPause: (track) => {
-    const { player, playingTrackId, isPlaying, queue, currentIndex, startTimeTracking, stopTimeTracking } = get();
+    const {
+      player,
+      playingTrackId,
+      isPlaying,
+      queue,
+      currentIndex,
+      startTimeTracking,
+      stopTimeTracking,
+    } = get();
     if (!player || !track.youtube_video_id) return;
-    
+
     if (playingTrackId === track.id) {
       if (isPlaying) {
         player.pauseVideo();
@@ -201,17 +217,20 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
       }
     } else {
       // If playing a different track, update the queue and index
-      const trackIndex = queue.findIndex(t => t.id === track.id);
+      const trackIndex = queue.findIndex((t) => t.id === track.id);
       if (trackIndex !== -1) {
         set({ currentIndex: trackIndex });
       }
-      
-      player.loadVideoById({ videoId: track.youtube_video_id, suggestedQuality: 'highres' });
+
+      player.loadVideoById({
+        videoId: track.youtube_video_id,
+        suggestedQuality: 'highres',
+      });
       player.playVideo();
-      set({ 
-        playingTrackId: track.id, 
-        currentTrack: track, 
-        isPlaying: true 
+      set({
+        playingTrackId: track.id,
+        currentTrack: track,
+        isPlaying: true,
       });
       startTimeTracking();
     }
@@ -219,67 +238,80 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 
   setQueue: (tracks, startIndex = 0) => {
     const indices = Array.from({ length: tracks.length }, (_, i) => i);
-    set({ 
-      queue: tracks, 
+    set({
+      queue: tracks,
       currentIndex: startIndex,
-      shuffledIndices: shuffleArray(indices)
+      shuffledIndices: shuffleArray(indices),
     });
   },
 
   addToQueue: (track) => {
     const { queue } = get();
-    if (!queue.find(t => t.id === track.id)) {
+    if (!queue.find((t) => t.id === track.id)) {
       const newQueue = [...queue, track];
       const indices = Array.from({ length: newQueue.length }, (_, i) => i);
-      set({ 
+      set({
         queue: newQueue,
-        shuffledIndices: shuffleArray(indices)
+        shuffledIndices: shuffleArray(indices),
       });
     }
   },
 
   removeFromQueue: (trackId) => {
     const { queue, currentIndex } = get();
-    const newQueue = queue.filter(track => track.id !== trackId);
+    const newQueue = queue.filter((track) => track.id !== trackId);
     const indices = Array.from({ length: newQueue.length }, (_, i) => i);
-    
+
     // Adjust current index if necessary
-    const removedIndex = queue.findIndex(track => track.id === trackId);
-    const newIndex = removedIndex < currentIndex ? currentIndex - 1 : currentIndex;
-    
-    set({ 
+    const removedIndex = queue.findIndex((track) => track.id === trackId);
+    const newIndex =
+      removedIndex < currentIndex ? currentIndex - 1 : currentIndex;
+
+    set({
       queue: newQueue,
       currentIndex: Math.max(0, newIndex),
-      shuffledIndices: shuffleArray(indices)
+      shuffledIndices: shuffleArray(indices),
     });
   },
 
   clearQueue: () => {
-    set({ 
-      queue: [], 
-      currentIndex: 0, 
+    set({
+      queue: [],
+      currentIndex: 0,
       shuffledIndices: [],
       currentTrack: null,
-      playingTrackId: null
+      playingTrackId: null,
     });
   },
 
   playNext: () => {
-    const { queue, currentIndex, isShuffleEnabled, isRepeatEnabled, shuffledIndices, playTrack } = get();
+    const {
+      queue,
+      currentIndex,
+      isShuffleEnabled,
+      isRepeatEnabled,
+      shuffledIndices,
+      playTrack,
+    } = get();
     if (queue.length === 0) return;
 
     let nextIndex: number;
-    
+
     if (isShuffleEnabled) {
       const currentShuffledIndex = shuffledIndices.indexOf(currentIndex);
-      const nextShuffledIndex = (currentShuffledIndex + 1) % shuffledIndices.length;
+      const nextShuffledIndex =
+        (currentShuffledIndex + 1) % shuffledIndices.length;
       nextIndex = shuffledIndices[nextShuffledIndex];
     } else {
       nextIndex = (currentIndex + 1) % queue.length;
     }
 
     // Handle repeat mode
-    if (!isRepeatEnabled && nextIndex === 0 && currentIndex === queue.length - 1) {
+    if (
+      !isRepeatEnabled &&
+      nextIndex === 0 &&
+      currentIndex === queue.length - 1
+    ) {
       // End of queue and no repeat
       return;
     }
@@ -292,16 +324,23 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   },
 
   playPrevious: () => {
-    const { queue, currentIndex, isShuffleEnabled, shuffledIndices, playTrack } = get();
+    const {
+      queue,
+      currentIndex,
+      isShuffleEnabled,
+      shuffledIndices,
+      playTrack,
+    } = get();
     if (queue.length === 0) return;
 
     let prevIndex: number;
-    
+
     if (isShuffleEnabled) {
       const currentShuffledIndex = shuffledIndices.indexOf(currentIndex);
-      const prevShuffledIndex = currentShuffledIndex === 0 
-        ? shuffledIndices.length - 1 
-        : currentShuffledIndex - 1;
+      const prevShuffledIndex =
+        currentShuffledIndex === 0
+          ? shuffledIndices.length - 1
+          : currentShuffledIndex - 1;
       prevIndex = shuffledIndices[prevShuffledIndex];
     } else {
       prevIndex = currentIndex === 0 ? queue.length - 1 : currentIndex - 1;
@@ -318,15 +357,15 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     const { isShuffleEnabled, queue } = get();
     const newShuffleState = !isShuffleEnabled;
     const indices = Array.from({ length: queue.length }, (_, i) => i);
-    
-    set({ 
+
+    set({
       isShuffleEnabled: newShuffleState,
-      shuffledIndices: newShuffleState ? shuffleArray(indices) : indices
+      shuffledIndices: newShuffleState ? shuffleArray(indices) : indices,
     });
   },
 
   toggleRepeat: () => {
-    set(state => ({ isRepeatEnabled: !state.isRepeatEnabled }));
+    set((state) => ({ isRepeatEnabled: !state.isRepeatEnabled }));
   },
 
   setVolume: (volume) => {
@@ -358,7 +397,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     if (timeUpdateInterval) {
       clearInterval(timeUpdateInterval);
     }
-    
+
     const interval = setInterval(() => {
       const { player, isPlaying } = get();
       if (player && isPlaying) {
@@ -371,7 +410,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
         }
       }
     }, 1000);
-    
+
     set({ timeUpdateInterval: interval });
   },
 
@@ -388,11 +427,11 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     if (timeUpdateInterval) {
       clearInterval(timeUpdateInterval);
     }
-    
-    set({ 
-      player: null, 
-      isReady: false, 
-      playingTrackId: null, 
+
+    set({
+      player: null,
+      isReady: false,
+      playingTrackId: null,
       currentTrack: null,
       isPlaying: false,
       queue: [],
@@ -403,7 +442,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
       volume: 80,
       currentTime: 0,
       duration: 0,
-      timeUpdateInterval: null
+      timeUpdateInterval: null,
     });
   },
-})); 
+}));

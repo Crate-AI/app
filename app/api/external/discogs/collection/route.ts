@@ -3,7 +3,10 @@ import { DiscogsSDK } from '@crate.ai/discogs-sdk';
 import { cookies, headers } from 'next/headers';
 import { CollectionUtils } from '@/lib/database/serverUtils/collection';
 import { createClient } from '@/lib/database/server';
-import { CollectionResponse, Release } from '@crate.ai/discogs-sdk/dist/collection/types';
+import {
+  CollectionResponse,
+  Release,
+} from '@crate.ai/discogs-sdk/dist/collection/types';
 
 export const dynamic = 'force-dynamic';
 

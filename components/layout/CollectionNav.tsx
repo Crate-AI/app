@@ -23,7 +23,7 @@ export function CollectionNav() {
             'px-4 py-2 text-sm font-medium rounded-full transition-colors',
             pathname === item.href
               ? 'bg-main text-black border-2 border-black'
-              : 'text-gray-500 hover:text-gray-900 border-2 border-transparent'
+              : 'text-gray-500 hover:text-gray-900 border-2 border-transparent',
           )}
         >
           {item.name}
@@ -31,4 +31,4 @@ export function CollectionNav() {
       ))}
     </nav>
   );
-} 
+}

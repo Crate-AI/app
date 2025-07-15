@@ -1,11 +1,11 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Play, Pause, Trash2 } from "lucide-react";
-import { cn } from "@/lib/utils/utils";
-import { PlaylistWithTracks } from "@/types";
-import Image from "next/image";
-import { usePlayerStore, usePlaylistStore } from "@/stores";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Play, Pause, Trash2 } from 'lucide-react';
+import { cn } from '@/lib/utils/utils';
+import { PlaylistWithTracks } from '@/types';
+import Image from 'next/image';
+import { usePlayerStore, usePlaylistStore } from '@/stores';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 interface PlaylistCardProps {
   playlist: PlaylistWithTracks;
@@ -13,7 +13,7 @@ interface PlaylistCardProps {
   onExpand: () => void;
 }
 
-export const PlaylistCard = ({ 
+export const PlaylistCard = ({
   playlist,
   handleClick,
   onExpand,
@@ -21,7 +21,9 @@ export const PlaylistCard = ({
   const { deletePlaylist } = usePlaylistStore();
   const { playingTrackId, isPlaying, togglePlayPause } = usePlayerStore();
 
-  const isPlayingThisPlaylist = playlist.tracks?.some(track => track.id === playingTrackId);
+  const isPlayingThisPlaylist = playlist.tracks?.some(
+    (track) => track.id === playingTrackId,
+  );
 
   const handlePlayPause = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -42,25 +44,31 @@ export const PlaylistCard = ({
   };
 
   return (
-    <Card 
+    <Card
       className={cn(
-        "group relative overflow-hidden transition-all hover:shadow-light cursor-pointer border-none",
-        isPlayingThisPlaylist && 'ring-2 ring-mainAccent'
+        'group relative overflow-hidden transition-all hover:shadow-light cursor-pointer border-none',
+        isPlayingThisPlaylist && 'ring-2 ring-mainAccent',
       )}
       onClick={handleClick}
     >
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-      
+
       <div className="absolute right-4 top-4 flex gap-2">
-        <button 
+        <button
           className={cn(
-            "p-3 rounded-full bg-mainAccent text-text",
-            isPlayingThisPlaylist ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
-            "transition-all hover:scale-105"
+            'p-3 rounded-full bg-mainAccent text-text',
+            isPlayingThisPlaylist
+              ? 'opacity-100'
+              : 'opacity-0 group-hover:opacity-100',
+            'transition-all hover:scale-105',
           )}
           onClick={handlePlayPause}
         >
-          {isPlayingThisPlaylist && isPlaying ? <Pause size={24} /> : <Play size={24} />}
+          {isPlayingThisPlaylist && isPlaying ? (
+            <Pause size={24} />
+          ) : (
+            <Play size={24} />
+          )}
         </button>
 
         <Button
@@ -75,10 +83,12 @@ export const PlaylistCard = ({
 
       <CardHeader className="h-48 bg-gray-100">
         {playlist.tracks?.length > 0 && playlist.tracks[0].artwork ? (
-          <Image 
-            src={decodeURIComponent(playlist.tracks[0].artwork.replace(/^"(.*)"$/, '$1'))}
+          <Image
+            src={decodeURIComponent(
+              playlist.tracks[0].artwork.replace(/^"(.*)"$/, '$1'),
+            )}
             alt={playlist.tracks[0].artist ?? ''}
-            className="w-full h-full object-cover" 
+            className="w-full h-full object-cover"
             width={400}
             height={400}
             priority
@@ -100,4 +110,4 @@ export const PlaylistCard = ({
       </CardContent>
     </Card>
   );
-}; 
+};

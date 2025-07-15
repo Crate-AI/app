@@ -10,39 +10,50 @@ import { useCompletion, useChat } from 'ai/react';
 
 export const Chatbot = () => {
   const { collection } = useDiscogsCollection();
-  const [messages, setMessages] = React.useState([{
-    id: '1',
-    role: 'assistant',
-    content: 'Hey DJ! Tell me about your gig - what type of venue, time slot, and vibe you\'re aiming for. I\'ll suggest tracks from your collection.'
-  }]);
-  
-  const { completion, complete, input, handleInputChange, isLoading } = useCompletion({
-    api: '/api/ai/chat',
-    body: {
-      collection: collection?.map(item => ({
-        title: item.basic_information.title,
-        artist: item.basic_information.artists[0].name,
-        year: item.basic_information.year,
-        genres: item.basic_information.genres,
-        styles: item.basic_information.styles
-      }))
+  const [messages, setMessages] = React.useState([
+    {
+      id: '1',
+      role: 'assistant',
+      content:
+        "Hey DJ! Tell me about your gig - what type of venue, time slot, and vibe you're aiming for. I'll suggest tracks from your collection.",
     },
-    onFinish: (prompt, completion) => {
-      setMessages(prev => [...prev, 
-        { id: Date.now().toString(), role: 'user', content: prompt },
-        { id: (Date.now() + 1).toString(), role: 'assistant', content: completion }
-      ]);
-    },
-    onError: (error) => {
-      console.error('Chat error:', error);
-    }
-  });
+  ]);
+
+  const { completion, complete, input, handleInputChange, isLoading } =
+    useCompletion({
+      api: '/api/ai/chat',
+      body: {
+        collection: collection?.map((item) => ({
+          title: item.basic_information.title,
+          artist: item.basic_information.artists[0].name,
+          year: item.basic_information.year,
+          genres: item.basic_information.genres,
+          styles: item.basic_information.styles,
+        })),
+      },
+      onFinish: (prompt, completion) => {
+        setMessages((prev) => [
+          ...prev,
+          { id: Date.now().toString(), role: 'user', content: prompt },
+          {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            content: completion,
+          },
+        ]);
+      },
+      onError: (error) => {
+        console.error('Chat error:', error);
+      },
+    });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
     await complete(input);
-    handleInputChange({ target: { value: '' } } as React.ChangeEvent<HTMLInputElement>);
+    handleInputChange({
+      target: { value: '' },
+    } as React.ChangeEvent<HTMLInputElement>);
   };
 
   return (

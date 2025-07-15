@@ -1,4 +1,4 @@
-import { Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react';
 
 export function ChatLoader() {
   return (
@@ -8,5 +8,5 @@ export function ChatLoader() {
         <p className="text-sm">DJ Assistant is mixing up a response...</p>
       </div>
     </div>
-  )
+  );
 }

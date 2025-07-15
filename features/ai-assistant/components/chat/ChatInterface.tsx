@@ -1,119 +1,134 @@
-'use client'
+'use client';
 
-import { useCallback, useRef, useEffect } from 'react'
-import { Send, Bot } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { CrateTrack } from '@/types'
-import { ChatLoader } from '@/features/ai-assistant/components/chat/ChatLoader'
-import { useChat } from 'ai/react'
-import { cn } from '@/lib/utils/utils'
-import { useAuthStore, useTracksStore } from '@/stores'
-import { useTrackSorting } from '@/lib/hooks/useTrackSorting'
-import { toast } from 'sonner'
+import { useCallback, useRef, useEffect } from 'react';
+import { Send, Bot } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { CrateTrack } from '@/types';
+import { ChatLoader } from '@/features/ai-assistant/components/chat/ChatLoader';
+import { useChat } from 'ai/react';
+import { cn } from '@/lib/utils/utils';
+import { useAuthStore, useTracksStore } from '@/stores';
+import { useTrackSorting } from '@/lib/hooks/useTrackSorting';
+import { toast } from 'sonner';
 
 interface ChatInterfaceProps {
-  tracks: CrateTrack[]
-  onTracksFilter: (filteredTracks: CrateTrack[]) => void
+  tracks: CrateTrack[];
+  onTracksFilter: (filteredTracks: CrateTrack[]) => void;
 }
 
 interface ParsedTrack {
-  title: string
-  artist: string
-  bpm: number
+  title: string;
+  artist: string;
+  bpm: number;
 }
 
 const findMatchingTrack = (suggestion: ParsedTrack, tracks: CrateTrack[]) => {
   // First try exact title match
-  let match = tracks.find(t => 
-    t.title.toLowerCase() === suggestion.title.toLowerCase()
-  )
+  let match = tracks.find(
+    (t) => t.title.toLowerCase() === suggestion.title.toLowerCase(),
+  );
 
   // If no exact match, try fuzzy matching
   if (!match) {
-    match = tracks.find(t => 
-      t.title.toLowerCase().includes(suggestion.title.toLowerCase()) ||
-      suggestion.title.toLowerCase().includes(t.title.toLowerCase())
-    )
+    match = tracks.find(
+      (t) =>
+        t.title.toLowerCase().includes(suggestion.title.toLowerCase()) ||
+        suggestion.title.toLowerCase().includes(t.title.toLowerCase()),
+    );
   }
 
-  return match
-}
+  return match;
+};
 
 const parseTracksFromMessage = (content: string): ParsedTrack[] => {
-  const matches = content.matchAll(/["'](.+?)["']\s*-\s*(.+?)\s*(?:\(|$$)(\d+)\s*BPM(?:\)|$$)/g)
-  return Array.from(matches).map(match => ({
+  const matches = content.matchAll(
+    /["'](.+?)["']\s*-\s*(.+?)\s*(?:\(|$$)(\d+)\s*BPM(?:\)|$$)/g,
+  );
+  return Array.from(matches).map((match) => ({
     title: match[1].trim(),
     artist: match[2].trim(),
-    bpm: parseInt(match[3])
-  }))
-}
+    bpm: parseInt(match[3]),
+  }));
+};
 
-export default function ChatInterface({ tracks, onTracksFilter }: ChatInterfaceProps) {
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const { userIdentity } = useAuthStore()
-  const { setSuggestedTracks } = useTracksStore()
-  const { setOrderingConfig } = useTrackSorting(tracks)
+export default function ChatInterface({
+  tracks,
+  onTracksFilter,
+}: ChatInterfaceProps) {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { userIdentity } = useAuthStore();
+  const { setSuggestedTracks } = useTracksStore();
+  const { setOrderingConfig } = useTrackSorting(tracks);
 
-  const processTrackSuggestions = useCallback((content: string) => {
-    try {
-      const suggestedTracks = parseTracksFromMessage(content)
-      if (suggestedTracks.length > 0) {
-        const matchedTracks = suggestedTracks
-          .map(suggestion => findMatchingTrack(suggestion, tracks))
-          .filter(Boolean) as CrateTrack[]
+  const processTrackSuggestions = useCallback(
+    (content: string) => {
+      try {
+        const suggestedTracks = parseTracksFromMessage(content);
+        if (suggestedTracks.length > 0) {
+          const matchedTracks = suggestedTracks
+            .map((suggestion) => findMatchingTrack(suggestion, tracks))
+            .filter(Boolean) as CrateTrack[];
 
-        if (matchedTracks.length > 0) {
-          // Update the tracks store with suggested tracks
-          setSuggestedTracks(matchedTracks)
-          // Update the ordering config to show suggested tracks
-          setOrderingConfig({ orderBy: 'suggested', direction: 'asc' })
-          // Call the filter callback with matched tracks
-          onTracksFilter(matchedTracks)
-          toast.success(`Found ${matchedTracks.length} matching tracks`)
-        } else {
-          toast.error('No matching tracks found in your collection')
+          if (matchedTracks.length > 0) {
+            // Update the tracks store with suggested tracks
+            setSuggestedTracks(matchedTracks);
+            // Update the ordering config to show suggested tracks
+            setOrderingConfig({ orderBy: 'suggested', direction: 'asc' });
+            // Call the filter callback with matched tracks
+            onTracksFilter(matchedTracks);
+            toast.success(`Found ${matchedTracks.length} matching tracks`);
+          } else {
+            toast.error('No matching tracks found in your collection');
+          }
         }
+      } catch (e) {
+        console.error('Failed to process track suggestions:', e);
+        toast.error('Failed to process track suggestions');
       }
-    } catch (e) {
-      console.error('Failed to process track suggestions:', e)
-      toast.error('Failed to process track suggestions')
-    }
-  }, [tracks, onTracksFilter, setOrderingConfig, setSuggestedTracks])
+    },
+    [tracks, onTracksFilter, setOrderingConfig, setSuggestedTracks],
+  );
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
-    api: '/api/ai/chat',
-    body: { 
-      tracks: tracks.map(track => ({
-        title: track.title,
-        artist: track.artist,
-        bpm: track.bpm,
-        genres: track.genres
-      }))
-    },
-    onFinish: (message) => {
-      processTrackSuggestions(message.content)
-    },
-    onError: (error) => {
-      console.error('Chat error:', error)
-      toast.error('Failed to get AI response')
-    }
-  })
+  const { messages, input, handleInputChange, handleSubmit, isLoading } =
+    useChat({
+      api: '/api/ai/chat',
+      body: {
+        tracks: tracks.map((track) => ({
+          title: track.title,
+          artist: track.artist,
+          bpm: track.bpm,
+          genres: track.genres,
+        })),
+      },
+      onFinish: (message) => {
+        processTrackSuggestions(message.content);
+      },
+      onError: (error) => {
+        console.error('Chat error:', error);
+        toast.error('Failed to get AI response');
+      },
+    });
 
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [])
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
 
   useEffect(() => {
-    scrollToBottom()
-  }, [messages, scrollToBottom])
+    scrollToBottom();
+  }, [messages, scrollToBottom]);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    handleSubmit(e)
-  }
+    e.preventDefault();
+    handleSubmit(e);
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -136,9 +151,9 @@ export default function ChatInterface({ tracks, onTracksFilter }: ChatInterfaceP
                 <div
                   className={cn(
                     'rounded-lg p-3 shadow-sm border transition-colors',
-                    message.role === 'user' 
+                    message.role === 'user'
                       ? 'bg-primary/10 border-primary/20 text-primary-foreground ml-auto hover:bg-primary/15'
-                      : 'bg-muted/50 border-muted-foreground/20 text-foreground hover:bg-muted/60'
+                      : 'bg-muted/50 border-muted-foreground/20 text-foreground hover:bg-muted/60',
                   )}
                 >
                   <div className="whitespace-pre-wrap">{message.content}</div>
@@ -146,7 +161,9 @@ export default function ChatInterface({ tracks, onTracksFilter }: ChatInterfaceP
                 {message.role === 'user' && (
                   <Avatar>
                     <AvatarImage src={userIdentity?.avatarUrl} alt="User" />
-                    <AvatarFallback>{userIdentity?.username?.charAt(0)}</AvatarFallback>
+                    <AvatarFallback>
+                      {userIdentity?.username?.charAt(0)}
+                    </AvatarFallback>
                   </Avatar>
                 )}
               </div>
@@ -181,5 +198,5 @@ export default function ChatInterface({ tracks, onTracksFilter }: ChatInterfaceP
         </form>
       </div>
     </div>
-  )
+  );
 }

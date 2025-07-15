@@ -6,7 +6,7 @@ import { cookies } from 'next/headers';
 
 export async function GET(
   request: Request,
-  { params }: { params: { playlistId: string } }
+  { params }: { params: { playlistId: string } },
 ) {
   try {
     const user = await auth();
@@ -16,34 +16,39 @@ export async function GET(
 
     const { data: playlist, error } = await supabase
       .from('playlists')
-      .select(`
+      .select(
+        `
         *,
         playlist_tracks (
           *,
           track: tracks (*)
         )
-      `)
+      `,
+      )
       .eq('id', params.playlistId)
       .eq('user_id', user.id)
       .single();
 
     if (error) throw error;
     if (!playlist) {
-      return NextResponse.json({ error: 'Playlist not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Playlist not found' },
+        { status: 404 },
+      );
     }
 
     return NextResponse.json(playlist);
   } catch (error) {
     return NextResponse.json(
       { error: (error as Error).message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PUT(
   request: Request,
-  { params }: { params: { playlistId: string } }
+  { params }: { params: { playlistId: string } },
 ) {
   try {
     const user = await auth();
@@ -53,10 +58,7 @@ export async function PUT(
 
     const { title, description } = await request.json();
     if (!title) {
-      return NextResponse.json(
-        { error: 'Title is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Title is required' }, { status: 400 });
     }
 
     const { data: playlist, error } = await supabase
@@ -69,27 +71,32 @@ export async function PUT(
 
     if (error) throw error;
     if (!playlist) {
-      return NextResponse.json({ error: 'Playlist not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Playlist not found' },
+        { status: 404 },
+      );
     }
 
     return NextResponse.json(playlist);
   } catch (error) {
     return NextResponse.json(
       { error: (error as Error).message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { playlistId: string } }
+  { params }: { params: { playlistId: string } },
 ) {
   try {
     const cookieStore = cookies();
     const supabase = await createClient();
 
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -105,7 +112,7 @@ export async function DELETE(
     if (playlistError || !playlist) {
       return NextResponse.json(
         { error: 'Playlist not found or unauthorized' },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -122,7 +129,7 @@ export async function DELETE(
     console.error('Error deleting playlist:', error);
     return NextResponse.json(
       { error: (error as Error).message },
-      { status: 500 }
+      { status: 500 },
     );
   }
-} 
+}

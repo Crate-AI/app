@@ -11,7 +11,10 @@ if (!baseUrl) {
   throw new Error('NEXT_PUBLIC_BASE_URL environment variable is required');
 }
 
-if (!process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_KEY || !process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET) {
+if (
+  !process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_KEY ||
+  !process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET
+) {
   console.error('Missing Discogs credentials');
   throw new Error('Discogs credentials are required');
 }
@@ -34,7 +37,8 @@ export async function GET(request: Request) {
 
     const sdk = new DiscogsSDK({
       DiscogsConsumerKey: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_KEY || '',
-      DiscogsConsumerSecret: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET || '',
+      DiscogsConsumerSecret:
+        process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET || '',
       callbackUrl: `${baseUrl}/api/auth/discogs/callback`,
       userAgent: 'CrateApp/1.0 +https://crate.ai',
     });
@@ -78,10 +82,11 @@ export async function GET(request: Request) {
     const password = `discogs_${userIdentity.id}`;
 
     // Try to sign in with email first
-    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-      email: user.email,
-      password,
-    });
+    const { data: signInData, error: signInError } =
+      await supabase.auth.signInWithPassword({
+        email: user.email,
+        password,
+      });
 
     if (signInData?.user) {
       // Update user data cookie
@@ -96,9 +101,9 @@ export async function GET(request: Request) {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
           sameSite: 'lax',
-        }
+        },
       );
-      
+
       // Update Discogs profile
       const { error: updateError } = await supabase
         .from('user_discogs_profile')
@@ -106,29 +111,33 @@ export async function GET(request: Request) {
           user_id: signInData.user.id,
           username: userIdentity.username,
         });
-        
+
       if (updateError) {
         console.error('Failed to update user profile:', updateError);
       }
-      
+
       return NextResponse.redirect(new URL('/', request.url));
     }
 
     // If user doesn't exist, create new account
-    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-      email: user.email,
-      password,
-      options: {
-        data: {
-          discogs_username: userIdentity.username,
-          discogs_id: userIdentity.id,
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp(
+      {
+        email: user.email,
+        password,
+        options: {
+          data: {
+            discogs_username: userIdentity.username,
+            discogs_id: userIdentity.id,
+          },
         },
       },
-    });
+    );
 
     if (signUpError || !signUpData.user) {
       console.error('Failed to create user:', signUpError);
-      return NextResponse.redirect(new URL('/?error=signup_failed', request.url));
+      return NextResponse.redirect(
+        new URL('/?error=signup_failed', request.url),
+      );
     }
 
     // Create Discogs profile
@@ -141,7 +150,9 @@ export async function GET(request: Request) {
 
     if (createError) {
       console.error('Failed to create user profile:', createError);
-      return NextResponse.redirect(new URL('/?error=profile_failed', request.url));
+      return NextResponse.redirect(
+        new URL('/?error=profile_failed', request.url),
+      );
     }
 
     // Set user data cookie
@@ -156,7 +167,7 @@ export async function GET(request: Request) {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
-      }
+      },
     );
 
     return NextResponse.redirect(new URL('/', request.url));

@@ -66,21 +66,24 @@ const HomeClient = ({}: HomeClientProps) => {
             Your AI-powered music collection analyzer
           </p>
           <p className="text-base text-muted-foreground mb-8">
-            Connect your Discogs collection and discover insights about your music with AI-powered analysis.
+            Connect your Discogs collection and discover insights about your
+            music with AI-powered analysis.
           </p>
-          
+
           {/* Features */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 text-left">
             <div className="p-4 rounded-lg border bg-card">
               <h3 className="font-semibold mb-2">🎵 Collection Analysis</h3>
               <p className="text-sm text-muted-foreground">
-                Get insights into your music collection, including BPM analysis, genre distribution, and more.
+                Get insights into your music collection, including BPM analysis,
+                genre distribution, and more.
               </p>
             </div>
             <div className="p-4 rounded-lg border bg-card">
               <h3 className="font-semibold mb-2">🤖 AI-Powered</h3>
               <p className="text-sm text-muted-foreground">
-                Chat with AI about your music and get personalized recommendations.
+                Chat with AI about your music and get personalized
+                recommendations.
               </p>
             </div>
             <div className="p-4 rounded-lg border bg-card">

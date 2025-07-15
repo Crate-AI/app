@@ -4,17 +4,17 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores';
 import { cn } from '@/lib/utils/utils';
-import { 
-  Search, 
-  Music, 
-  ListMusic, 
-  Brain, 
-  Plus, 
-  Settings, 
+import {
+  Search,
+  Music,
+  ListMusic,
+  Brain,
+  Plus,
+  Settings,
   User,
   Command,
   ArrowRight,
-  Clock
+  Clock,
 } from 'lucide-react';
 
 interface CommandPaletteProps {
@@ -33,7 +33,10 @@ interface CommandItem {
   href?: string;
 }
 
-export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
+export default function CommandPalette({
+  isOpen,
+  onClose,
+}: CommandPaletteProps) {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [recentCommands, setRecentCommands] = useState<string[]>([]);
@@ -68,14 +71,14 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault();
-          setSelectedIndex(prev => 
-            prev < filteredCommands.length - 1 ? prev + 1 : 0
+          setSelectedIndex((prev) =>
+            prev < filteredCommands.length - 1 ? prev + 1 : 0,
           );
           break;
         case 'ArrowUp':
           e.preventDefault();
-          setSelectedIndex(prev => 
-            prev > 0 ? prev - 1 : filteredCommands.length - 1
+          setSelectedIndex((prev) =>
+            prev > 0 ? prev - 1 : filteredCommands.length - 1,
           );
           break;
         case 'Enter':
@@ -93,10 +96,14 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, selectedIndex, query]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, selectedIndex, query, onClose]);
 
   const saveRecentCommand = (commandId: string) => {
-    const updated = [commandId, ...recentCommands.filter(id => id !== commandId)].slice(0, 5);
+    const updated = [
+      commandId,
+      ...recentCommands.filter((id) => id !== commandId),
+    ].slice(0, 5);
     setRecentCommands(updated);
     localStorage.setItem('crate-recent-commands', JSON.stringify(updated));
   };
@@ -210,29 +217,36 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
 
   const commands = generateCommands();
 
-  const filteredCommands = commands.filter(command => {
+  const filteredCommands = commands.filter((command) => {
     if (!query) return true;
-    
+
     const searchTerms = query.toLowerCase().split(' ');
-    return searchTerms.every(term => 
-      command.title.toLowerCase().includes(term) ||
-      command.description?.toLowerCase().includes(term) ||
-      command.keywords.some(keyword => keyword.toLowerCase().includes(term))
+    return searchTerms.every(
+      (term) =>
+        command.title.toLowerCase().includes(term) ||
+        command.description?.toLowerCase().includes(term) ||
+        command.keywords.some((keyword) =>
+          keyword.toLowerCase().includes(term),
+        ),
     );
   });
 
   // Group commands by category
-  const groupedCommands = filteredCommands.reduce((acc, command) => {
-    if (!acc[command.category]) {
-      acc[command.category] = [];
-    }
-    acc[command.category].push(command);
-    return acc;
-  }, {} as Record<string, CommandItem[]>);
+  const groupedCommands = filteredCommands.reduce(
+    (acc, command) => {
+      if (!acc[command.category]) {
+        acc[command.category] = [];
+      }
+      acc[command.category].push(command);
+      return acc;
+    },
+    {} as Record<string, CommandItem[]>,
+  );
 
   // Show recent commands if no query
-  const recentCommandItems = !query ? 
-    commands.filter(cmd => recentCommands.includes(cmd.id)) : [];
+  const recentCommandItems = !query
+    ? commands.filter((cmd) => recentCommands.includes(cmd.id))
+    : [];
 
   if (!isOpen) return null;
 
@@ -334,36 +348,42 @@ interface CommandButtonProps {
 
 function CommandButton({ command, isSelected, onClick }: CommandButtonProps) {
   const Icon = command.icon;
-  
+
   return (
     <button
       onClick={onClick}
       className={cn(
-        "w-full flex items-center p-3 rounded-lg text-left transition-colors",
-        isSelected ? "bg-primary text-white" : "hover:bg-gray-100"
+        'w-full flex items-center p-3 rounded-lg text-left transition-colors',
+        isSelected ? 'bg-primary text-white' : 'hover:bg-gray-100',
       )}
     >
-      <Icon className={cn(
-        "w-5 h-5 mr-3",
-        isSelected ? "text-white" : "text-gray-400"
-      )} />
+      <Icon
+        className={cn(
+          'w-5 h-5 mr-3',
+          isSelected ? 'text-white' : 'text-gray-400',
+        )}
+      />
       <div className="flex-1 min-w-0">
         <div className="font-medium truncate">{command.title}</div>
         {command.description && (
-          <div className={cn(
-            "text-sm truncate",
-            isSelected ? "text-white/80" : "text-gray-500"
-          )}>
+          <div
+            className={cn(
+              'text-sm truncate',
+              isSelected ? 'text-white/80' : 'text-gray-500',
+            )}
+          >
             {command.description}
           </div>
         )}
       </div>
       {command.href && (
-        <ArrowRight className={cn(
-          "w-4 h-4 ml-2",
-          isSelected ? "text-white" : "text-gray-400"
-        )} />
+        <ArrowRight
+          className={cn(
+            'w-4 h-4 ml-2',
+            isSelected ? 'text-white' : 'text-gray-400',
+          )}
+        />
       )}
     </button>
   );
-} 
+}

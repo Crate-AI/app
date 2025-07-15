@@ -8,8 +8,10 @@ const cardVariants = cva(
     variants: {
       variant: {
         default: 'shadow-light',
-        interactive: 'shadow-light hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none cursor-pointer active:bg-mainAccent/10 active:scale-[0.98] active:translate-x-boxShadowX active:translate-y-boxShadowY active:shadow-none',
-        elevated: 'shadow-light hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none',
+        interactive:
+          'shadow-light hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none cursor-pointer active:bg-mainAccent/10 active:scale-[0.98] active:translate-x-boxShadowX active:translate-y-boxShadowY active:shadow-none',
+        elevated:
+          'shadow-light hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none',
         flat: 'shadow-none',
       },
     },
@@ -52,7 +54,10 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn('font-semibold leading-none tracking-tight text-text font-heading', className)}
+    className={cn(
+      'font-semibold leading-none tracking-tight text-text font-heading',
+      className,
+    )}
     {...props}
   />
 ));
