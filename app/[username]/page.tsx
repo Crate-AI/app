@@ -6,6 +6,7 @@ import {
   useTracksStore,
   usePlaylistStore,
   usePlayerStore,
+  useFavoritesStore,
 } from '@/stores';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,10 +19,10 @@ import {
   Shuffle,
   List,
   Brain,
+  Heart,
   Search,
   Plus,
   Headphones,
-  Heart,
   Zap,
 } from 'lucide-react';
 import { cn } from '@/lib/utils/utils';
@@ -101,79 +102,114 @@ const DashboardStats = ({ tracks }: { tracks: CrateTrack[] }) => {
   );
 };
 
-const RecentTracksSection = ({ tracks }: { tracks: CrateTrack[] }) => {
+const FavoritesSection = ({ allTracks }: { allTracks: CrateTrack[] }) => {
   const { togglePlayPause, playingTrackId, isPlaying, setQueue } =
     usePlayerStore();
-  const recentTracks = tracks.slice(0, 6);
+  const { getFavoriteTracksFromAllTracks, toggleFavorite, isFavorite } =
+    useFavoritesStore();
+  const favoriteTracks = getFavoriteTracksFromAllTracks(allTracks).slice(0, 6);
 
   const handlePlayTrack = (track: CrateTrack) => {
-    const trackIndex = tracks.findIndex((t) => t.id === track.id);
-    setQueue(tracks, trackIndex);
+    const trackIndex = allTracks.findIndex((t) => t.id === track.id);
+    setQueue(allTracks, trackIndex);
     togglePlayPause(track);
+  };
+
+  const handleToggleFavorite = (trackId: string) => {
+    const wasFavorite = isFavorite(trackId);
+    toggleFavorite(trackId);
+
+    if (wasFavorite) {
+      toast.success('Removed from favorites');
+    } else {
+      toast.success('Added to favorites');
+    }
   };
 
   return (
     <Card variant="elevated">
       <CardHeader className="border-b-2 border-black bg-bg">
         <CardTitle className="flex items-center space-x-2">
-          <Clock className="w-5 h-5" />
-          <span>Recent Tracks</span>
+          <Heart className="w-5 h-5" />
+          <span>Favourite list</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-4">
         <div className="space-y-3">
-          {recentTracks.map((track) => (
-            <div
-              key={track.id}
-              className="flex items-center space-x-3 p-3 rounded-base hover:bg-mainAccent/10 transition-colors group cursor-pointer active:bg-mainAccent/20 active:scale-[0.98]"
-              onClick={() => handlePlayTrack(track)}
-            >
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handlePlayTrack(track);
-                }}
-                className="h-8 w-8 p-0 bg-main hover:bg-mainAccent border border-black rounded-base"
-              >
-                {playingTrackId === track.id && isPlaying ? (
-                  <Pause className="w-4 h-4 text-black" />
-                ) : (
-                  <Play className="w-4 h-4 text-black" />
-                )}
-              </Button>
-
-              {track.artwork ? (
-                <Image
-                  src={track.artwork}
-                  alt={track.title}
-                  width={40}
-                  height={40}
-                  className="w-10 h-10 rounded-base object-cover"
-                />
-              ) : (
-                <div className="w-10 h-10 bg-mainAccent border-2 border-black rounded-base flex items-center justify-center">
-                  <Music className="w-5 h-5 text-black" />
-                </div>
-              )}
-
-              <div className="flex-1 min-w-0">
-                <div className="font-medium text-sm truncate text-text">
-                  {track.title}
-                </div>
-                <div className="text-xs text-gray-600 truncate">
-                  {track.artist}
-                </div>
-              </div>
-
-              {track.bpm && (
-                <div className="text-xs bg-white border border-black px-2 py-1 rounded-base text-text font-mono">
-                  {track.bpm} BPM
-                </div>
-              )}
+          {favoriteTracks.length === 0 ? (
+            <div className="text-center text-gray-500 py-8">
+              <Heart className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+              <p>No favorite tracks yet</p>
+              <p className="text-sm">
+                Use the heart icon in the player to add favorites
+              </p>
             </div>
-          ))}
+          ) : (
+            favoriteTracks.map((track: CrateTrack) => (
+              <div
+                key={track.id}
+                className="flex items-center space-x-3 p-3 rounded-base hover:bg-mainAccent/10 transition-colors group cursor-pointer active:bg-mainAccent/20 active:scale-[0.98]"
+                onClick={() => handlePlayTrack(track)}
+              >
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handlePlayTrack(track);
+                  }}
+                  className="h-8 w-8 p-0 bg-main hover:bg-mainAccent border border-black rounded-base"
+                >
+                  {playingTrackId === track.id && isPlaying ? (
+                    <Pause className="w-4 h-4 text-black" />
+                  ) : (
+                    <Play className="w-4 h-4 text-black" />
+                  )}
+                </Button>
+
+                {track.artwork ? (
+                  <Image
+                    src={track.artwork}
+                    alt={track.title}
+                    width={40}
+                    height={40}
+                    className="w-10 h-10 rounded-base object-cover"
+                  />
+                ) : (
+                  <div className="w-10 h-10 bg-mainAccent border-2 border-black rounded-base flex items-center justify-center">
+                    <Music className="w-5 h-5 text-black" />
+                  </div>
+                )}
+
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-sm truncate text-text">
+                    {track.title}
+                  </div>
+                  <div className="text-xs text-gray-600 truncate">
+                    {track.artist}
+                  </div>
+                </div>
+
+                {track.bpm && (
+                  <div className="text-xs bg-white border border-black px-2 py-1 rounded-base text-text font-mono">
+                    {track.bpm} BPM
+                  </div>
+                )}
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleToggleFavorite(track.id);
+                  }}
+                  className="h-8 w-8 p-0 bg-red-100 hover:bg-red-200 text-red-600 border border-black rounded-base"
+                >
+                  <Heart className="w-4 h-4 fill-current" />
+                </Button>
+              </div>
+            ))
+          )}
         </div>
 
         <div className="mt-4 pt-4 border-t-2 border-black">
@@ -322,8 +358,8 @@ const WelcomeSection = ({ username }: { username: string }) => {
         {getGreeting()}, {username}!
       </h1>
       <p className="text-gray-600">
-        Ready to explore your music collection? Here&apos;s what&apos;s happening with
-        your tracks.
+        Ready to explore your music collection? Here&apos;s what&apos;s
+        happening with your tracks.
       </p>
     </div>
   );
@@ -375,7 +411,7 @@ const DashboardContent = ({ username }: { username: string }) => {
       <DashboardStats tracks={allTracks} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <RecentTracksSection tracks={allTracks} />
+        <FavoritesSection allTracks={allTracks} />
         <QuickActionsSection username={username} />
       </div>
     </div>

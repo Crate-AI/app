@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { usePlayerStore } from '@/stores';
+import { usePlayerStore, useFavoritesStore } from '@/stores';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -18,6 +18,7 @@ import {
   Music,
   ChevronUp,
   ChevronDown,
+  Heart,
 } from 'lucide-react';
 import { cn } from '@/lib/utils/utils';
 import { CrateTrack } from '@/types';
@@ -52,6 +53,8 @@ const PersistentPlayer = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [previousVolume, setPreviousVolume] = useState(volume);
 
+  const { toggleFavorite, isFavorite } = useFavoritesStore();
+
   const handleVolumeChange = (value: number[]) => {
     const newVolume = value[0];
     setVolume(newVolume);
@@ -68,6 +71,19 @@ const PersistentPlayer = () => {
       setPreviousVolume(volume);
       setVolume(0);
       setIsMuted(true);
+    }
+  };
+
+  const handleToggleFavorite = (trackId: string) => {
+    if (!trackId) return;
+
+    const wasFavorite = isFavorite(trackId);
+    toggleFavorite(trackId);
+
+    if (wasFavorite) {
+      toast.success('Removed from favorites');
+    } else {
+      toast.success('Added to favorites');
     }
   };
 
@@ -265,6 +281,28 @@ const PersistentPlayer = () => {
                 </div>
               )}
             </div>
+
+            {/* Favorite Button */}
+            {currentTrack && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleToggleFavorite(currentTrack.id)}
+                className={cn(
+                  'h-8 w-8 p-0 border border-black rounded-base icon-button',
+                  isFavorite(currentTrack.id)
+                    ? 'bg-red-100 hover:bg-red-200 text-red-600'
+                    : 'bg-white hover:bg-gray-100 text-gray-600',
+                )}
+              >
+                <Heart
+                  className={cn(
+                    'w-4 h-4',
+                    isFavorite(currentTrack.id) && 'fill-current',
+                  )}
+                />
+              </Button>
+            )}
 
             {/* Playback Controls */}
             <div className="flex items-center space-x-1">
