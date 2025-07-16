@@ -15,6 +15,9 @@ import {
   Command,
   ArrowRight,
   Clock,
+  Zap,
+  Home,
+  X,
 } from 'lucide-react';
 
 interface CommandPaletteProps {
@@ -31,6 +34,7 @@ interface CommandItem {
   keywords: string[];
   category: 'navigation' | 'actions' | 'search' | 'recent';
   href?: string;
+  badge?: string;
 }
 
 export default function CommandPalette({
@@ -40,7 +44,9 @@ export default function CommandPalette({
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [recentCommands, setRecentCommands] = useState<string[]>([]);
+  const [isAnimating, setIsAnimating] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { userIdentity } = useAuthStore();
 
@@ -56,10 +62,16 @@ export default function CommandPalette({
     }
   }, []);
 
-  // Focus input when opened
+  // Handle animations
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
+    if (isOpen) {
+      setIsAnimating(true);
+      // Focus input after animation starts
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+    } else {
+      setIsAnimating(false);
     }
   }, [isOpen]);
 
@@ -71,15 +83,19 @@ export default function CommandPalette({
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault();
-          setSelectedIndex((prev) =>
-            prev < filteredCommands.length - 1 ? prev + 1 : 0,
-          );
+          setSelectedIndex((prev) => {
+            const newIndex = prev < filteredCommands.length - 1 ? prev + 1 : 0;
+            scrollToSelected(newIndex);
+            return newIndex;
+          });
           break;
         case 'ArrowUp':
           e.preventDefault();
-          setSelectedIndex((prev) =>
-            prev > 0 ? prev - 1 : filteredCommands.length - 1,
-          );
+          setSelectedIndex((prev) => {
+            const newIndex = prev > 0 ? prev - 1 : filteredCommands.length - 1;
+            scrollToSelected(newIndex);
+            return newIndex;
+          });
           break;
         case 'Enter':
           e.preventDefault();
@@ -96,8 +112,21 @@ export default function CommandPalette({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, selectedIndex, query, onClose]);
+
+  const scrollToSelected = (index: number) => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const items = container.querySelectorAll('[data-command-item]');
+    const selectedItem = items[index];
+    if (selectedItem) {
+      selectedItem.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
+    }
+  };
 
   const saveRecentCommand = (commandId: string) => {
     const updated = [
@@ -124,90 +153,93 @@ export default function CommandPalette({
       {
         id: 'nav-dashboard',
         title: 'Dashboard',
-        description: 'Go to your dashboard',
-        icon: User,
+        description: 'Go to your personal dashboard',
+        icon: Home,
         action: () => router.push(`/${userIdentity.username}`),
-        keywords: ['dashboard', 'home', 'overview'],
+        keywords: ['dashboard', 'home', 'overview', 'profile'],
         category: 'navigation',
         href: `/${userIdentity.username}`,
       },
       {
         id: 'nav-tracks',
         title: 'Tracks',
-        description: 'Browse your track collection',
+        description: 'Browse your complete track collection',
         icon: Music,
         action: () => router.push(`/${userIdentity.username}/tracks`),
-        keywords: ['tracks', 'music', 'collection'],
+        keywords: ['tracks', 'music', 'collection', 'songs'],
         category: 'navigation',
         href: `/${userIdentity.username}/tracks`,
       },
       {
         id: 'nav-playlists',
         title: 'Playlists',
-        description: 'Manage your playlists',
+        description: 'Create and manage your playlists',
         icon: ListMusic,
         action: () => router.push(`/${userIdentity.username}/playlists`),
-        keywords: ['playlists', 'lists', 'music'],
+        keywords: ['playlists', 'lists', 'music', 'collections'],
         category: 'navigation',
         href: `/${userIdentity.username}/playlists`,
       },
       {
         id: 'nav-collection',
         title: 'Collection',
-        description: 'Explore your Discogs collection',
+        description: 'Explore your synced Discogs collection',
         icon: Search,
         action: () => router.push(`/${userIdentity.username}/collection`),
-        keywords: ['collection', 'discogs', 'explore'],
+        keywords: ['collection', 'discogs', 'explore', 'vinyl', 'records'],
         category: 'navigation',
         href: `/${userIdentity.username}/collection`,
       },
       {
         id: 'nav-analyze',
-        title: 'Analyze',
-        description: 'AI-powered music analysis',
+        title: 'AI Analysis',
+        description: 'Analyze music with AI-powered insights',
         icon: Brain,
         action: () => router.push('/analyze'),
-        keywords: ['analyze', 'ai', 'analysis'],
+        keywords: ['analyze', 'ai', 'analysis', 'insights', 'smart'],
         category: 'navigation',
         href: '/analyze',
+        badge: 'AI',
       },
       {
         id: 'nav-settings',
         title: 'Settings',
-        description: 'Manage your preferences',
+        description: 'Manage your account and preferences',
         icon: Settings,
         action: () => router.push('/settings'),
-        keywords: ['settings', 'preferences', 'config'],
+        keywords: ['settings', 'preferences', 'config', 'account'],
         category: 'navigation',
         href: '/settings',
       },
 
-      // Actions
+      // Quick Actions
       {
         id: 'action-new-playlist',
-        title: 'Create New Playlist',
-        description: 'Start a new playlist',
+        title: 'Create Playlist',
+        description: 'Start building a new playlist',
         icon: Plus,
         action: () => router.push(`/${userIdentity.username}/playlists/new`),
-        keywords: ['create', 'new', 'playlist'],
+        keywords: ['create', 'new', 'playlist', 'make'],
         category: 'actions',
+        badge: 'Quick',
       },
       {
         id: 'action-analyze-track',
         title: 'Analyze Track',
-        description: 'Analyze a track with AI',
-        icon: Brain,
+        description: 'Get AI-powered track analysis',
+        icon: Zap,
         action: () => router.push('/analyze'),
-        keywords: ['analyze', 'track', 'ai'],
+        keywords: ['analyze', 'track', 'ai', 'quick'],
         category: 'actions',
+        badge: 'AI',
       },
       {
         id: 'action-add-track',
         title: 'Add Track',
-        description: 'Add a new track to your collection',
+        description: 'Add new music to your collection',
         icon: Music,
         action: () => router.push(`/${userIdentity.username}/tracks/add`),
-        keywords: ['add', 'track', 'music'],
+        keywords: ['add', 'track', 'music', 'upload'],
         category: 'actions',
       },
     ];
@@ -231,6 +263,13 @@ export default function CommandPalette({
     );
   });
 
+  // Maintain selected index when filtering
+  useEffect(() => {
+    if (selectedIndex >= filteredCommands.length) {
+      setSelectedIndex(Math.max(0, filteredCommands.length - 1));
+    }
+  }, [filteredCommands.length, selectedIndex]);
+
   // Group commands by category
   const groupedCommands = filteredCommands.reduce(
     (acc, command) => {
@@ -251,92 +290,143 @@ export default function CommandPalette({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-start justify-center pt-[10vh]">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 overflow-hidden">
-        {/* Search Input */}
-        <div className="flex items-center p-4 border-b border-gray-200">
-          <Command className="w-5 h-5 text-gray-400 mr-3" />
-          <input
-            ref={inputRef}
-            type="text"
-            placeholder="Search commands and navigation..."
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setSelectedIndex(0);
-            }}
-            className="flex-1 text-lg outline-none"
-          />
-        </div>
+    <>
+      {/* Backdrop */}
+      <div
+        className={cn(
+          'fixed inset-0 bg-black/40 z-50 transition-opacity duration-200',
+          isAnimating ? 'opacity-100' : 'opacity-0',
+        )}
+        onClick={onClose}
+      />
 
-        {/* Results */}
-        <div className="max-h-96 overflow-y-auto">
-          {!query && recentCommandItems.length > 0 && (
-            <div className="p-2">
-              <div className="px-3 py-2 text-xs font-medium text-gray-500 flex items-center">
-                <Clock className="w-4 h-4 mr-2" />
-                Recent
-              </div>
-              {recentCommandItems.map((command, index) => (
-                <CommandButton
-                  key={command.id}
-                  command={command}
-                  isSelected={index === selectedIndex}
-                  onClick={() => executeCommand(command)}
-                />
-              ))}
-            </div>
+      {/* Command Palette */}
+      <div className="fixed inset-0 z-50 flex items-start justify-center pt-[10vh] px-4">
+        <div
+          className={cn(
+            'bg-white rounded-xl shadow-xl border border-gray-200 w-full max-w-xl overflow-hidden transition-all duration-200 ease-out',
+            isAnimating
+              ? 'opacity-100 scale-100 translate-y-0'
+              : 'opacity-0 scale-95 translate-y-2',
           )}
-
-          {Object.entries(groupedCommands).map(([category, commands]) => (
-            <div key={category} className="p-2">
-              <div className="px-3 py-2 text-xs font-medium text-gray-500 capitalize">
-                {category}
+        >
+          {/* Header */}
+          <div className="flex items-center px-4 py-3 border-b border-gray-200">
+            <div className="flex items-center flex-1">
+              <div className="flex items-center justify-center w-8 h-8 bg-yellow-400 rounded-lg mr-3">
+                <Command className="w-4 h-4 text-black" />
               </div>
-              {commands.map((command, index) => {
-                const globalIndex = filteredCommands.indexOf(command);
-                return (
-                  <CommandButton
-                    key={command.id}
-                    command={command}
-                    isSelected={globalIndex === selectedIndex}
-                    onClick={() => executeCommand(command)}
-                  />
-                );
-              })}
+              <input
+                ref={inputRef}
+                type="text"
+                placeholder="Type a command or search..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className="flex-1 text-sm bg-transparent border-none outline-none placeholder-gray-500"
+              />
             </div>
-          ))}
+            <button
+              onClick={onClose}
+              className="flex items-center justify-center w-6 h-6 rounded-md hover:bg-gray-100 transition-colors"
+            >
+              <X className="w-4 h-4 text-gray-400" />
+            </button>
+          </div>
 
-          {filteredCommands.length === 0 && (
-            <div className="p-8 text-center text-gray-500">
-              <Search className="w-8 h-8 mx-auto mb-4 text-gray-300" />
-              <p>No commands found</p>
-              <p className="text-sm mt-1">Try a different search term</p>
-            </div>
-          )}
-        </div>
+          {/* Results */}
+          <div ref={containerRef} className="max-h-80 overflow-y-auto">
+            {!query && recentCommandItems.length > 0 && (
+              <div className="p-3">
+                <div className="flex items-center px-2 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">
+                  <Clock className="w-3 h-3 mr-2" />
+                  Recent
+                </div>
+                <div className="space-y-0.5">
+                  {recentCommandItems.map((command, index) => (
+                    <CommandButton
+                      key={command.id}
+                      command={command}
+                      isSelected={index === selectedIndex}
+                      onClick={() => executeCommand(command)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
 
-        {/* Footer */}
-        <div className="p-3 border-t border-gray-200 bg-gray-50">
-          <div className="flex items-center justify-between text-xs text-gray-500">
-            <div className="flex items-center space-x-4">
-              <span className="flex items-center">
-                <kbd className="px-2 py-1 bg-white rounded border mr-1">↵</kbd>
-                to select
-              </span>
-              <span className="flex items-center">
-                <kbd className="px-2 py-1 bg-white rounded border mr-1">↑↓</kbd>
-                to navigate
-              </span>
+            {Object.entries(groupedCommands).map(
+              ([category, categoryCommands]) => (
+                <div key={category} className="p-3">
+                  <div className="flex items-center px-2 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">
+                    {category === 'navigation' && (
+                      <Home className="w-3 h-3 mr-2" />
+                    )}
+                    {category === 'actions' && <Zap className="w-3 h-3 mr-2" />}
+                    {category === 'search' && (
+                      <Search className="w-3 h-3 mr-2" />
+                    )}
+                    {category}
+                  </div>
+                  <div className="space-y-0.5">
+                    {categoryCommands.map((command) => {
+                      const globalIndex = filteredCommands.indexOf(command);
+                      return (
+                        <CommandButton
+                          key={command.id}
+                          command={command}
+                          isSelected={globalIndex === selectedIndex}
+                          onClick={() => executeCommand(command)}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              ),
+            )}
+
+            {filteredCommands.length === 0 && (
+              <div className="p-8 text-center">
+                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Search className="w-6 h-6 text-gray-400" />
+                </div>
+                <h3 className="text-sm font-medium text-gray-900 mb-1">
+                  No commands found
+                </h3>
+                <p className="text-xs text-gray-500">
+                  Try adjusting your search or browse available commands
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="px-4 py-3 bg-gray-50 border-t border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4 text-xs text-gray-500">
+                <div className="flex items-center">
+                  <kbd className="px-1.5 py-0.5 bg-white rounded border border-gray-200 text-xs font-mono mr-1">
+                    ↵
+                  </kbd>
+                  <span>to select</span>
+                </div>
+                <div className="flex items-center">
+                  <kbd className="px-1.5 py-0.5 bg-white rounded border border-gray-200 text-xs font-mono mr-1">
+                    ↑↓
+                  </kbd>
+                  <span>to navigate</span>
+                </div>
+              </div>
+              <div className="flex items-center text-xs text-gray-500">
+                <kbd className="px-1.5 py-0.5 bg-white rounded border border-gray-200 text-xs font-mono mr-1">
+                  esc
+                </kbd>
+                <span>to close</span>
+              </div>
             </div>
-            <span className="flex items-center">
-              <kbd className="px-2 py-1 bg-white rounded border mr-1">esc</kbd>
-              to close
-            </span>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -351,36 +441,69 @@ function CommandButton({ command, isSelected, onClick }: CommandButtonProps) {
 
   return (
     <button
+      data-command-item
       onClick={onClick}
       className={cn(
-        'w-full flex items-center p-3 rounded-lg text-left transition-colors',
-        isSelected ? 'bg-primary text-white' : 'hover:bg-gray-100',
+        'w-full flex items-center p-2 rounded-lg text-left transition-all duration-150 group',
+        isSelected ? 'bg-yellow-400 text-black' : 'hover:bg-gray-100',
       )}
     >
-      <Icon
+      <div
         className={cn(
-          'w-5 h-5 mr-3',
-          isSelected ? 'text-white' : 'text-gray-400',
+          'flex items-center justify-center w-8 h-8 rounded-md mr-3 transition-colors',
+          isSelected ? 'bg-black/10' : 'bg-gray-100 group-hover:bg-gray-200',
         )}
-      />
+      >
+        <Icon
+          className={cn(
+            'w-4 h-4 transition-colors',
+            isSelected ? 'text-black' : 'text-gray-600',
+          )}
+        />
+      </div>
+
       <div className="flex-1 min-w-0">
-        <div className="font-medium truncate">{command.title}</div>
+        <div className="flex items-center">
+          <div
+            className={cn(
+              'text-sm font-medium truncate transition-colors',
+              isSelected ? 'text-black' : 'text-gray-900',
+            )}
+          >
+            {command.title}
+          </div>
+          {command.badge && (
+            <span
+              className={cn(
+                'ml-2 px-1.5 py-0.5 text-xs font-medium rounded-full',
+                isSelected
+                  ? 'bg-black/10 text-black'
+                  : 'bg-yellow-100 text-yellow-800',
+              )}
+            >
+              {command.badge}
+            </span>
+          )}
+        </div>
         {command.description && (
           <div
             className={cn(
-              'text-sm truncate',
-              isSelected ? 'text-white/80' : 'text-gray-500',
+              'text-xs truncate transition-colors',
+              isSelected ? 'text-black/70' : 'text-gray-500',
             )}
           >
             {command.description}
           </div>
         )}
       </div>
+
       {command.href && (
         <ArrowRight
           className={cn(
-            'w-4 h-4 ml-2',
-            isSelected ? 'text-white' : 'text-gray-400',
+            'w-4 h-4 ml-2 transition-all duration-150',
+            isSelected
+              ? 'text-black translate-x-0'
+              : 'text-gray-400 group-hover:translate-x-0.5',
           )}
         />
       )}
