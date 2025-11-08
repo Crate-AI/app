@@ -66,7 +66,7 @@ const HomeClient = ({}: HomeClientProps) => {
             Your AI-powered music collection analyzer
           </p>
           <p className="text-base text-muted-foreground mb-8">
-            Connect your Discogs collection and discover insights about your
+            Connect your Music collection and discover insights about your
             music with AI-powered analysis.
           </p>
 
