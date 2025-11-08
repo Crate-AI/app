@@ -228,7 +228,50 @@ export type Database = {
           user_id?: string | null;
           username?: string;
         };
-        Relationships: [];
+                Relationships: [];
+      };
+      user_favorites: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          track_id: string | null;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          track_id?: string | null;
+          created_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          track_id?: string | null;
+          created_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'user_favorites_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'user_favorites_track_id_fkey';
+            columns: ['track_id'];
+            isOneToOne: false;
+            referencedRelation: 'tracks';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'user_favorites_track_id_fkey';
+            columns: ['track_id'];
+            isOneToOne: false;
+            referencedRelation: 'user_releases_and_tracks';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       user_releases: {
         Row: {

@@ -9,8 +9,6 @@ interface SearchViewProps {
   results: DiscogsSearchResult[];
   onQueryChange: (query: string) => void;
   viewMode: 'grid' | 'list';
-  playingTrackId: number | null;
-  onPlayToggle: (id: number) => void;
 }
 
 const SearchView = ({
@@ -20,8 +18,6 @@ const SearchView = ({
   results,
   onQueryChange,
   viewMode,
-  playingTrackId,
-  onPlayToggle,
 }: SearchViewProps) => {
   return (
     <>
@@ -39,8 +35,6 @@ const SearchView = ({
         <TrackGrid
           viewMode={viewMode}
           items={results}
-          playingTrackId={playingTrackId}
-          onPlayToggle={onPlayToggle}
         />
       )}
     </>

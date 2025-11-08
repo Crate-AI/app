@@ -103,26 +103,54 @@ const DashboardStats = ({ tracks }: { tracks: CrateTrack[] }) => {
 };
 
 const FavoritesSection = ({ allTracks }: { allTracks: CrateTrack[] }) => {
-  const { togglePlayPause, playingTrackId, isPlaying, setQueue } =
+  const { togglePlayPause, playingTrackId, isPlaying, setQueue, isReady, initializePlayer } =
     usePlayerStore();
-  const { getFavoriteTracksFromAllTracks, toggleFavorite, isFavorite } =
+  const { getFavoriteTracksFromAllTracks, toggleFavorite, isFavorite, isLoading, loadFavorites } =
     useFavoritesStore();
   const favoriteTracks = getFavoriteTracksFromAllTracks(allTracks).slice(0, 6);
 
+  // Initialize player and load favorites when component mounts
+  useEffect(() => {
+    initializePlayer();
+    loadFavorites();
+  }, [initializePlayer, loadFavorites]);
+
   const handlePlayTrack = (track: CrateTrack) => {
-    const trackIndex = allTracks.findIndex((t) => t.id === track.id);
-    setQueue(allTracks, trackIndex);
-    togglePlayPause(track);
+    if (!track.youtube_video_id) {
+      toast.error('No audio available for this track');
+      return;
+    }
+
+    if (!isReady) {
+      toast.error('Player is still loading...');
+      return;
+    }
+
+    try {
+      // Set up the queue with favorite tracks, but use all tracks for context
+      const trackIndex = allTracks.findIndex((t) => t.id === track.id);
+      setQueue(allTracks, trackIndex);
+      togglePlayPause(track);
+    } catch (error) {
+      console.error('Error playing track:', error);
+      toast.error('Failed to play track');
+    }
   };
 
-  const handleToggleFavorite = (trackId: string) => {
+  const handleToggleFavorite = async (trackId: string) => {
     const wasFavorite = isFavorite(trackId);
-    toggleFavorite(trackId);
-
-    if (wasFavorite) {
-      toast.success('Removed from favorites');
-    } else {
-      toast.success('Added to favorites');
+    
+    try {
+      await toggleFavorite(trackId);
+      
+      if (wasFavorite) {
+        toast.success('Removed from favorites');
+      } else {
+        toast.success('Added to favorites');
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      toast.error('Failed to update favorites');
     }
   };
 
@@ -136,7 +164,12 @@ const FavoritesSection = ({ allTracks }: { allTracks: CrateTrack[] }) => {
       </CardHeader>
       <CardContent className="p-4">
         <div className="space-y-3">
-          {favoriteTracks.length === 0 ? (
+          {isLoading ? (
+            <div className="text-center text-gray-500 py-8">
+              <div className="animate-spin w-8 h-8 border-2 border-mainAccent border-t-transparent rounded-full mx-auto mb-2" />
+              <p>Loading favorites...</p>
+            </div>
+          ) : favoriteTracks.length === 0 ? (
             <div className="text-center text-gray-500 py-8">
               <Heart className="w-8 h-8 mx-auto mb-2 text-gray-400" />
               <p>No favorite tracks yet</p>
@@ -158,10 +191,19 @@ const FavoritesSection = ({ allTracks }: { allTracks: CrateTrack[] }) => {
                     e.stopPropagation();
                     handlePlayTrack(track);
                   }}
-                  className="h-8 w-8 p-0 bg-main hover:bg-mainAccent border border-black rounded-base"
+                  disabled={!track.youtube_video_id || !isReady}
+                  className={cn(
+                    'h-8 w-8 p-0 border border-black rounded-base',
+                    playingTrackId === track.id && isPlaying
+                      ? 'bg-main/20 hover:bg-main/30'
+                      : 'bg-main hover:bg-mainAccent',
+                  )}
                 >
                   {playingTrackId === track.id && isPlaying ? (
-                    <Pause className="w-4 h-4 text-black" />
+                    <>
+                      <Pause className="w-4 h-4 text-black" />
+                      <span className="absolute inset-0 rounded-full animate-pulse-light bg-main/30" />
+                    </>
                   ) : (
                     <Play className="w-4 h-4 text-black" />
                   )}

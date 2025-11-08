@@ -74,16 +74,22 @@ const PersistentPlayer = () => {
     }
   };
 
-  const handleToggleFavorite = (trackId: string) => {
+  const handleToggleFavorite = async (trackId: string) => {
     if (!trackId) return;
 
     const wasFavorite = isFavorite(trackId);
-    toggleFavorite(trackId);
-
-    if (wasFavorite) {
-      toast.success('Removed from favorites');
-    } else {
-      toast.success('Added to favorites');
+    
+    try {
+      await toggleFavorite(trackId);
+      
+      if (wasFavorite) {
+        toast.success('Removed from favorites');
+      } else {
+        toast.success('Added to favorites');
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      toast.error('Failed to update favorites');
     }
   };
 

@@ -1,12 +1,11 @@
 import { CollectionRelease } from '@/types';
 import TrackGrid from '@/features/crate-explorer/tracks/TrackGrid';
+
 interface CollectionViewProps {
   isLoading: boolean;
   error: string | null;
   collection: CollectionRelease[];
   viewMode: 'grid' | 'list';
-  playingTrackId: number | null;
-  onPlayToggle: (id: number) => void;
 }
 
 const CollectionView = ({
@@ -14,8 +13,6 @@ const CollectionView = ({
   error,
   collection,
   viewMode,
-  playingTrackId,
-  onPlayToggle,
 }: CollectionViewProps) => {
   if (isLoading) return <div>Loading collection...</div>;
   if (error) return <div className="text-red-500">{error}</div>;
@@ -40,8 +37,6 @@ const CollectionView = ({
         resource_url: `https://api.discogs.com/releases/${release.basic_information.id}`,
         date_added: release.date_added,
       }))}
-      playingTrackId={playingTrackId}
-      onPlayToggle={onPlayToggle}
     />
   );
 };

@@ -106,16 +106,38 @@ export const CollectionUtils = (supabase: SupabaseClient<Database>) => {
       throw new Error(userError.message);
     }
 
-    const { data: tracksData, error: tracksError } = await supabase.rpc(
-      'fetch_discogs_releases_and_tracks',
-      {
-        user_id: userData.user.id,
-      },
-    );
-    if (tracksError) {
-      throw tracksError;
+    // Fetch tracks in batches to avoid max_rows limit
+    const BATCH_SIZE = 1000;
+    let allTracks: Database['public']['Views']['user_releases_and_tracks']['Row'][] = [];
+    let offset = 0;
+    let hasMore = true;
+
+    while (hasMore) {
+      const { data: tracksData, error: tracksError } = await supabase
+        .from('user_releases_and_tracks')
+        .select('*')
+        .eq('user_id', userData.user.id)
+        .order('id', { ascending: true })
+        .range(offset, offset + BATCH_SIZE - 1);
+
+      if (tracksError) {
+        throw tracksError;
+      }
+
+      if (!tracksData || tracksData.length === 0) {
+        hasMore = false;
+      } else {
+        allTracks = [...allTracks, ...tracksData];
+        offset += BATCH_SIZE;
+        
+        // If we got fewer than BATCH_SIZE, we've reached the end
+        if (tracksData.length < BATCH_SIZE) {
+          hasMore = false;
+        }
+      }
     }
-    return tracksData;
+
+    return allTracks;
   };
 
   const getReleaseTracks = async (releaseId: string) => {

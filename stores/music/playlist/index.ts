@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { CrateTrack, PlaylistWithTracks } from '@/types';
 import { toast } from 'sonner';
+import { isExternalTrack } from '@/lib/utils/track-conversion';
 
 interface PlaylistStore {
   playlists: PlaylistWithTracks[];
@@ -10,6 +11,7 @@ interface PlaylistStore {
   fetchPlaylists: () => Promise<void>;
   createPlaylist: (title: string, description?: string) => Promise<string>;
   addTrackToPlaylist: (playlistId: string, trackId: string) => Promise<void>;
+  addExternalTrackToPlaylist: (playlistId: string, track: CrateTrack) => Promise<void>;
   removeTrackFromPlaylist: (
     playlistId: string,
     trackId: string,
@@ -94,6 +96,11 @@ export const usePlaylistStore = create<PlaylistStore>((set, get) => {
 
     addTrackToPlaylist: async (playlistId: string, trackId: string) => {
       try {
+        // Check if this is an external track
+        if (isExternalTrack(trackId)) {
+          throw new Error('Use addExternalTrackToPlaylist for external tracks');
+        }
+
         const response = await fetch(
           `/api/music/playlists/${playlistId}/tracks`,
           {
@@ -117,6 +124,49 @@ export const usePlaylistStore = create<PlaylistStore>((set, get) => {
           error instanceof Error
             ? error.message
             : 'Failed to add track to playlist';
+        toast.error(message);
+        throw error;
+      }
+    },
+
+    addExternalTrackToPlaylist: async (playlistId: string, track: CrateTrack) => {
+      try {
+        const response = await fetch(
+          `/api/music/playlists/${playlistId}/external-tracks`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ track }),
+          },
+        );
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Failed to add external track to playlist');
+        }
+
+        // Update local state optimistically
+        set((state) => ({
+          playlists: state.playlists.map((playlist) => {
+            if (playlist.id === playlistId) {
+              return {
+                ...playlist,
+                tracks: [...(playlist.tracks || []), track],
+              };
+            }
+            return playlist;
+          }),
+        }));
+
+        toast.success('Track added to playlist');
+      } catch (error) {
+        console.error('PlaylistStore: Error adding external track to playlist:', error);
+        const message =
+          error instanceof Error
+            ? error.message
+            : 'Failed to add external track to playlist';
         toast.error(message);
         throw error;
       }

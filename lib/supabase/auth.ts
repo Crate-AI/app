@@ -39,3 +39,16 @@ export async function initializeAuth() {
     return null;
   }
 }
+
+export async function logout() {
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Logout error:', error);
+      throw error;
+    }
+  } catch (error) {
+    console.error('Logout error:', error);
+    throw error;
+  }
+}

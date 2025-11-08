@@ -40,7 +40,7 @@ const HomeClient = ({}: HomeClientProps) => {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="bg-white text-black p-6 flex justify-between items-center shadow-lg">
+      <header className="bg-transparent text-black p-6 flex justify-between items-center">
         <div className="flex items-center">
           <Image
             src="/logo.svg"
