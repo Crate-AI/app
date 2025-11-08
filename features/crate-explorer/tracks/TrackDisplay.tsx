@@ -6,6 +6,7 @@ import { createContext, useContext } from 'react';
 interface TrackContextType {
   result: any;
   isPlaying: boolean;
+  isLoading?: boolean;
   onPlayToggle: () => void;
   dateAdded?: string;
 }
@@ -25,6 +26,7 @@ export const useTrackContext = () => {
 const TrackDisplay = ({
   result,
   isPlaying,
+  isLoading,
   onPlayToggle,
   viewMode,
   dateAdded,
@@ -33,7 +35,7 @@ const TrackDisplay = ({
 
   return (
     <TrackContext.Provider
-      value={{ result, isPlaying, onPlayToggle, dateAdded }}
+      value={{ result, isPlaying, isLoading, onPlayToggle, dateAdded }}
     >
       {viewMode === 'list' ? <TrackDisplayList /> : <TrackDisplayGrid />}
     </TrackContext.Provider>

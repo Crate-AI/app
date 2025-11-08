@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores';
 import { cn } from '@/lib/utils/utils';
+import { logout } from '@/lib/supabase/auth';
 import {
   Search,
   Bell,
@@ -117,9 +118,15 @@ export default function TopBar({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
-    // Add logout logic here
-    router.push('/');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      // The AuthProvider will handle redirecting to '/' and clearing the auth state
+    } catch (error) {
+      console.error('Failed to logout:', error);
+      // Fallback to manual redirect if logout fails
+      router.push('/');
+    }
   };
 
   const handleQuickAction = (action: string) => {

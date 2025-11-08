@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import useDiscogsSearch from '@/lib/hooks/useDiscogsSearch';
 import { useDiscogsCollection } from '@/lib/hooks/useDiscogsCollection';
+import { usePlayerStore } from '@/stores';
 import ViewToggle from './components/ViewToggle';
 import type { CrateExplorerProps } from '@/types';
 import ViewToggleButtons from './components/ViewToggleButtons';
@@ -28,9 +29,15 @@ const CrateExplorer = ({}: CrateExplorerProps) => {
     loading: collectionLoading,
     error: collectionError,
   } = useDiscogsCollection();
-  const [playingTrackId, setPlayingTrackId] = useState<number | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [view, setView] = useState<'search' | 'collection'>('search');
+  
+  // Initialize player when component mounts
+  const { initializePlayer } = usePlayerStore();
+  
+  useEffect(() => {
+    initializePlayer();
+  }, [initializePlayer]);
   const [collectionStats, setCollectionStats] = useState<CollectionStats>({
     total: 0,
     loaded: 0,
@@ -64,10 +71,6 @@ const CrateExplorer = ({}: CrateExplorerProps) => {
           results={results}
           onQueryChange={setQuery}
           viewMode={viewMode}
-          playingTrackId={playingTrackId}
-          onPlayToggle={(id) =>
-            setPlayingTrackId(playingTrackId === id ? null : id)
-          }
         />
       ) : (
         <CollectionView
@@ -75,10 +78,6 @@ const CrateExplorer = ({}: CrateExplorerProps) => {
           error={collectionError}
           collection={collection}
           viewMode={viewMode}
-          playingTrackId={playingTrackId}
-          onPlayToggle={(id) =>
-            setPlayingTrackId(playingTrackId === id ? null : id)
-          }
         />
       )}
     </div>

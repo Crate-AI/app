@@ -194,6 +194,7 @@ export interface UserDetails {
 export interface TrackDisplayProps {
   result: DiscogsSearchResult;
   isPlaying: boolean;
+  isLoading?: boolean;
   onPlayToggle: () => void;
   viewMode: 'grid' | 'list';
   dateAdded: string;
