@@ -37,3 +37,5 @@ next-env.d.ts
 
 # storage
 storage.json
+.aider*
+.env
