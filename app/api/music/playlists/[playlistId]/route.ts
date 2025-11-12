@@ -86,6 +86,49 @@ export async function PUT(
   }
 }
 
+export async function PATCH(
+  request: Request,
+  { params }: { params: { playlistId: string } },
+) {
+  try {
+    const cookieStore = cookies();
+    const supabase = await createClient();
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { is_public } = await request.json();
+
+    const { data: playlist, error } = await supabase
+      .from('playlists')
+      .update({ is_public })
+      .eq('id', params.playlistId)
+      .eq('user_id', session.user.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    if (!playlist) {
+      return NextResponse.json(
+        { error: 'Playlist not found' },
+        { status: 404 },
+      );
+    }
+
+    return NextResponse.json(playlist);
+  } catch (error) {
+    console.error('Error updating playlist:', error);
+    return NextResponse.json(
+      { error: (error as Error).message },
+      { status: 500 },
+    );
+  }
+}
+
 export async function DELETE(
   request: Request,
   { params }: { params: { playlistId: string } },

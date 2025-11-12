@@ -1,19 +1,20 @@
 'use client';
 
 import { useEffect } from 'react';
-import { Play, Pause, Trash2 } from 'lucide-react';
+import { Play, Pause, Trash2, Globe, Lock } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils/utils';
 import { usePlaylistStore, usePlayerStore } from '@/stores';
 import { formatDuration } from '@/lib/utils/format';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 
 interface PlaylistProps {
   activePlaylistId: string;
 }
 
 export const Playlist = ({ activePlaylistId }: PlaylistProps) => {
-  const { playlists, removeTrackFromPlaylist } = usePlaylistStore();
+  const { playlists, removeTrackFromPlaylist, togglePlaylistPublic } = usePlaylistStore();
   const { initializePlayer, playingTrackId, isPlaying, togglePlayPause } =
     usePlayerStore();
 
@@ -37,10 +38,38 @@ export const Playlist = ({ activePlaylistId }: PlaylistProps) => {
 
   return (
     <div className="relative overflow-x-auto">
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-medium-title font-heading font-bold text-text">
-          {activePlaylist.title}
-        </h2>
+      <div className="mb-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-medium-title font-heading font-bold text-text">
+            {activePlaylist.title}
+          </h2>
+        </div>
+        
+        <div className="flex items-center gap-3 pb-4 border-b border-border">
+          <Switch
+            id={`public-${activePlaylist.id}`}
+            checked={activePlaylist.is_public ?? false}
+            onCheckedChange={(checked) => {
+              togglePlaylistPublic(activePlaylist.id, checked);
+            }}
+          />
+          <label
+            htmlFor={`public-${activePlaylist.id}`}
+            className="text-sm font-medium cursor-pointer flex items-center gap-2"
+          >
+            {activePlaylist.is_public ? (
+              <>
+                <Globe className="h-4 w-4" />
+                Public Playlist
+              </>
+            ) : (
+              <>
+                <Lock className="h-4 w-4" />
+                Private Playlist
+              </>
+            )}
+          </label>
+        </div>
       </div>
 
       <table className="min-w-full divide-y divide-border">
