@@ -22,6 +22,7 @@ interface PlaylistStore {
     newPosition: number,
   ) => Promise<void>;
   deletePlaylist: (playlistId: string) => Promise<void>;
+  togglePlaylistPublic: (playlistId: string, isPublic: boolean) => Promise<void>;
   clearError: () => void;
 }
 
@@ -273,6 +274,37 @@ export const usePlaylistStore = create<PlaylistStore>((set, get) => {
         throw error;
       } finally {
         set({ isLoading: false });
+      }
+    },
+
+    togglePlaylistPublic: async (playlistId: string, isPublic: boolean) => {
+      try {
+        const response = await fetch(`/api/music/playlists/${playlistId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ is_public: isPublic }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update playlist visibility');
+        }
+
+        // Update local state
+        set((state) => ({
+          playlists: state.playlists.map((playlist) =>
+            playlist.id === playlistId
+              ? { ...playlist, is_public: isPublic }
+              : playlist
+          ),
+        }));
+
+        toast.success(`Playlist is now ${isPublic ? 'public' : 'private'}`);
+      } catch (error) {
+        console.error('PlaylistStore: Error toggling playlist public:', error);
+        toast.error('Failed to update playlist visibility');
+        throw error;
       }
     },
 

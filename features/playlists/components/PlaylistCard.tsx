@@ -1,10 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Play, Pause, Trash2 } from 'lucide-react';
+import { Play, Pause, Trash2, Globe, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils/utils';
 import { PlaylistWithTracks } from '@/types';
 import Image from 'next/image';
 import { usePlayerStore, usePlaylistStore } from '@/stores';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 
 interface PlaylistCardProps {
@@ -18,7 +19,7 @@ export const PlaylistCard = ({
   handleClick,
   onExpand,
 }: PlaylistCardProps) => {
-  const { deletePlaylist } = usePlaylistStore();
+  const { deletePlaylist, togglePlaylistPublic } = usePlaylistStore();
   const { playingTrackId, isPlaying, togglePlayPause } = usePlayerStore();
 
   const isPlayingThisPlaylist = playlist.tracks?.some(
@@ -100,13 +101,35 @@ export const PlaylistCard = ({
         )}
       </CardHeader>
 
-      <CardContent className="p-4 bg-bg">
+      <CardContent className="p-4 bg-bg space-y-3">
         <CardTitle className="text-lg font-heading font-medium text-text mb-1">
           {playlist?.title}
         </CardTitle>
         <p className="text-small-subtitle text-text/70">
           {playlist?.tracks?.length} tracks
         </p>
+
+        <div className="flex items-center justify-between pt-3 border-t border-border/50">
+          <div className="flex items-center gap-2">
+            <label
+              htmlFor={`public-${playlist.id}`}
+              className="text-xs font-medium cursor-pointer flex items-center gap-1.5"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {playlist.is_public ? (
+                <>
+                  <Globe className="h-3 w-3" />
+                  Public
+                </>
+              ) : (
+                <>
+                  <Lock className="h-3 w-3" />
+                  Private
+                </>
+              )}
+            </label>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
