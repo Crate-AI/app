@@ -16,6 +16,7 @@ import {
   PlusCircle,
   ListPlus,
   Plus,
+  Heart,
 } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils/utils';
@@ -101,11 +102,37 @@ export default function TracksTable() {
       timestamp: number;
     }>
   >([]);
+  const [favoriteTrackIds, setFavoriteTrackIds] = useState<Set<string>>(
+    new Set(),
+  );
+  const [favoritesPlaylistId, setFavoritesPlaylistId] = useState<string | null>(
+    null,
+  );
+  const [isTogglingFavorite, setIsTogglingFavorite] = useState<string | null>(
+    null,
+  );
 
   // Initialize player when component mounts
   useEffect(() => {
     initializePlayer();
   }, [initializePlayer]);
+
+  // Fetch favorites on mount
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      try {
+        const response = await fetch('/api/music/favorites');
+        if (response.ok) {
+          const data = await response.json();
+          setFavoriteTrackIds(new Set(data.favoriteTrackIds || []));
+        }
+      } catch (error) {
+        console.error('Error fetching favorites:', error);
+      }
+    };
+
+    fetchFavorites();
+  }, []);
 
   const handlePlayToggle = async (track: CrateTrack) => {
     if (!track.youtube_video_id) {
@@ -139,14 +166,67 @@ export default function TracksTable() {
     toast.success(`Added "${track.title}" to queue`);
   };
 
+  const handleToggleFavorite = async (track: CrateTrack) => {
+    if (!favoritesPlaylistId) {
+      toast.error('Favorites playlist not found');
+      return;
+    }
+
+    setIsTogglingFavorite(track.id);
+    try {
+      const isFavorite = favoriteTrackIds.has(track.id);
+
+      if (isFavorite) {
+        // Remove from favorites
+        const response = await fetch('/api/music/favorites', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ trackId: track.id }),
+        });
+
+        if (response.ok) {
+          setFavoriteTrackIds((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(track.id);
+            return newSet;
+          });
+          toast.success('Removed from favorites');
+        } else {
+          toast.error('Failed to remove from favorites');
+        }
+      } else {
+        // Add to favorites
+        const response = await fetch('/api/music/favorites', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ trackId: track.id }),
+        });
+
+        if (response.ok) {
+          setFavoriteTrackIds((prev) => new Set([...prev, track.id]));
+          toast.success('Added to favorites');
+        } else {
+          toast.error('Failed to add to favorites');
+        }
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      toast.error('Failed to update favorite');
+    } finally {
+      setIsTogglingFavorite(null);
+    }
+  };
+
   useEffect(() => {
     const getPlaylists = async () => {
       try {
-        const fetchedPlaylists = await fetchPlaylists();
-        // Safely set playlists if they exist
-        if (Array.isArray(fetchedPlaylists)) {
-          setPlaylists(fetchedPlaylists);
+        // FIXME: incorrect type returned by fetchPlaylists
+        const fetchedPlaylists: any[] = await fetchPlaylists();
+        const favPlaylist = fetchedPlaylists.find((p) => p.is_favorites);
+        if (favPlaylist) {
+          setFavoritesPlaylistId(favPlaylist.id);
         }
+        setPlaylists(fetchedPlaylists);
       } catch (error) {
         console.error('Error fetching playlists:', error);
         setError('Failed to fetch playlists');
@@ -292,6 +372,35 @@ export default function TracksTable() {
 
   const columns = useMemo(
     () => [
+      // Favorites column
+      columnHelper.display({
+        id: 'favorite',
+        header: '',
+        cell: ({ row }) => {
+          const track = row.original;
+          const isFavorite = favoriteTrackIds.has(track.id);
+          const isToggling = isTogglingFavorite === track.id;
+
+          return (
+            <Button
+              variant="noShadow"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => handleToggleFavorite(track)}
+              disabled={isToggling}
+            >
+              <Heart
+                className={cn(
+                  'h-4 w-4 transition-colors',
+                  isFavorite
+                    ? 'fill-red-500 text-red-500'
+                    : 'text-gray-400 hover:text-red-500',
+                )}
+              />
+            </Button>
+          );
+        },
+      }),
       // Combined Play/Position column with contextual actions
       columnHelper.display({
         id: 'playActions',
@@ -499,6 +608,8 @@ export default function TracksTable() {
       handlePlayToggle,
       handleAddToPlaylist,
       playlists,
+      favoriteTrackIds,
+      isTogglingFavorite,
     ],
   );
 
@@ -568,7 +679,7 @@ export default function TracksTable() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                {Array.from({ length: 5 }).map((_, i) => (
+                {Array.from({ length: 6 }).map((_, i) => (
                   <th key={i} className="px-4 py-3">
                     <div className="h-4 bg-gray-200 rounded w-20 animate-pulse"></div>
                   </th>
@@ -578,6 +689,9 @@ export default function TracksTable() {
             <tbody>
               {Array.from({ length: 8 }).map((_, rowIndex) => (
                 <tr key={rowIndex} className="border-b border-gray-100">
+                  <td className="px-4 py-4">
+                    <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
+                  </td>
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
@@ -693,9 +807,9 @@ export default function TracksTable() {
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                   </th>
                 ))}
               </tr>
