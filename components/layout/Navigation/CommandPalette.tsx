@@ -10,11 +10,11 @@ import {
   ListMusic,
   Plus,
   Settings,
-  User,
   Command,
   ArrowRight,
   Clock,
   Home,
+  Zap,
   X,
 } from 'lucide-react';
 
