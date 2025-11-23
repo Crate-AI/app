@@ -94,7 +94,7 @@ const PersistentPlayer = () => {
   };
 
   const handleTrackClick = (track: CrateTrack, index: number) => {
-    const trackIndex = queue.findIndex((t) => t.id === track.id);
+    const trackIndex = queue.findIndex((t: CrateTrack) => t.id === track.id);
     if (trackIndex !== -1) {
       setQueue(queue, trackIndex);
       togglePlayPause(track);
@@ -128,7 +128,7 @@ const PersistentPlayer = () => {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-bg border-t-2 border-black">
+    <div className="w-full z-[60] bg-bg border-t-2 border-black">
       {/* Queue Panel */}
       {showQueue && (
         <div className="max-h-96 overflow-y-auto bg-white border-t-2 border-black">
@@ -156,7 +156,7 @@ const PersistentPlayer = () => {
               </div>
             </div>
             <div className="space-y-2">
-              {queue.map((track, index) => (
+              {queue.map((track: CrateTrack, index: number) => (
                 <div
                   key={track.id}
                   className={cn(
@@ -221,10 +221,10 @@ const PersistentPlayer = () => {
       {/* Main Player */}
       <Card className="rounded-none border-0 shadow-none">
         <CardContent className="p-3">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             {/* Progress Bar Section */}
-            <div className="flex items-center space-x-2 w-48">
-              <span className="text-xs text-gray-500 font-mono w-8 text-right">
+            <div className="flex items-center space-x-2 w-24 sm:w-48">
+              <span className="hidden sm:inline text-xs text-gray-500 font-mono w-8 text-right">
                 {formatTime(currentTime)}
               </span>
               <div className="flex-1 relative">
@@ -237,11 +237,11 @@ const PersistentPlayer = () => {
                   disabled={!duration}
                   className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer disabled:cursor-not-allowed"
                   style={{
-                    background: `linear-gradient(to right, #fddd00 0%, #fddd00 ${progressPercentage}%, #e5e5e5 ${progressPercentage}%, #e5e5e5 100%)`,
+                    background: `linear-gradient(to right, #FFDC58 0%, #FFDC58 ${progressPercentage}%, #e5e5e5 ${progressPercentage}%, #e5e5e5 100%)`,
                   }}
                 />
               </div>
-              <span className="text-xs text-gray-500 font-mono w-8">
+              <span className="hidden sm:inline text-xs text-gray-500 font-mono w-8">
                 {formatTime(duration)}
               </span>
             </div>
@@ -372,30 +372,35 @@ const PersistentPlayer = () => {
 
             {/* Volume & Queue Controls */}
             <div className="flex items-center space-x-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={toggleMute}
-                className="h-8 w-8 p-0 bg-white hover:bg-gray-100 border border-black rounded-base icon-button"
-              >
-                {isMuted || volume === 0 ? (
-                  <VolumeX className="w-4 h-4" />
-                ) : (
-                  <Volume2 className="w-4 h-4" />
-                )}
-              </Button>
+              <div className="hidden sm:flex items-center space-x-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={toggleMute}
+                  className="h-8 w-8 p-0 bg-white hover:bg-gray-100 border border-black rounded-base icon-button"
+                >
+                  {isMuted || volume === 0 ? (
+                    <VolumeX className="w-4 h-4" />
+                  ) : (
+                    <Volume2 className="w-4 h-4" />
+                  )}
+                </Button>
 
-              <div className="w-16">
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={volume}
-                  onChange={(e) =>
-                    handleVolumeChange([parseInt(e.target.value)])
-                  }
-                  className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer interactive-element"
-                />
+                <div className="w-16">
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={volume}
+                    onChange={(e) =>
+                      handleVolumeChange([parseInt(e.target.value)])
+                    }
+                    className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer interactive-element"
+                    style={{
+                      background: `linear-gradient(to right, #FFDC58 0%, #FFDC58 ${volume}%, #e5e5e5 ${volume}%, #e5e5e5 100%)`,
+                    }}
+                  />
+                </div>
               </div>
 
               <Button

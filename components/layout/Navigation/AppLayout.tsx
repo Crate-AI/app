@@ -22,8 +22,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
   // Enable keyboard navigation
   useKeyboardNavigation();
 
-  // Handle responsive behavior
+  // Handle responsive behavior and persistence
   useEffect(() => {
+    // Check localStorage for sidebar state
+    const savedState = localStorage.getItem('crate-sidebar-collapsed');
+    if (savedState !== null) {
+      setSidebarCollapsed(JSON.parse(savedState));
+    }
+
     const handleResize = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
@@ -39,6 +45,13 @@ export default function AppLayout({ children }: AppLayoutProps) {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Persist sidebar state
+  const toggleSidebar = () => {
+    const newState = !sidebarCollapsed;
+    setSidebarCollapsed(newState);
+    localStorage.setItem('crate-sidebar-collapsed', JSON.stringify(newState));
+  };
 
   // Close mobile menu when clicking outside
   useEffect(() => {
@@ -64,7 +77,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         if (isMobile) {
           setMobileMenuOpen(!mobileMenuOpen);
         } else {
-          setSidebarCollapsed(!sidebarCollapsed);
+          toggleSidebar();
         }
       }
 
@@ -94,63 +107,69 @@ export default function AppLayout({ children }: AppLayoutProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="h-screen flex flex-col overflow-hidden bg-gray-50">
       {/* Mobile Menu Overlay */}
       {isMobile && mobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-[55] md:hidden"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
-      <div
-        id="sidebar"
-        className={cn(
-          'fixed left-0 top-0 h-full transition-transform duration-300 z-50',
-          isMobile
-            ? mobileMenuOpen
-              ? 'translate-x-0'
-              : '-translate-x-full'
-            : 'translate-x-0',
-        )}
-      >
-        <Sidebar
-          collapsed={!isMobile && sidebarCollapsed}
-          onToggle={() => {
-            if (isMobile) {
-              setMobileMenuOpen(!mobileMenuOpen);
-            } else {
-              setSidebarCollapsed(!sidebarCollapsed);
-            }
-          }}
-        />
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Sidebar Wrapper */}
+        <div
+          id="sidebar"
+          className={cn(
+            'transition-all duration-300 z-[60] bg-white border-r border-gray-200 flex-shrink-0',
+            isMobile
+              ? cn(
+                  'fixed inset-y-0 left-0 h-full',
+                  mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+                )
+              : cn(
+                  'relative',
+                  sidebarCollapsed ? 'w-16' : 'w-64'
+                )
+          )}
+        >
+          <Sidebar
+            collapsed={!isMobile && sidebarCollapsed}
+            onToggle={() => {
+              if (isMobile) {
+                setMobileMenuOpen(!mobileMenuOpen);
+              } else {
+                toggleSidebar();
+              }
+            }}
+          />
+        </div>
+
+        {/* Main Content Wrapper */}
+        <div className="flex flex-col flex-1 min-w-0 overflow-hidden relative">
+          {/* Top Bar */}
+          <TopBar
+            sidebarCollapsed={sidebarCollapsed}
+            onMobileMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
+            mobileMenuOpen={mobileMenuOpen}
+          />
+
+          {/* Scrollable Page Content */}
+          <main className="flex-1 overflow-y-auto">
+             <div className="p-6 max-w-7xl mx-auto">
+               {children}
+             </div>
+          </main>
+        </div>
       </div>
-
-      {/* Top Bar */}
-      <TopBar
-        sidebarCollapsed={sidebarCollapsed}
-        onMobileMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
-        mobileMenuOpen={mobileMenuOpen}
-      />
-
-      {/* Main Content */}
-      <main
-        className={cn(
-          'pt-16 transition-all duration-300 min-h-screen pb-20',
-          isMobile ? 'ml-0' : sidebarCollapsed ? 'ml-16' : 'ml-64',
-        )}
-      >
-        <div className="p-6 max-w-7xl mx-auto">{children}</div>
-      </main>
 
       {/* Mobile Navigation Helper */}
       {isMobile && (
-        <div className="fixed bottom-4 right-4 flex flex-col space-y-2 z-30">
-          {/* Quick access button for mobile */}
+        <div className="fixed bottom-24 right-4 flex flex-col space-y-2 z-30 pointer-events-none">
+          {/* Quick access button for mobile - moved up to avoid player if present */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="w-12 h-12 bg-main text-black rounded-full shadow-lg flex items-center justify-center hover:bg-mainAccent transition-colors border-2 border-black"
+            className="pointer-events-auto w-12 h-12 bg-main text-black rounded-full shadow-lg flex items-center justify-center hover:bg-mainAccent transition-colors border-2 border-black"
             aria-label="Toggle navigation"
           >
             {mobileMenuOpen ? (
@@ -174,8 +193,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
         </div>
       )}
 
-      {/* Persistent Music Player */}
-      <PersistentPlayer />
+      {/* Persistent Music Player - Stacks at bottom */}
+      <div className="flex-shrink-0 z-[60]">
+        <PersistentPlayer />
+      </div>
     </div>
   );
 }

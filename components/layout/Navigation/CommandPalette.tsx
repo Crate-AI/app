@@ -290,7 +290,7 @@ export default function CommandPalette({
           {/* Header */}
           <div className="flex items-center px-4 py-3 border-b border-gray-200">
             <div className="flex items-center flex-1">
-              <div className="flex items-center justify-center w-8 h-8 bg-yellow-400 rounded-lg mr-3">
+              <div className="flex items-center justify-center w-8 h-8 bg-main rounded-lg mr-3">
                 <Command className="w-4 h-4 text-black" />
               </div>
               <input
@@ -422,7 +422,7 @@ function CommandButton({ command, isSelected, onClick }: CommandButtonProps) {
       onClick={onClick}
       className={cn(
         'w-full flex items-center p-2 rounded-lg text-left transition-all duration-150 group',
-        isSelected ? 'bg-yellow-400 text-black' : 'hover:bg-gray-100',
+        isSelected ? 'bg-main text-black' : 'hover:bg-gray-100',
       )}
     >
       <div
@@ -455,7 +455,7 @@ function CommandButton({ command, isSelected, onClick }: CommandButtonProps) {
                 'ml-2 px-1.5 py-0.5 text-xs font-medium rounded-full',
                 isSelected
                   ? 'bg-black/10 text-black'
-                  : 'bg-yellow-100 text-yellow-800',
+                  : 'bg-main/20 text-yellow-800',
               )}
             >
               {command.badge}

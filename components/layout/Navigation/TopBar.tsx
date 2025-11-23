@@ -292,8 +292,8 @@ export default function TopBar({
       setInternalSearchQuery(value);
     }
 
-    // Show dropdown when typing
-    if (value.length > 0) {
+    // Show dropdown when typing, ONLY if not in filtering mode
+    if (value.length > 0 && !onSearchQueryChange) {
       setSearchDropdownOpen(true);
       setSelectedIndex(0);
     } else {
@@ -302,7 +302,7 @@ export default function TopBar({
   };
 
   const handleSearchFocus = () => {
-    if (searchQuery.length > 0) {
+    if (searchQuery.length > 0 && !onSearchQueryChange) {
       setSearchDropdownOpen(true);
     }
   };
@@ -352,8 +352,7 @@ export default function TopBar({
       />
       <header
         className={cn(
-          'fixed top-0 right-0 h-16 bg-white border-b border-gray-200 transition-all duration-300 z-50 flex items-center justify-between px-4',
-          sidebarCollapsed ? 'left-16' : 'left-64',
+          'h-16 bg-white border-b border-gray-200 transition-all duration-300 z-40 flex items-center justify-between px-4 w-full sticky top-0',
         )}
       >
         {/* Mobile Menu Button */}
@@ -384,7 +383,10 @@ export default function TopBar({
               className="w-full pl-10 pr-16 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main focus:border-main text-sm transition-all"
             />
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
-              <kbd className="px-2 py-1 text-xs bg-gray-100 rounded border text-gray-500">
+              <kbd
+                className="px-2 py-1 text-xs bg-gray-100 rounded border text-gray-500 cursor-pointer hover:bg-gray-200 transition-colors"
+                onClick={() => setCommandPaletteOpen(true)}
+              >
                 ⌘K
               </kbd>
             </div>
@@ -539,7 +541,7 @@ function SearchCommandButton({
       onClick={onClick}
       className={cn(
         'w-full flex items-center p-2 rounded-lg text-left transition-all duration-150 group',
-        isSelected ? 'bg-yellow-400 text-black' : 'hover:bg-gray-100',
+        isSelected ? 'bg-main text-black' : 'hover:bg-gray-100',
       )}
     >
       <div
@@ -572,7 +574,7 @@ function SearchCommandButton({
                 'ml-2 px-1.5 py-0.5 text-xs font-medium rounded-full',
                 isSelected
                   ? 'bg-black/10 text-black'
-                  : 'bg-yellow-100 text-yellow-800',
+                  : 'bg-main/20 text-yellow-800',
               )}
             >
               {command.badge}
