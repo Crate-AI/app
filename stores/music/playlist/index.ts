@@ -32,6 +32,7 @@ export const usePlaylistStore = create<PlaylistStore>((set, get) => {
     isLoading: false,
     error: null,
 
+    // FIXME: consistent return type
     fetchPlaylists: async () => {
       set({ isLoading: true, error: null });
       try {
@@ -55,6 +56,8 @@ export const usePlaylistStore = create<PlaylistStore>((set, get) => {
         }));
 
         set({ playlists: transformedPlaylists });
+        // FIXME: remove `isLoading`, `error` slop
+        return transformedPlaylists;
       } catch (error) {
         set({ error: (error as Error).message });
         toast.error('Failed to fetch playlists');
