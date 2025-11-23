@@ -19,6 +19,42 @@ if (
   throw new Error('Discogs credentials are required');
 }
 
+async function createFavoritesPlaylist(userId: string) {
+  try {
+    const supabase = await createClient();
+
+    console.log("creating playlist for ", userId);
+
+    // Check if Favorites playlist already exists
+    const { data: existingFavorites, error: checkError } = await supabase
+      .from('playlists')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('is_favorites', true)
+      .maybeSingle();
+
+    if (checkError) {
+      throw checkError;
+    }
+
+    if (!existingFavorites) {
+      const { error: playlistError } = await supabase
+        .from('playlists')
+        .insert({
+          title: 'Favorites',
+          user_id: userId,
+          is_favorites: true,
+        });
+
+      if (playlistError) {
+        throw playlistError;
+      }
+    }
+  } catch (error) {
+    console.error('Error ensuring Favorites playlist:', error);
+  }
+}
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -116,6 +152,8 @@ export async function GET(request: Request) {
         console.error('Failed to update user profile:', updateError);
       }
 
+      await createFavoritesPlaylist(signInData.user.id);
+
       return NextResponse.redirect(new URL('/', request.url));
     }
 
@@ -154,6 +192,8 @@ export async function GET(request: Request) {
         new URL('/?error=profile_failed', request.url),
       );
     }
+
+    await createFavoritesPlaylist(signUpData.user.id);
 
     // Set user data cookie
     cookieStore.set(
