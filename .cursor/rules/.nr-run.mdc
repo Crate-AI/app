@@ -1,0 +1,38 @@
+---
+description: Use nr to run scripts and ni to install dependencies
+alwaysApply: true
+tags:
+  - npm
+  - package-manager
+  - tooling
+---
+
+# nr and ni
+
+- **`ni`** - Install dependencies (auto-detects package manager)
+- **`nr`** - Run scripts from package.json (auto-detects package manager)
+
+## ❌ Do NOT use
+
+- `npm install` / `npm run`
+- `yarn add` / `yarn run`
+- `pnpm install` / `pnpm run`
+
+Always use `ni` and `nr` instead.
+
+## ✅ Common Commands
+
+```bash
+nr dev          # pnpm dev
+nr build        # pnpm build
+nr test         # pnpm test
+nr lint         # pnpm lint
+
+ni package      # pnpm i package
+ni -D @types/node  # pnpm i -D @types/node
+```
+
+Works with: npm, yarn, pnpm, bun, deno
+
+See: [ni GitHub](https://github.com/antfu-collective/ni)
+

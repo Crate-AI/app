@@ -55,6 +55,7 @@
     "zustand": "^5.0.2"
   },
   "devDependencies": {
+    "@antfu/ni": "^27.0.1",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
