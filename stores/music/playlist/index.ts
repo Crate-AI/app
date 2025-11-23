@@ -8,7 +8,7 @@ interface PlaylistStore {
   isLoading: boolean;
   error: string | null;
 
-  fetchPlaylists: () => Promise<void>;
+  fetchPlaylists: () => Promise<any[]>;
   createPlaylist: (title: string, description?: string) => Promise<string>;
   addTrackToPlaylist: (playlistId: string, trackId: string) => Promise<void>;
   addExternalTrackToPlaylist: (playlistId: string, track: CrateTrack) => Promise<void>;
