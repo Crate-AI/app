@@ -1,4 +1,4 @@
-import { Clock, Music, BarChart2, Play, Pause } from 'lucide-react';
+import { Clock, Play, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CrateTrack } from '@/types';
 
@@ -23,7 +23,7 @@ const TrackListItem = ({
   return (
     <div
       key={track.position}
-      className="grid grid-cols-[auto_1fr_auto_auto] gap-4 p-3 border-2 border-border dark:border-darkBorder rounded-base group items-center hover:bg-border/10"
+      className="grid grid-cols-[auto_1fr_auto] gap-4 p-3 border-2 border-border dark:border-darkBorder rounded-base group items-center hover:bg-border/10"
     >
       <div className="w-8 flex items-center justify-center">
         <Button
@@ -53,13 +53,6 @@ const TrackListItem = ({
       </div>
 
       <div className="text-text/60 dark:text-darkText/60">{track.duration}</div>
-
-      <div className="text-text/60 dark:text-darkText/60 flex items-center gap-2">
-        <span>{track.bpm || '---'}</span>
-        {track.bpm && (
-          <Music className="w-4 h-4 text-text/40 dark:text-darkText/40" />
-        )}
-      </div>
     </div>
   );
 };
@@ -72,16 +65,12 @@ export function TrackList({
 }: TrackListProps) {
   return (
     <div className="space-y-2">
-      <div className="grid grid-cols-[auto_1fr_auto_auto] gap-4 p-2 text-sm text-text/60 dark:text-darkText/60">
+      <div className="grid grid-cols-[auto_1fr_auto] gap-4 p-2 text-sm text-text/60 dark:text-darkText/60">
         <div className="w-8">#</div>
         <div>TITLE</div>
         <div className="flex items-center gap-1">
           <Clock className="w-4 h-4" />
           <span>TIME</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <BarChart2 className="w-4 h-4" />
-          <span>BPM</span>
         </div>
       </div>
 

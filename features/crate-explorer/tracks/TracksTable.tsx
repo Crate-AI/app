@@ -6,7 +6,6 @@ import { useTracksStore, usePlaylistStore, usePlayerStore } from '@/stores';
 import { SearchInput } from './components/SearchInput';
 import { Button } from '@/components/ui/button';
 import {
-  Sparkles,
   MoreHorizontal,
   ArrowUpDown,
   Play,
@@ -569,21 +568,6 @@ export default function TracksTable() {
           );
         },
       }),
-      columnHelper.accessor((row) => row.bpm, {
-        id: 'bpm',
-        header: ({ column }) => (
-          <div
-            className="flex items-center cursor-pointer"
-            onClick={() => column.toggleSorting()}
-          >
-            <span>BPM</span>
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </div>
-        ),
-        cell: ({ getValue }) => (
-          <div className="text-sm text-gray-500">{getValue() || '-'}</div>
-        ),
-      }),
       columnHelper.accessor((row) => row.duration, {
         id: 'duration',
         header: ({ column }) => (
@@ -775,16 +759,6 @@ export default function TracksTable() {
       <style jsx>{marqueeStyles}</style>
       <div className="flex justify-between items-center mb-4">
         <div>
-          {suggestedTrackIds.size > 0 && (
-            <Button
-              onClick={handleCreateAiPlaylist}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <Sparkles className="h-4 w-4" />
-              <span>Create AI Playlist</span>
-            </Button>
-          )}
         </div>
         <SearchInput
           ref={searchInputRef}
