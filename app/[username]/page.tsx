@@ -15,15 +15,11 @@ import {
   Play,
   Pause,
   TrendingUp,
-  Clock,
   Shuffle,
-  List,
-  Brain,
   Heart,
   Search,
   Plus,
   Headphones,
-  Zap,
 } from 'lucide-react';
 import { cn } from '@/lib/utils/utils';
 import { CrateTrack } from '@/types';
@@ -73,16 +69,10 @@ const DashboardStats = ({ tracks }: { tracks: CrateTrack[] }) => {
       icon: Heart,
       color: 'bg-purple-100 text-purple-700',
     },
-    {
-      label: 'Avg BPM',
-      value: stats.avgBpm,
-      icon: Zap,
-      color: 'bg-orange-100 text-orange-700',
-    },
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
       {statItems.map((stat) => (
         <Card key={stat.label} variant="elevated">
           <CardContent className="p-4">
@@ -232,12 +222,6 @@ const FavoritesSection = ({ allTracks }: { allTracks: CrateTrack[] }) => {
                   </div>
                 </div>
 
-                {track.bpm && (
-                  <div className="text-xs bg-white border border-black px-2 py-1 rounded-base text-text font-mono">
-                    {track.bpm} BPM
-                  </div>
-                )}
-
                 <Button
                   variant="ghost"
                   size="sm"
@@ -283,13 +267,6 @@ const QuickActionsSection = ({ username }: { username: string }) => {
       icon: Plus,
       href: `/${username}/playlists`,
       color: 'bg-green-500 hover:bg-green-600',
-    },
-    {
-      title: 'AI Analysis',
-      description: 'Get insights about your music',
-      icon: Brain,
-      href: '/analyze',
-      color: 'bg-purple-500 hover:bg-purple-600',
     },
     {
       title: 'Shuffle Play',
