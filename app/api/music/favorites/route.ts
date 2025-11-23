@@ -1,33 +1,44 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import type { Database } from '@/types/database/supabase';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false,
-  },
-});
+import { createClient } from '@/lib/supabase/server';
+import { cookies } from 'next/headers';
 
 // GET - Fetch user's favorite tracks
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
+    const cookieStore = cookies();
+    const supabase = await createClient();
 
-    if (!userId) {
-      return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: favorites, error } = await supabase
-      .from('user_favorites')
+    // Get user data from cookie
+    const userDataCookie = cookieStore.get('user_data');
+    const userData = userDataCookie ? JSON.parse(userDataCookie.value) : null;
+    const userId = userData?.userId || session.user.id;
+
+    // Fetch the Favorites playlist
+    const { data: favoritesPlaylist, error: playlistError } = await supabase
+      .from('playlists')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('is_favorites', true)
+      .single();
+
+    if (playlistError || !favoritesPlaylist) {
+      return NextResponse.json({ favoriteTrackIds: [], favorites: [] });
+    }
+
+    // Fetch tracks in the Favorites playlist
+    const { data: playlistTracks, error: tracksError } = await supabase
+      .from('playlist_tracks')
       .select(`
         track_id,
         created_at,
-        tracks:track_id (
+        tracks (
           id,
           title,
           artist,
@@ -40,19 +51,19 @@ export async function GET(request: Request) {
           position
         )
       `)
-      .eq('user_id', userId)
+      .eq('playlist_id', favoritesPlaylist.id)
       .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('Error fetching favorites:', error);
+    if (tracksError) {
+      console.error('Error fetching favorite tracks:', tracksError);
       return NextResponse.json({ error: 'Failed to fetch favorites' }, { status: 500 });
     }
 
-    const favoriteTrackIds = favorites?.map(fav => fav.track_id) || [];
-    
-    return NextResponse.json({ 
+    const favoriteTrackIds = playlistTracks?.map(pt => pt.track_id) || [];
+
+    return NextResponse.json({
       favoriteTrackIds,
-      favorites: favorites || []
+      favorites: playlistTracks || [],
     });
   } catch (error) {
     console.error('Error in GET favorites:', error);
@@ -63,23 +74,63 @@ export async function GET(request: Request) {
 // POST - Add track to favorites
 export async function POST(request: Request) {
   try {
-    const { userId, trackId } = await request.json();
+    const cookieStore = cookies();
+    const supabase = await createClient();
 
-    if (!userId || !trackId) {
-      return NextResponse.json({ error: 'User ID and Track ID are required' }, { status: 400 });
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { trackId } = await request.json();
+
+    if (!trackId) {
+      return NextResponse.json({ error: 'Track ID is required' }, { status: 400 });
+    }
+
+    // Get user data from cookie
+    const userDataCookie = cookieStore.get('user_data');
+    const userData = userDataCookie ? JSON.parse(userDataCookie.value) : null;
+    const userId = userData?.userId || session.user.id;
+
+    // Fetch the Favorites playlist
+    const { data: favoritesPlaylist, error: playlistError } = await supabase
+      .from('playlists')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('is_favorites', true)
+      .single();
+
+    if (playlistError || !favoritesPlaylist) {
+      return NextResponse.json({ error: 'Favorites playlist not found' }, { status: 404 });
+    }
+
+    // Get the highest position in the playlist
+    const { data: lastTrack, error: positionError } = await supabase
+      .from('playlist_tracks')
+      .select('position')
+      .eq('playlist_id', favoritesPlaylist.id)
+      .order('position', { ascending: false })
+      .limit(1)
+      .single();
+
+    const nextPosition = (lastTrack?.position || 0) + 1;
+
+    // Add track to Favorites playlist
     const { data, error } = await supabase
-      .from('user_favorites')
+      .from('playlist_tracks')
       .insert({
-        user_id: userId,
+        playlist_id: favoritesPlaylist.id,
         track_id: trackId,
+        position: nextPosition,
       })
       .select()
       .single();
 
     if (error) {
-      // Handle unique constraint violation (already favorited)
+      // Handle unique constraint violation (already in favorites)
       if (error.code === '23505') {
         return NextResponse.json({ message: 'Track already in favorites' }, { status: 200 });
       }
@@ -97,16 +148,44 @@ export async function POST(request: Request) {
 // DELETE - Remove track from favorites
 export async function DELETE(request: Request) {
   try {
-    const { userId, trackId } = await request.json();
+    const cookieStore = cookies();
+    const supabase = await createClient();
 
-    if (!userId || !trackId) {
-      return NextResponse.json({ error: 'User ID and Track ID are required' }, { status: 400 });
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { error } = await supabase
-      .from('user_favorites')
-      .delete()
+    const { trackId } = await request.json();
+
+    if (!trackId) {
+      return NextResponse.json({ error: 'Track ID is required' }, { status: 400 });
+    }
+
+    // Get user data from cookie
+    const userDataCookie = cookieStore.get('user_data');
+    const userData = userDataCookie ? JSON.parse(userDataCookie.value) : null;
+    const userId = userData?.userId || session.user.id;
+
+    // Fetch the Favorites playlist
+    const { data: favoritesPlaylist, error: playlistError } = await supabase
+      .from('playlists')
+      .select('id')
       .eq('user_id', userId)
+      .eq('is_favorites', true)
+      .single();
+
+    if (playlistError || !favoritesPlaylist) {
+      return NextResponse.json({ error: 'Favorites playlist not found' }, { status: 404 });
+    }
+
+    // Remove track from Favorites playlist
+    const { error } = await supabase
+      .from('playlist_tracks')
+      .delete()
+      .eq('playlist_id', favoritesPlaylist.id)
       .eq('track_id', trackId);
 
     if (error) {
@@ -119,4 +198,4 @@ export async function DELETE(request: Request) {
     console.error('Error in DELETE favorites:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-} 
+}
