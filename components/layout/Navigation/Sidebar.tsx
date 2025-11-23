@@ -9,7 +9,6 @@ import {
   Music,
   ListMusic,
   Search,
-  Brain,
   Settings,
   ChevronLeft,
   ChevronRight,
@@ -65,12 +64,6 @@ export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
       href: `/${userIdentity.username}/collection`,
       icon: Search,
       description: 'Explore your Discogs collection',
-    },
-    {
-      name: 'Analyze',
-      href: '/analyze',
-      icon: Brain,
-      description: 'AI-powered music analysis',
     },
   ];
 

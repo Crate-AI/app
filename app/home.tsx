@@ -60,36 +60,33 @@ const HomeClient = ({}: HomeClientProps) => {
       <div className="flex-1 flex flex-col items-center justify-center px-4">
         <div className="max-w-2xl text-center">
           <h1 className="text-4xl font-bold tracking-tight sm:text-6xl mb-6">
-            Welcome to Crate
+            Discover, Curate, Share Your Music
           </h1>
           <p className="text-lg leading-8 text-muted-foreground mb-8">
-            Your AI-powered music collection analyzer
+            Connect your Discogs and Spotify collections. Create playlists and share them with the world.
           </p>
           <p className="text-base text-muted-foreground mb-8">
-            Connect your Music collection and discover insights about your
-            music with AI-powered analysis.
+            Sync your libraries in one place. Browse, search, and organize your music effortlessly.
           </p>
 
           {/* Features */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 text-left">
             <div className="p-4 rounded-lg border bg-card">
-              <h3 className="font-semibold mb-2">🎵 Collection Analysis</h3>
+              <h3 className="font-semibold mb-2">🎵 Collection Management</h3>
               <p className="text-sm text-muted-foreground">
-                Get insights into your music collection, including BPM analysis,
-                genre distribution, and more.
-              </p>
-            </div>
-            <div className="p-4 rounded-lg border bg-card">
-              <h3 className="font-semibold mb-2">🤖 AI-Powered</h3>
-              <p className="text-sm text-muted-foreground">
-                Chat with AI about your music and get personalized
-                recommendations.
+                Sync your Discogs and Spotify libraries in one place. Browse, search, and organize your music.
               </p>
             </div>
             <div className="p-4 rounded-lg border bg-card">
               <h3 className="font-semibold mb-2">🎧 Smart Playlists</h3>
               <p className="text-sm text-muted-foreground">
-                Create playlists based on BPM, genre, and other characteristics.
+                Create custom playlists from your collection. Add favorites and organize tracks your way.
+              </p>
+            </div>
+            <div className="p-4 rounded-lg border bg-card">
+              <h3 className="font-semibold mb-2">🌍 Share & Discover</h3>
+              <p className="text-sm text-muted-foreground">
+                Make your playlists public and share them with friends. Discover what others are listening to.
               </p>
             </div>
           </div>

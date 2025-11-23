@@ -1,13 +1,25 @@
-// app/analyze/chat/page.tsx
 'use client';
 
-import { Chatbot } from '@/features/analyze/components/Chatbot';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/stores';
+import { LoadingSpinner } from '@/components/ui/loading';
 
 export default function ChatPage() {
+  const router = useRouter();
+  const { userIdentity } = useAuthStore();
+
+  useEffect(() => {
+    if (userIdentity?.username) {
+      router.replace(`/${userIdentity.username}`);
+    } else {
+      router.replace('/');
+    }
+  }, [userIdentity, router]);
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">AI Chat Assistant</h1>
-      <Chatbot />
+    <div className="flex items-center justify-center min-h-screen">
+      <LoadingSpinner />
     </div>
   );
 }

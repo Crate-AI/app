@@ -274,11 +274,6 @@ const PersistentPlayer = () => {
               {/* Compact BPM and Genre Info */}
               {currentTrack && (
                 <div className="flex items-center space-x-1">
-                  {currentTrack.bpm && (
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-base text-xs font-medium bg-white border border-black text-black">
-                      {currentTrack.bpm} BPM
-                    </span>
-                  )}
                   {currentTrack.genres && currentTrack.genres.length > 0 && (
                     <span className="inline-flex items-center px-1.5 py-0.5 rounded-base text-xs font-medium bg-mainAccent2 border border-black text-black">
                       {currentTrack.genres[0]}
