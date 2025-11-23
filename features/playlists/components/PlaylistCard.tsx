@@ -5,9 +5,7 @@ import { PlaylistWithTracks } from '@/types';
 import Image from 'next/image';
 import { usePlayerStore, usePlaylistStore } from '@/stores';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-
 interface PlaylistCardProps {
   playlist: PlaylistWithTracks;
   handleClick: () => void;
@@ -72,14 +70,16 @@ export const PlaylistCard = ({
           )}
         </button>
 
-        <Button
-          variant="destructive"
-          size="icon"
-          className="opacity-0 group-hover:opacity-100 transition-opacity"
-          onClick={handleDelete}
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
+        {!playlist.is_favorites && (
+          <Button
+            variant="destructive"
+            size="icon"
+            className="opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={handleDelete}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        )}
       </div>
 
       <CardHeader className="h-48 bg-gray-100">
