@@ -59,7 +59,7 @@ const RootLayout = ({ children }: Readonly<RootLayoutProps>) => {
           richColors
           toastOptions={{
             style: {
-              border: '2px solid black',
+              border: '2px solid #1f2937', // gray-800
               borderRadius: '12px',
               fontSize: '14px',
               fontWeight: '500',
