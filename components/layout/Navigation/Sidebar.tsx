@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { useAuthStore } from '@/stores';
+import { useAuthStore, usePlayerStore } from '@/stores';
 import { cn } from '@/lib/utils/utils';
 import {
   Home,
@@ -25,7 +25,10 @@ interface SidebarProps {
 export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const { userIdentity } = useAuthStore();
+  const { currentTrack, queue } = usePlayerStore();
   const [isCollapsed, setIsCollapsed] = useState(collapsed);
+
+  const isPlayerVisible = !!currentTrack || queue.length > 0;
 
   // Sync internal state with prop
   useEffect(() => {
@@ -70,7 +73,7 @@ export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'fixed left-0 top-0 h-full bg-white border-r border-gray-200 transition-all duration-300 z-50',
+        'h-full bg-white border-r border-gray-200 transition-all duration-300 flex flex-col',
         isCollapsed ? 'w-16' : 'w-64',
       )}
     >

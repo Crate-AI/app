@@ -55,19 +55,19 @@ const DashboardStats = ({ tracks }: { tracks: CrateTrack[] }) => {
       label: 'Total Tracks',
       value: stats.totalTracks,
       icon: Music,
-      color: 'bg-blue-100 text-blue-700',
+      color: 'bg-main border-2 border-black',
     },
     {
       label: 'Artists',
       value: stats.totalArtists,
       icon: Headphones,
-      color: 'bg-green-100 text-green-700',
+      color: 'bg-main border-2 border-black',
     },
     {
       label: 'Genres',
       value: stats.totalGenres,
       icon: Heart,
-      color: 'bg-purple-100 text-purple-700',
+      color: 'bg-main border-2 border-black',
     },
   ];
 
@@ -77,8 +77,8 @@ const DashboardStats = ({ tracks }: { tracks: CrateTrack[] }) => {
         <Card key={stat.label} variant="elevated">
           <CardContent className="p-4">
             <div className="flex items-center space-x-3">
-              <div className={cn('p-2 rounded-base', stat.color)}>
-                <stat.icon className="w-5 h-5" />
+              <div className={cn('p-2 rounded-base flex items-center justify-center', stat.color)}>
+                <stat.icon className="w-5 h-5 text-black" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-text">{stat.value}</p>
@@ -259,21 +259,21 @@ const QuickActionsSection = ({ username }: { username: string }) => {
       description: 'Browse your Discogs collection',
       icon: Search,
       href: `/${username}/collection`,
-      color: 'bg-blue-500 hover:bg-blue-600',
+      color: 'bg-main border-2 border-black',
     },
     {
       title: 'Create Playlist',
       description: 'Organize your favorite tracks',
       icon: Plus,
       href: `/${username}/playlists`,
-      color: 'bg-green-500 hover:bg-green-600',
+      color: 'bg-main border-2 border-black',
     },
     {
       title: 'Shuffle Play',
       description: 'Start a random mix',
       icon: Shuffle,
       href: '#',
-      color: 'bg-orange-500 hover:bg-orange-600',
+      color: 'bg-main border-2 border-black',
       action: 'shuffle',
     },
   ];
@@ -314,7 +314,7 @@ const QuickActionsSection = ({ username }: { username: string }) => {
                   <div className="flex items-center space-x-3">
                     <div
                       className={cn(
-                        'p-2 rounded-base text-white',
+                        'p-2 rounded-base text-black flex items-center justify-center',
                         action.color,
                       )}
                     >
@@ -337,7 +337,7 @@ const QuickActionsSection = ({ username }: { username: string }) => {
                     <div className="flex items-center space-x-3">
                       <div
                         className={cn(
-                          'p-2 rounded-base text-white',
+                          'p-2 rounded-base text-black flex items-center justify-center',
                           action.color,
                         )}
                       >
