@@ -2,16 +2,13 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { useAuthStore, usePlayerStore } from '@/stores';
+import { useAuthStore } from '@/stores';
 import { cn } from '@/lib/utils/utils';
 import {
   Home,
   Music,
   ListMusic,
-  Search,
-  Settings,
-  ChevronLeft,
-  ChevronRight,
+  Search
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -25,10 +22,7 @@ interface SidebarProps {
 export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const { userIdentity } = useAuthStore();
-  const { currentTrack, queue } = usePlayerStore();
   const [isCollapsed, setIsCollapsed] = useState(collapsed);
-
-  const isPlayerVisible = !!currentTrack || queue.length > 0;
 
   // Sync internal state with prop
   useEffect(() => {
@@ -48,70 +42,68 @@ export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
       name: 'Dashboard',
       href: `/${userIdentity.username}`,
       icon: Home,
-      description: 'Overview and quick actions',
+      description: 'Overview',
     },
     {
       name: 'Tracks',
       href: `/${userIdentity.username}/tracks`,
       icon: Music,
-      description: 'Browse and manage tracks',
+      description: 'Library',
     },
     {
       name: 'Playlists',
       href: `/${userIdentity.username}/playlists`,
       icon: ListMusic,
-      description: 'Create and manage playlists',
+      description: 'Collections',
     },
     {
       name: 'Collection',
       href: `/${userIdentity.username}/collection`,
       icon: Search,
-      description: 'Explore your Discogs collection',
+      description: 'Discogs',
     },
   ];
 
   return (
     <aside
       className={cn(
-        'h-full bg-white border-r border-gray-200 transition-all duration-300 flex flex-col',
-        isCollapsed ? 'w-16' : 'w-64',
+        'h-full bg-white border-r-2 border-gray-800 transition-all duration-300 flex flex-col',
+        isCollapsed ? 'w-20' : 'w-72',
       )}
     >
       {/* Sidebar Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
-        {!isCollapsed && (
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 flex items-center justify-center">
-              <Image
-                src="/logo.svg"
-                alt="Crate Logo"
-                width={32}
-                height={32}
-                priority
-                className="w-8 h-8"
-              />
-            </div>
-            <span className="font-semibold text-gray-900">Crate</span>
-          </div>
+      <div
+        className={cn(
+          'flex items-center px-6 border-b-2 border-gray-800 h-16 transition-all',
+          isCollapsed ? 'justify-center' : 'justify-start',
         )}
-        <button
+      >
+        <div
           onClick={handleToggle}
-          className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
-          aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        >
-          {isCollapsed ? (
-            <ChevronRight className="w-4 h-4 active:text-main transition-colors" />
-          ) : (
-            <ChevronLeft className="w-4 h-4 active:text-main transition-colors" />
+          className={cn(
+            'flex items-center transition-all cursor-pointer hover:scale-105 active:scale-95',
+            !isCollapsed && 'space-x-3',
           )}
-        </button>
+        >
+          <div className="relative w-8 h-8 shrink-0">
+            <Image
+              src="/logo.svg"
+              alt="Crate Logo"
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
+          {!isCollapsed && (
+            <span className="font-bold text-xl tracking-tight">Crate</span>
+          )}
+        </div>
       </div>
 
       {/* Navigation Items */}
-      <nav className="flex-1 p-4 space-y-1">
+      <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto no-scrollbar">
         {navigationItems.map((item) => {
           const Icon = item.icon;
-          // Simplified active state logic
           const isActive =
             pathname === item.href ||
             (item.href !== `/${userIdentity.username}` &&
@@ -122,35 +114,36 @@ export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
               key={item.name}
               href={item.href}
               className={cn(
-                'group flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 relative',
+                'group flex items-center space-x-3 px-4 py-3 rounded-base transition-all duration-200 relative border-2',
                 isActive
-                  ? 'text-black'
-                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900',
+                  ? 'bg-main border-gray-800 shadow-light'
+                  : 'bg-transparent border-transparent hover:bg-gray-100 hover:border-gray-200 text-gray-600 hover:text-black',
+                isCollapsed && 'justify-center px-2',
               )}
             >
               <Icon
                 className={cn(
-                  'w-5 h-5 shrink-0 transition-colors active:text-main',
-                  isActive
-                    ? 'text-main'
-                    : 'text-gray-500 group-hover:text-gray-700',
+                  'w-5 h-5 shrink-0 transition-colors',
+                  isActive ? 'text-black' : 'text-current',
                 )}
               />
 
               {!isCollapsed && (
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium truncate">{item.name}</div>
-                  {!isActive && (
-                    <div className="text-xs text-gray-500 truncate">
-                      {item.description}
-                    </div>
-                  )}
+                  <div
+                    className={cn(
+                      'font-medium truncate',
+                      isActive ? 'text-black' : 'text-current',
+                    )}
+                  >
+                    {item.name}
+                  </div>
                 </div>
               )}
 
               {/* Tooltip for collapsed state */}
               {isCollapsed && (
-                <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                <div className="absolute left-full ml-4 px-3 py-1.5 bg-black text-white text-sm font-medium rounded-base shadow-light opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 border-2 border-white">
                   {item.name}
                 </div>
               )}
@@ -160,26 +153,28 @@ export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
       </nav>
 
       {/* User Section */}
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-6 border-t-2 border-gray-800 bg-white">
         <div
           className={cn(
-            'flex items-center space-x-3 px-3 py-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer',
-            isCollapsed && 'justify-center',
+            'flex items-center space-x-3 p-2 rounded-base border-2 transition-all cursor-pointer group',
+            isCollapsed
+              ? 'justify-center bg-transparent border-transparent hover:bg-white hover:border-gray-800 hover:shadow-light'
+              : 'bg-white border-gray-800 shadow-light hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:bg-gray-100',
           )}
         >
-          <Avatar className="w-8 h-8">
-            <AvatarImage src={userIdentity.avatarUrl} />
-            <AvatarFallback className="bg-main text-black border-2 border-black text-sm">
-              {userIdentity.username.charAt(0).toUpperCase()}
+          <Avatar className="w-9 h-9 border-2 border-gray-800 shrink-0">
+            <AvatarImage src={userIdentity.avatarUrl ?? ''} />
+            <AvatarFallback className="bg-main font-bold text-sm">
+              {userIdentity.username?.charAt(0).toUpperCase() ?? ''}
             </AvatarFallback>
           </Avatar>
 
           {!isCollapsed && (
-            <div className="flex-1 min-w-0">
-              <div className="font-medium text-gray-900 truncate">
+            <div className="flex-1 min-w-0 overflow-hidden">
+              <div className="font-medium text-sm truncate text-black">
                 {userIdentity.username}
               </div>
-              <div className="text-xs text-gray-500">Music curator</div>
+              <div className="text-xs text-gray-500 truncate">View Profile</div>
             </div>
           )}
         </div>

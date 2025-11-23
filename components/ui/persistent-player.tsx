@@ -128,10 +128,10 @@ const PersistentPlayer = () => {
   }
 
   return (
-    <div className="w-full z-[60] bg-bg border-t-2 border-black">
+    <div className="w-full z-[60] bg-bg border-t-2 border-gray-800">
       {/* Queue Panel */}
       {showQueue && (
-        <div className="max-h-96 overflow-y-auto bg-white border-t-2 border-black">
+        <div className="max-h-96 overflow-y-auto bg-white border-t-2 border-gray-800">
           <div className="p-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-text">
@@ -160,12 +160,12 @@ const PersistentPlayer = () => {
                 <div
                   key={track.id}
                   className={cn(
-                    'flex items-center space-x-3 p-3 rounded-base border-2 border-black hover:bg-mainAccent/10 transition-colors cursor-pointer track-row',
+                    'flex items-center space-x-3 p-3 rounded-base border-2 border-gray-800 hover:bg-mainAccent/10 transition-colors cursor-pointer track-row',
                     index === currentIndex && 'bg-main/20',
                   )}
                   onClick={() => handleTrackClick(track, index)}
                 >
-                  <div className="w-8 h-8 bg-mainAccent border-2 border-black rounded-base flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 bg-mainAccent border-2 border-gray-800 rounded-base flex items-center justify-center flex-shrink-0">
                     {index === currentIndex && isPlaying ? (
                       <Pause className="w-4 h-4 text-black" />
                     ) : (
@@ -275,7 +275,7 @@ const PersistentPlayer = () => {
               {currentTrack && (
                 <div className="flex items-center space-x-1">
                   {currentTrack.genres && currentTrack.genres.length > 0 && (
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-base text-xs font-medium bg-mainAccent2 border border-black text-black">
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-base text-xs font-medium bg-mainAccent2 border border-gray-800 text-black">
                       {currentTrack.genres[0]}
                     </span>
                   )}
@@ -290,7 +290,7 @@ const PersistentPlayer = () => {
                 size="sm"
                 onClick={() => handleToggleFavorite(currentTrack.id)}
                 className={cn(
-                  'h-8 w-8 p-0 border border-black rounded-base icon-button',
+                  'h-8 w-8 p-0 border border-gray-800 rounded-base icon-button',
                   isFavorite(currentTrack.id)
                     ? 'bg-red-100 hover:bg-red-200 text-red-600'
                     : 'bg-white hover:bg-gray-100 text-gray-600',
@@ -312,7 +312,7 @@ const PersistentPlayer = () => {
                 size="sm"
                 onClick={toggleShuffle}
                 className={cn(
-                  'h-8 w-8 p-0 border border-black rounded-base icon-button',
+                  'h-8 w-8 p-0 border border-gray-800 rounded-base icon-button',
                   isShuffleEnabled
                     ? 'bg-main hover:bg-mainAccent'
                     : 'bg-white hover:bg-gray-100',
@@ -326,7 +326,7 @@ const PersistentPlayer = () => {
                 size="sm"
                 onClick={playPrevious}
                 disabled={queue.length === 0}
-                className="h-8 w-8 p-0 bg-white hover:bg-gray-100 border border-black rounded-base icon-button"
+                className="h-8 w-8 p-0 bg-white hover:bg-gray-100 border border-gray-800 rounded-base icon-button"
               >
                 <SkipBack className="w-4 h-4" />
               </Button>
@@ -336,7 +336,7 @@ const PersistentPlayer = () => {
                 size="sm"
                 onClick={() => currentTrack && togglePlayPause(currentTrack)}
                 disabled={!currentTrack}
-                className="h-10 w-10 p-0 bg-main hover:bg-mainAccent border-2 border-black rounded-base play-button"
+                className="h-10 w-10 p-0 bg-main hover:bg-mainAccent border-2 border-gray-800 rounded-base play-button"
               >
                 {isPlaying ? (
                   <Pause className="w-5 h-5 text-black" />
@@ -350,7 +350,7 @@ const PersistentPlayer = () => {
                 size="sm"
                 onClick={playNext}
                 disabled={queue.length === 0}
-                className="h-8 w-8 p-0 bg-white hover:bg-gray-100 border border-black rounded-base icon-button"
+                className="h-8 w-8 p-0 bg-white hover:bg-gray-100 border border-gray-800 rounded-base icon-button"
               >
                 <SkipForward className="w-4 h-4" />
               </Button>
@@ -360,7 +360,7 @@ const PersistentPlayer = () => {
                 size="sm"
                 onClick={toggleRepeat}
                 className={cn(
-                  'h-8 w-8 p-0 border border-black rounded-base icon-button',
+                  'h-8 w-8 p-0 border border-gray-800 rounded-base icon-button',
                   isRepeatEnabled
                     ? 'bg-main hover:bg-mainAccent'
                     : 'bg-white hover:bg-gray-100',
@@ -377,7 +377,7 @@ const PersistentPlayer = () => {
                   variant="ghost"
                   size="sm"
                   onClick={toggleMute}
-                  className="h-8 w-8 p-0 bg-white hover:bg-gray-100 border border-black rounded-base icon-button"
+                  className="h-8 w-8 p-0 bg-white hover:bg-gray-100 border border-gray-800 rounded-base icon-button"
                 >
                   {isMuted || volume === 0 ? (
                     <VolumeX className="w-4 h-4" />
@@ -408,7 +408,7 @@ const PersistentPlayer = () => {
                 size="sm"
                 onClick={() => setShowQueue(!showQueue)}
                 className={cn(
-                  'h-8 w-8 p-0 border border-black rounded-base icon-button',
+                  'h-8 w-8 p-0 border border-gray-800 rounded-base icon-button',
                   showQueue
                     ? 'bg-main hover:bg-mainAccent'
                     : 'bg-white hover:bg-gray-100',

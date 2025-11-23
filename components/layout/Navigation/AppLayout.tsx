@@ -121,7 +121,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         <div
           id="sidebar"
           className={cn(
-            'transition-all duration-300 z-[60] bg-white border-r border-gray-200 flex-shrink-0',
+            'transition-all duration-300 z-[60] bg-white border-r border-gray-800 flex-shrink-0',
             isMobile
               ? cn(
                   'fixed inset-y-0 left-0 h-full',

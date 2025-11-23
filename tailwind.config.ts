@@ -18,7 +18,7 @@ const config: Config = {
         overlay: 'rgba(0,0,0,0.8)',
         bg: '#FEF2E8',
         text: '#000',
-        border: '#000',
+        border: '#1f2937', // gray-800
         darkBg: '#374151',
         darkText: '#eeefe9',
         darkBorder: '#000',

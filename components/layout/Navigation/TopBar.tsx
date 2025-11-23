@@ -352,7 +352,7 @@ export default function TopBar({
       />
       <header
         className={cn(
-          'h-16 bg-white border-b border-gray-200 transition-all duration-300 z-40 flex items-center justify-between px-4 w-full sticky top-0',
+          'h-16 bg-white border-b-2 border-gray-800 transition-all duration-300 z-40 flex items-center justify-between px-6 w-full sticky top-0',
         )}
       >
         {/* Mobile Menu Button */}
@@ -371,7 +371,7 @@ export default function TopBar({
         {/* Search Bar */}
         <div className="flex-1 max-w-2xl mx-4 relative" ref={dropdownRef}>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-black" />
             <input
               ref={searchInputRef}
               type="text"
@@ -380,11 +380,11 @@ export default function TopBar({
               onChange={handleSearchChange}
               onFocus={handleSearchFocus}
               onKeyDown={handleSearchKeyDown}
-              className="w-full pl-10 pr-16 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main focus:border-main text-sm transition-all"
+              className="w-full pl-10 pr-16 py-2 border-2 border-gray-800 rounded-base focus:outline-none focus:ring-0 text-sm transition-all placeholder:text-gray-500"
             />
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
               <kbd
-                className="px-2 py-1 text-xs bg-gray-100 rounded border text-gray-500 cursor-pointer hover:bg-gray-200 transition-colors"
+                className="px-2 py-1 text-xs bg-white border-2 border-gray-800 rounded-base text-black font-bold cursor-pointer hover:bg-gray-100 transition-colors"
                 onClick={() => setCommandPaletteOpen(true)}
               >
                 ⌘K
@@ -479,7 +479,7 @@ export default function TopBar({
                 >
                   <Avatar className="w-8 h-8">
                     <AvatarImage src={userIdentity.avatarUrl} />
-                    <AvatarFallback className="bg-main text-black border-2 border-black">
+                    <AvatarFallback className="bg-main text-black border-2 border-gray-800">
                       {userIdentity.username.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>

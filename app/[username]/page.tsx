@@ -55,19 +55,19 @@ const DashboardStats = ({ tracks }: { tracks: CrateTrack[] }) => {
       label: 'Total Tracks',
       value: stats.totalTracks,
       icon: Music,
-      color: 'bg-main border-2 border-black',
+      color: 'bg-main border-2 border-gray-800',
     },
     {
       label: 'Artists',
       value: stats.totalArtists,
       icon: Headphones,
-      color: 'bg-main border-2 border-black',
+      color: 'bg-main border-2 border-gray-800',
     },
     {
       label: 'Genres',
       value: stats.totalGenres,
       icon: Heart,
-      color: 'bg-main border-2 border-black',
+      color: 'bg-main border-2 border-gray-800',
     },
   ];
 
@@ -81,7 +81,7 @@ const DashboardStats = ({ tracks }: { tracks: CrateTrack[] }) => {
                 <stat.icon className="w-5 h-5 text-black" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-text">{stat.value}</p>
+                <p className="text-2xl font-semibold text-text">{stat.value}</p>
                 <p className="text-sm text-gray-600">{stat.label}</p>
               </div>
             </div>
@@ -146,7 +146,7 @@ const FavoritesSection = ({ allTracks }: { allTracks: CrateTrack[] }) => {
 
   return (
     <Card variant="elevated">
-      <CardHeader className="border-b-2 border-black bg-bg">
+      <CardHeader className="border-b-2 border-gray-800 bg-bg">
         <CardTitle className="flex items-center space-x-2">
           <Heart className="w-5 h-5" />
           <span>Favourite list</span>
@@ -183,7 +183,7 @@ const FavoritesSection = ({ allTracks }: { allTracks: CrateTrack[] }) => {
                   }}
                   disabled={!track.youtube_video_id || !isReady}
                   className={cn(
-                    'h-8 w-8 p-0 border border-black rounded-base',
+                    'h-8 w-8 p-0 border border-gray-800 rounded-base',
                     playingTrackId === track.id && isPlaying
                       ? 'bg-main/20 hover:bg-main/30'
                       : 'bg-main hover:bg-mainAccent',
@@ -208,7 +208,7 @@ const FavoritesSection = ({ allTracks }: { allTracks: CrateTrack[] }) => {
                     className="w-10 h-10 rounded-base object-cover"
                   />
                 ) : (
-                  <div className="w-10 h-10 bg-mainAccent border-2 border-black rounded-base flex items-center justify-center">
+                  <div className="w-10 h-10 bg-mainAccent border-2 border-gray-800 rounded-base flex items-center justify-center">
                     <Music className="w-5 h-5 text-black" />
                   </div>
                 )}
@@ -229,7 +229,7 @@ const FavoritesSection = ({ allTracks }: { allTracks: CrateTrack[] }) => {
                     e.stopPropagation();
                     handleToggleFavorite(track.id);
                   }}
-                  className="h-8 w-8 p-0 bg-red-100 hover:bg-red-200 text-red-600 border border-black rounded-base"
+                  className="h-8 w-8 p-0 bg-red-100 hover:bg-red-200 text-red-600 border border-gray-800 rounded-base"
                 >
                   <Heart className="w-4 h-4 fill-current" />
                 </Button>
@@ -238,7 +238,7 @@ const FavoritesSection = ({ allTracks }: { allTracks: CrateTrack[] }) => {
           )}
         </div>
 
-        <div className="mt-4 pt-4 border-t-2 border-black">
+        <div className="mt-4 pt-4 border-t-2 border-gray-800">
           <Link
             href={`/${useAuthStore.getState().userIdentity?.username}/tracks`}
           >
@@ -259,21 +259,21 @@ const QuickActionsSection = ({ username }: { username: string }) => {
       description: 'Browse your Discogs collection',
       icon: Search,
       href: `/${username}/collection`,
-      color: 'bg-main border-2 border-black',
+      color: 'bg-main border-2 border-gray-800',
     },
     {
       title: 'Create Playlist',
       description: 'Organize your favorite tracks',
       icon: Plus,
       href: `/${username}/playlists`,
-      color: 'bg-main border-2 border-black',
+      color: 'bg-main border-2 border-gray-800',
     },
     {
       title: 'Shuffle Play',
       description: 'Start a random mix',
       icon: Shuffle,
       href: '#',
-      color: 'bg-main border-2 border-black',
+      color: 'bg-main border-2 border-gray-800',
       action: 'shuffle',
     },
   ];
@@ -295,7 +295,7 @@ const QuickActionsSection = ({ username }: { username: string }) => {
 
   return (
     <Card variant="elevated">
-      <CardHeader className="border-b-2 border-black bg-bg">
+      <CardHeader className="border-b-2 border-gray-800 bg-bg">
         <CardTitle className="flex items-center space-x-2">
           <TrendingUp className="w-5 h-5" />
           <span>Quick Actions</span>
@@ -309,7 +309,7 @@ const QuickActionsSection = ({ username }: { username: string }) => {
                 <Button
                   variant="ghost"
                   onClick={() => handleAction(action.action!)}
-                  className="h-auto p-4 text-left justify-start bg-white hover:bg-mainAccent/10 border-2 border-black rounded-base shadow-light hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none transition-all text-text w-full active:bg-mainAccent/20 active:scale-[0.98]"
+                  className="h-auto p-4 text-left justify-start bg-white hover:bg-mainAccent/10 border-2 border-gray-800 rounded-base shadow-light hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none transition-all text-text w-full active:bg-mainAccent/20 active:scale-[0.98]"
                 >
                   <div className="flex items-center space-x-3">
                     <div
@@ -332,7 +332,7 @@ const QuickActionsSection = ({ username }: { username: string }) => {
                 <Link href={action.href}>
                   <Button
                     variant="ghost"
-                    className="h-auto p-4 text-left justify-start bg-white hover:bg-mainAccent/10 border-2 border-black rounded-base shadow-light hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none transition-all text-text w-full active:bg-mainAccent/20 active:scale-[0.98]"
+                    className="h-auto p-4 text-left justify-start bg-white hover:bg-mainAccent/10 border-2 border-gray-800 rounded-base shadow-light hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none transition-all text-text w-full active:bg-mainAccent/20 active:scale-[0.98]"
                   >
                     <div className="flex items-center space-x-3">
                       <div
@@ -373,7 +373,7 @@ const WelcomeSection = ({ username }: { username: string }) => {
 
   return (
     <div className="mb-8">
-      <h1 className="text-3xl font-bold text-text mb-2">
+      <h1 className="text-3xl font-semibold text-text mb-2">
         {getGreeting()}, {username}!
       </h1>
       <p className="text-gray-600">
