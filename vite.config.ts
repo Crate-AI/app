@@ -6,7 +6,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   server: {
-    port: 3000,
+    port: 1995,
   },
   plugins: [
     tailwindcss(),
