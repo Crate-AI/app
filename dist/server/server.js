@@ -1,6 +1,5 @@
 import { createMemoryHistory } from "@tanstack/history";
 import { splitSetCookieString as splitSetCookieString$1 } from "cookie-es";
-import { defaultSerovalPlugins as defaultSerovalPlugins$1, makeSerovalPlugin, rootRouteId, isNotFound, createSerializationAdapter, isRedirect, isResolvedRedirect, executeRewriteInput } from "@tanstack/router-core";
 import invariant from "tiny-invariant";
 import { AsyncLocalStorage } from "node:async_hooks";
 import { jsx } from "react/jsx-runtime";
@@ -51,6 +50,9 @@ function json(payload, init) {
     )
   });
 }
+function isNotFound(obj) {
+  return !!obj?.isNotFound;
+}
 function createControlledPromise(onResolve) {
   let resolveLoadPromise;
   let rejectLoadPromise;
@@ -70,48 +72,23 @@ function createControlledPromise(onResolve) {
   };
   return controlledPromise;
 }
-const TSS_FORMDATA_CONTEXT = "__TSS_CONTEXT";
-const TSS_SERVER_FUNCTION = Symbol.for("TSS_SERVER_FUNCTION");
-const X_TSS_SERIALIZED = "x-tss-serialized";
-const X_TSS_RAW_RESPONSE = "x-tss-raw";
-const startStorage = new AsyncLocalStorage();
-async function runWithStartContext(context, fn2) {
-  return startStorage.run(context, fn2);
+const rootRouteId = "__root__";
+function isRedirect(obj) {
+  return obj instanceof Response && !!obj.options;
 }
-function getStartContext(opts) {
-  const context = startStorage.getStore();
-  if (!context && opts?.throwIfNotFound !== false) {
-    throw new Error(
-      `No Start context found in AsyncLocalStorage. Make sure you are using the function within the server runtime.`
-    );
+function isResolvedRedirect(obj) {
+  return isRedirect(obj) && !!obj.options.href;
+}
+function executeRewriteInput(rewrite, url) {
+  const res = rewrite?.input?.({ url });
+  if (res) {
+    if (typeof res === "string") {
+      return new URL(res);
+    } else if (res instanceof URL) {
+      return res;
+    }
   }
-  return context;
-}
-const getStartOptions = () => getStartContext().startOptions;
-function flattenMiddlewares(middlewares) {
-  const seen = /* @__PURE__ */ new Set();
-  const flattened = [];
-  const recurse = (middleware) => {
-    middleware.forEach((m2) => {
-      if (m2.options.middleware) {
-        recurse(m2.options.middleware);
-      }
-      if (!seen.has(m2)) {
-        seen.add(m2);
-        flattened.push(m2);
-      }
-    });
-  };
-  recurse(middlewares);
-  return flattened;
-}
-function getDefaultSerovalPlugins() {
-  const start = getStartOptions();
-  const adapters = start?.serializationAdapters;
-  return [
-    ...adapters?.map(makeSerovalPlugin) ?? [],
-    ...defaultSerovalPlugins$1
-  ];
+  return url;
 }
 var K = ((s) => (s[s.AggregateError = 1] = "AggregateError", s[s.ArrowFunction = 2] = "ArrowFunction", s[s.ErrorPrototypeStack = 4] = "ErrorPrototypeStack", s[s.ObjectAssign = 8] = "ObjectAssign", s[s.BigIntTypedArray = 16] = "BigIntTypedArray", s))(K || {});
 var b = Symbol.asyncIterator, lr = Symbol.hasInstance, P$1 = Symbol.isConcatSpreadable, A = Symbol.iterator, ur = Symbol.match, cr = Symbol.matchAll, fr = Symbol.replace, Sr = Symbol.search, pr = Symbol.species, dr = Symbol.split, mr = Symbol.toPrimitive, x = Symbol.toStringTag, gr = Symbol.unscopables;
@@ -1759,8 +1736,49 @@ function Xi(e, r = {}) {
   let t = v(r.plugins), n = Ot({ plugins: t, markedRefs: e.m });
   return er(n, e.t);
 }
-const minifiedTsrBootStrapScript = 'self.$_TSR={c(){document.querySelectorAll(".\\\\$tsr").forEach(e=>{e.remove()}),this.hydrated&&this.streamEnd&&(delete self.$_TSR,delete self.$R.tsr)},p(e){this.initialized?e():this.buffer.push(e)},buffer:[]};\n';
 const GLOBAL_TSR = "$_TSR";
+function createSerializationAdapter(opts) {
+  return opts;
+}
+function makeSsrSerovalPlugin(serializationAdapter, options) {
+  return _s({
+    tag: "$TSR/t/" + serializationAdapter.key,
+    test: serializationAdapter.test,
+    parse: {
+      stream(value, ctx) {
+        return ctx.parse(serializationAdapter.toSerializable(value));
+      }
+    },
+    serialize(node, ctx) {
+      options.didRun = true;
+      return GLOBAL_TSR + '.t.get("' + serializationAdapter.key + '")(' + ctx.serialize(node) + ")";
+    },
+    // we never deserialize on the server during SSR
+    deserialize: void 0
+  });
+}
+function makeSerovalPlugin(serializationAdapter) {
+  return _s({
+    tag: "$TSR/t/" + serializationAdapter.key,
+    test: serializationAdapter.test,
+    parse: {
+      sync(value, ctx) {
+        return ctx.parse(serializationAdapter.toSerializable(value));
+      },
+      async async(value, ctx) {
+        return await ctx.parse(serializationAdapter.toSerializable(value));
+      },
+      stream(value, ctx) {
+        return ctx.parse(serializationAdapter.toSerializable(value));
+      }
+    },
+    // we don't generate JS code outside of SSR (for now)
+    serialize: void 0,
+    deserialize(node, ctx) {
+      return serializationAdapter.fromSerializable(ctx.deserialize(node));
+    }
+  });
+}
 var p = {}, P = (e) => new ReadableStream({ start: (r) => {
   e.on({ next: (a) => {
     try {
@@ -1847,23 +1865,50 @@ const defaultSerovalPlugins = [
   // ReadableStreamNode is not exported by seroval
   u
 ];
-function makeSsrSerovalPlugin(serializationAdapter, options) {
-  return _s({
-    tag: "$TSR/t/" + serializationAdapter.key,
-    test: serializationAdapter.test,
-    parse: {
-      stream(value, ctx) {
-        return ctx.parse(serializationAdapter.toSerializable(value));
-      }
-    },
-    serialize(node, ctx) {
-      options.didRun = true;
-      return GLOBAL_TSR + '.t.get("' + serializationAdapter.key + '")(' + ctx.serialize(node) + ")";
-    },
-    // we never deserialize on the server during SSR
-    deserialize: void 0
-  });
+const TSS_FORMDATA_CONTEXT = "__TSS_CONTEXT";
+const TSS_SERVER_FUNCTION = Symbol.for("TSS_SERVER_FUNCTION");
+const X_TSS_SERIALIZED = "x-tss-serialized";
+const X_TSS_RAW_RESPONSE = "x-tss-raw";
+const startStorage = new AsyncLocalStorage();
+async function runWithStartContext(context, fn2) {
+  return startStorage.run(context, fn2);
 }
+function getStartContext(opts) {
+  const context = startStorage.getStore();
+  if (!context && opts?.throwIfNotFound !== false) {
+    throw new Error(
+      `No Start context found in AsyncLocalStorage. Make sure you are using the function within the server runtime.`
+    );
+  }
+  return context;
+}
+const getStartOptions = () => getStartContext().startOptions;
+function flattenMiddlewares(middlewares) {
+  const seen = /* @__PURE__ */ new Set();
+  const flattened = [];
+  const recurse = (middleware) => {
+    middleware.forEach((m2) => {
+      if (m2.options.middleware) {
+        recurse(m2.options.middleware);
+      }
+      if (!seen.has(m2)) {
+        seen.add(m2);
+        flattened.push(m2);
+      }
+    });
+  };
+  recurse(middlewares);
+  return flattened;
+}
+function getDefaultSerovalPlugins() {
+  const start = getStartOptions();
+  const adapters = start?.serializationAdapters;
+  return [
+    ...adapters?.map(makeSerovalPlugin) ?? [],
+    ...defaultSerovalPlugins
+  ];
+}
+const minifiedTsrBootStrapScript = 'self.$_TSR={c(){document.querySelectorAll(".\\\\$tsr").forEach(e=>{e.remove()}),this.hydrated&&this.streamEnd&&(delete self.$_TSR,delete self.$R.tsr)},p(e){this.initialized?e():this.buffer.push(e)},buffer:[]};\n';
 const TSR_SCRIPT_BARRIER_ID = "$tsr-stream-barrier";
 const SCOPE_ID = "tsr";
 function dehydrateMatch(match) {
