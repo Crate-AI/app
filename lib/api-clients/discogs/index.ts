@@ -3,8 +3,8 @@ import { DiscogsSDK } from '@crate.ai/discogs-sdk';
 import { rateLimiter } from '@/lib/utils/rateLimiter';
 
 const discogs = new DiscogsSDK({
-  DiscogsConsumerKey: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_KEY || '',
-  DiscogsConsumerSecret: process.env.NEXT_PUBLIC_DISCOGS_CONSUMER_SECRET || '',
+  DiscogsConsumerKey: import.meta.env.VITE_DISCOGS_CONSUMER_KEY || '',
+  DiscogsConsumerSecret: import.meta.env.VITE_DISCOGS_CONSUMER_SECRET || '',
 });
 
 export const fetchUserDetails = async (username: string) => {
@@ -80,9 +80,6 @@ export const getDiscogsRelease = async (
       Authorization: `OAuth oauth_token=${accessToken}, oauth_token_secret=${accessTokenSecret}`,
       'User-Agent': 'CrateApp/1.0 +https://crate.ai',
       Accept: 'application/json',
-    },
-    next: {
-      revalidate: 3600,
     },
   });
 

@@ -4,15 +4,18 @@ import { DiscogsSearchResult, CrateTrack } from '@/types';
  * Converts a Discogs search result to a CrateTrack format for playlist compatibility
  * This allows external tracks (not in user's collection) to be used in playlists and player
  */
-export function convertSearchResultToTrack(result: DiscogsSearchResult): CrateTrack {
+export function convertSearchResultToTrack(
+  result: DiscogsSearchResult,
+): CrateTrack {
   // Generate a unique ID for external tracks using the discogs ID
   const externalId = `external_${result.id}`;
-  
+
   // Extract artist and title from the title field (format: "Artist - Title")
   const titleParts = result.title.split(' - ');
   const artist = titleParts.length > 1 ? titleParts[0] : 'Unknown Artist';
-  const title = titleParts.length > 1 ? titleParts.slice(1).join(' - ') : result.title;
-  
+  const title =
+    titleParts.length > 1 ? titleParts.slice(1).join(' - ') : result.title;
+
   return {
     id: externalId,
     title: title || 'Unknown Title',
@@ -50,14 +53,14 @@ export function getDiscogsIdFromExternalTrack(trackId: string): string {
  */
 export function createTemporaryTrackForPlayback(
   result: DiscogsSearchResult,
-  youtubeVideoId?: string
+  youtubeVideoId?: string,
 ): CrateTrack {
   const track = convertSearchResultToTrack(result);
-  
+
   if (youtubeVideoId) {
     track.youtube_video_id = youtubeVideoId;
   }
-  
+
   return track;
 }
 
@@ -66,4 +69,4 @@ export function createTemporaryTrackForPlayback(
  */
 export function validateSearchResult(result: DiscogsSearchResult): boolean {
   return !!(result.id && result.title);
-} 
+}

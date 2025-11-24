@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Play, Pause, Trash2, Globe, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils/utils';
 import { PlaylistWithTracks } from '@/types';
-import Image from 'next/image';
+import { Image } from '@unpic/react';
 import { usePlayerStore, usePlaylistStore } from '@/stores';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -92,7 +92,6 @@ export const PlaylistCard = ({
             className="w-full h-full object-cover"
             width={400}
             height={400}
-            priority
           />
         ) : (
           <div className="w-full h-full bg-gray-100 flex items-center justify-center">

@@ -11,7 +11,10 @@ interface PlaylistStore {
   fetchPlaylists: () => Promise<any[]>;
   createPlaylist: (title: string, description?: string) => Promise<string>;
   addTrackToPlaylist: (playlistId: string, trackId: string) => Promise<void>;
-  addExternalTrackToPlaylist: (playlistId: string, track: CrateTrack) => Promise<void>;
+  addExternalTrackToPlaylist: (
+    playlistId: string,
+    track: CrateTrack,
+  ) => Promise<void>;
   removeTrackFromPlaylist: (
     playlistId: string,
     trackId: string,
@@ -22,7 +25,10 @@ interface PlaylistStore {
     newPosition: number,
   ) => Promise<void>;
   deletePlaylist: (playlistId: string) => Promise<void>;
-  togglePlaylistPublic: (playlistId: string, isPublic: boolean) => Promise<void>;
+  togglePlaylistPublic: (
+    playlistId: string,
+    isPublic: boolean,
+  ) => Promise<void>;
   clearError: () => void;
 }
 
@@ -133,7 +139,10 @@ export const usePlaylistStore = create<PlaylistStore>((set, get) => {
       }
     },
 
-    addExternalTrackToPlaylist: async (playlistId: string, track: CrateTrack) => {
+    addExternalTrackToPlaylist: async (
+      playlistId: string,
+      track: CrateTrack,
+    ) => {
       try {
         const response = await fetch(
           `/api/music/playlists/${playlistId}/external-tracks`,
@@ -148,7 +157,9 @@ export const usePlaylistStore = create<PlaylistStore>((set, get) => {
 
         if (!response.ok) {
           const error = await response.json();
-          throw new Error(error.message || 'Failed to add external track to playlist');
+          throw new Error(
+            error.message || 'Failed to add external track to playlist',
+          );
         }
 
         // Update local state optimistically
@@ -166,7 +177,10 @@ export const usePlaylistStore = create<PlaylistStore>((set, get) => {
 
         toast.success('Track added to playlist');
       } catch (error) {
-        console.error('PlaylistStore: Error adding external track to playlist:', error);
+        console.error(
+          'PlaylistStore: Error adding external track to playlist:',
+          error,
+        );
         const message =
           error instanceof Error
             ? error.message
@@ -299,7 +313,7 @@ export const usePlaylistStore = create<PlaylistStore>((set, get) => {
           playlists: state.playlists.map((playlist) =>
             playlist.id === playlistId
               ? { ...playlist, is_public: isPublic }
-              : playlist
+              : playlist,
           ),
         }));
 

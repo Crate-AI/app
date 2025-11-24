@@ -1,6 +1,6 @@
 import { Release, Track } from '@/types';
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+const baseUrl = import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
 export async function searchVideo(query: string): Promise<string | null> {
   try {
     const response = await fetch(

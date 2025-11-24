@@ -1,7 +1,4 @@
-'use client';
-
-import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from '@tanstack/react-router';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface BannerProps {
@@ -18,13 +15,12 @@ export default function Banner({
   return (
     <header className="text-black p-6 flex justify-between items-center">
       <div className="flex items-center">
-        <Link href="/">
-          <Image
+        <Link to="/">
+          <img
             src="/logo.svg"
             alt="Crate Logo"
             width={48}
             height={48}
-            priority
             className="w-12 h-12"
           />
         </Link>

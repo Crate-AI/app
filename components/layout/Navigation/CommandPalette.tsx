@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from '@tanstack/react-router';
 import { useAuthStore } from '@/stores';
 import { cn } from '@/lib/utils/utils';
 import {
@@ -45,7 +45,7 @@ export default function CommandPalette({
   const [isAnimating, setIsAnimating] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
+  const navigate = useNavigate();
   const { userIdentity } = useAuthStore();
 
   // Load recent commands from localStorage
@@ -153,7 +153,7 @@ export default function CommandPalette({
         title: 'Dashboard',
         description: 'Go to your personal dashboard',
         icon: Home,
-        action: () => router.push(`/${userIdentity.username}`),
+        action: () => navigate({ to: `/${userIdentity.username}` }),
         keywords: ['dashboard', 'home', 'overview', 'profile'],
         category: 'navigation',
         href: `/${userIdentity.username}`,
@@ -163,7 +163,7 @@ export default function CommandPalette({
         title: 'Tracks',
         description: 'Browse your complete track collection',
         icon: Music,
-        action: () => router.push(`/${userIdentity.username}/tracks`),
+        action: () => navigate({ to: `/${userIdentity.username}/tracks` }),
         keywords: ['tracks', 'music', 'collection', 'songs'],
         category: 'navigation',
         href: `/${userIdentity.username}/tracks`,
@@ -173,7 +173,7 @@ export default function CommandPalette({
         title: 'Playlists',
         description: 'Create and manage your playlists',
         icon: ListMusic,
-        action: () => router.push(`/${userIdentity.username}/playlists`),
+        action: () => navigate({ to: `/${userIdentity.username}/playlists` }),
         keywords: ['playlists', 'lists', 'music', 'collections'],
         category: 'navigation',
         href: `/${userIdentity.username}/playlists`,
@@ -183,7 +183,7 @@ export default function CommandPalette({
         title: 'Collection',
         description: 'Explore your synced Discogs collection',
         icon: Search,
-        action: () => router.push(`/${userIdentity.username}/collection`),
+        action: () => navigate({ to: `/${userIdentity.username}/collection` }),
         keywords: ['collection', 'discogs', 'explore', 'vinyl', 'records'],
         category: 'navigation',
         href: `/${userIdentity.username}/collection`,
@@ -193,7 +193,7 @@ export default function CommandPalette({
         title: 'Settings',
         description: 'Manage your account and preferences',
         icon: Settings,
-        action: () => router.push('/settings'),
+        action: () => navigate({ to: '/settings' }),
         keywords: ['settings', 'preferences', 'config', 'account'],
         category: 'navigation',
         href: '/settings',
@@ -205,7 +205,8 @@ export default function CommandPalette({
         title: 'Create Playlist',
         description: 'Start building a new playlist',
         icon: Plus,
-        action: () => router.push(`/${userIdentity.username}/playlists/new`),
+        action: () =>
+          navigate({ to: `/${userIdentity.username}/playlists/new` }),
         keywords: ['create', 'new', 'playlist', 'make'],
         category: 'actions',
         badge: 'Quick',
@@ -215,7 +216,7 @@ export default function CommandPalette({
         title: 'Add Track',
         description: 'Add new music to your collection',
         icon: Music,
-        action: () => router.push(`/${userIdentity.username}/tracks/add`),
+        action: () => navigate({ to: `/${userIdentity.username}/tracks/add` }),
         keywords: ['add', 'track', 'music', 'upload'],
         category: 'actions',
       },

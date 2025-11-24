@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { requestDiscogsAuth } from '@/app/actions/auth/discogs';
 import { LoaderCircle } from 'lucide-react';
 
 interface SignInButtonProps {}
@@ -21,9 +20,13 @@ const SignInButton = ({}: SignInButtonProps) => {
         });
       }
 
-      const { authorizationUrl } = await requestDiscogsAuth();
+      const response = await fetch('/api/auth/discogs/request-token');
+      if (!response.ok) {
+        throw new Error('Failed to get authorization URL');
+      }
+      const { authUrl } = await response.json();
 
-      window.location.href = authorizationUrl;
+      window.location.href = authUrl;
     } catch (error) {
       console.error('Authentication error:', error);
       setIsLoading(false);

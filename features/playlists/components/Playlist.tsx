@@ -14,7 +14,8 @@ interface PlaylistProps {
 }
 
 export const Playlist = ({ activePlaylistId }: PlaylistProps) => {
-  const { playlists, removeTrackFromPlaylist, togglePlaylistPublic } = usePlaylistStore();
+  const { playlists, removeTrackFromPlaylist, togglePlaylistPublic } =
+    usePlaylistStore();
   const { initializePlayer, playingTrackId, isPlaying, togglePlayPause } =
     usePlayerStore();
 
@@ -44,7 +45,7 @@ export const Playlist = ({ activePlaylistId }: PlaylistProps) => {
             {activePlaylist.title}
           </h2>
         </div>
-        
+
         <div className="flex items-center gap-3 pb-4 border-b border-border">
           <Switch
             id={`public-${activePlaylist.id}`}

@@ -17,7 +17,7 @@ import {
   Plus,
   Heart,
 } from 'lucide-react';
-import Image from 'next/image';
+import { Image } from '@unpic/react';
 import { cn } from '@/lib/utils/utils';
 import {
   createColumnHelper,
@@ -758,8 +758,7 @@ export default function TracksTable() {
     <div className="space-y-4 ml-8">
       <style jsx>{marqueeStyles}</style>
       <div className="flex justify-between items-center mb-4">
-        <div>
-        </div>
+        <div></div>
         <SearchInput
           ref={searchInputRef}
           value={searchQuery}
@@ -781,9 +780,9 @@ export default function TracksTable() {
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                   </th>
                 ))}
               </tr>

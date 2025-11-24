@@ -1,10 +1,9 @@
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useNavigate, useLocation } from '@tanstack/react-router';
 import { useAuthStore } from '@/stores';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { getCurrentUserIdentity } from '@/app/actions/auth/discogs';
 import { initializeAuth } from '@/lib/supabase/auth';
 import { supabase } from '@/lib/supabase/client';
 import type { Session, User } from '@supabase/supabase-js';
@@ -23,8 +22,9 @@ interface AuthProviderProps {
 }
 
 function AuthProviderContent({ children }: AuthProviderProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
   const { setUserIdentity, setSupabaseUser, setIsLoading } = useAuthStore();
 
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +33,7 @@ function AuthProviderContent({ children }: AuthProviderProps) {
     console.error('AuthProvider: Error initializing auth:', error);
     const newUrl = new URL(window.location.href);
     newUrl.searchParams.delete('error');
-    router.replace(newUrl.pathname);
+    navigate({ to: newUrl.pathname + newUrl.search, replace: true });
 
     // Handle both string errors and Error objects
     const errorMessage =
@@ -55,7 +55,7 @@ function AuthProviderContent({ children }: AuthProviderProps) {
     if (event === 'SIGNED_OUT') {
       setUserIdentity(null);
       setSupabaseUser(null);
-      router.replace('/');
+      navigate({ to: '/', replace: true });
     } else if (event === 'SIGNED_IN' && session?.user) {
       setSupabaseUser(session.user);
     }
@@ -70,9 +70,12 @@ function AuthProviderContent({ children }: AuthProviderProps) {
           setSupabaseUser(supabaseUser);
         }
 
-        const user = await getCurrentUserIdentity();
-        if (user) {
-          setUserIdentity(user);
+        const userResponse = await fetch('/api/auth/user');
+        if (userResponse.ok) {
+          const { user } = await userResponse.json();
+          if (user) {
+            setUserIdentity(user);
+          }
         }
 
         const error = searchParams.get('error');
