@@ -1,5 +1,6 @@
 name = "app"
-main = ".output/server/index.mjs"
+main = "dist/server/server.js"
+assets = { directory = "dist/client" }
 compatibility_date = "2024-12-16"
 compatibility_flags = ["nodejs_compat"]
 
