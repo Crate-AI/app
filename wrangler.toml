@@ -7,13 +7,13 @@ compatibility_flags = ["nodejs_compat"]
 [env.production]
 name = "app-production"
 routes = [
-  { pattern = "crate.audio/*", zone_name = "crate.audio" }
+  { pattern = "example.com/*", zone_name = "example.com" }
 ]
 
 [env.staging]
 name = "app-staging"
 routes = [
-  { pattern = "staging.crate.audio/*", zone_name = "crate.audio" }
+  { pattern = "staging.example.com/*", zone_name = "example.com" }
 ]
 
 # Environment variables
