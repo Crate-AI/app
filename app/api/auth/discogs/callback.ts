@@ -190,7 +190,7 @@ export const Route = createFileRoute('/api/auth/discogs/callback')({
         } catch (error) {
           console.error('Error during OAuth callback:', error);
           const baseUrl =
-            import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
+            import.meta.env.VITE_BASE_URL || 'http://localhost:1995';
           return Response.redirect(new URL('/?error=auth_failed', baseUrl));
         }
       },
