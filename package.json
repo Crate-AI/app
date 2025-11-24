@@ -11,7 +11,7 @@
     "---------------DEVELOPMENT (use ni to install, nr to run)-----------------": "⚙️",
     "dev": "vite dev",
     "build": "vite build",
-    "start": "node .output/server/index.mjs",
+    "start": "wrangler dev",
     "preview": "vite preview",
     "---------------CODE QUALITY-----------------": "🔍",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
