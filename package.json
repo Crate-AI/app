@@ -87,6 +87,7 @@
     "typescript": "^5",
     "vinxi": "^0.5.8",
     "vite": "^7.2.4",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "^5.1.4",
+    "wrangler": "^4.50.0"
   }
 }

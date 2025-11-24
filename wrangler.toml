@@ -1,5 +1,6 @@
 name = "app"
 main = "entry-worker.js"
+account_id = "32a73ac2845c6c9986379ea97030bb5d"
 assets = { directory = "dist/client" }
 compatibility_date = "2024-12-16"
 compatibility_flags = ["nodejs_compat"]
@@ -7,13 +8,13 @@ compatibility_flags = ["nodejs_compat"]
 [env.production]
 name = "app-production"
 routes = [
-  { pattern = "example.com/*", zone_name = "example.com" }
+  { pattern = "crate.audio", custom_domain = true }
 ]
 
 [env.staging]
 name = "app-staging"
 routes = [
-  { pattern = "staging.example.com/*", zone_name = "example.com" }
+  { pattern = "staging.crate.audio", custom_domain = true }
 ]
 
 # Environment variables
@@ -27,7 +28,6 @@ ENVIRONMENT = "staging"
 [build]
 command = "pnpm build"
 cwd = "."
-watch_paths = ["src/*/.ts", "src/*/.tsx", "app/*/.ts", "app/*/.tsx"]
 
 # Observability
 [observability]
