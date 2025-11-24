@@ -1,0 +1,33 @@
+name = "app"
+main = ".output/server/index.mjs"
+compatibility_date = "2024-12-16"
+compatibility_flags = ["nodejs_compat"]
+
+[env.production]
+name = "app-production"
+routes = [
+  { pattern = "example.com/*", zone_name = "example.com" }
+]
+
+[env.staging]
+name = "app-staging"
+routes = [
+  { pattern = "staging.example.com/*", zone_name = "example.com" }
+]
+
+# Environment variables
+[env.production.vars]
+ENVIRONMENT = "production"
+
+[env.staging.vars]
+ENVIRONMENT = "staging"
+
+# Build configuration
+[build]
+command = "pnpm build"
+cwd = "."
+watch_paths = ["src/*/.ts", "src/*/.tsx", "app/*/.ts", "app/*/.tsx"]
+
+# Observability
+[observability]
+enabled = true
