@@ -1,8 +1,9 @@
+import { QueryClient } from "@tanstack/react-query";
 import {
   Outlet,
-  createRootRoute,
   HeadContent,
   Scripts,
+  createRootRouteWithContext,
 } from '@tanstack/react-router';
 import { Suspense } from 'react';
 import { Toaster } from 'sonner';
@@ -13,7 +14,9 @@ import ErrorBoundary from '@/components/Error/ErrorBoundary';
 import { LoadingSpinner } from '@/components/ui/loading';
 import GlobalError from '@/components/Error/GlobalError';
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+}>()({
   head: () => ({
     meta: [
       { charSet: 'utf-8' },
