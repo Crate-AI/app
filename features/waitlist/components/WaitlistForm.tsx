@@ -13,7 +13,7 @@ import {
   FormControl,
   FormMessage,
 } from '@/components/ui/form';
-import { waitlistSchema } from '@/app/schemas/waitlistSchema';
+import { waitlistSchema } from '@/lib/schemas/waitlistSchema';
 import {
   Select,
   SelectTrigger,
@@ -21,8 +21,6 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
-import Image from 'next/image';
 
 const WaitListForm: React.FC = () => {
   const [message, setMessage] = useState<string | null>(null);
@@ -141,7 +139,7 @@ const WaitListForm: React.FC = () => {
           {message && (
             <div className="text-center text-green-600 mt-4 animate-pulse font-mono text-small-subtitle">
               <p>{message}</p>
-              <Image
+              <img
                 src="/Brut164.svg"
                 alt="Success Icon"
                 width={50}

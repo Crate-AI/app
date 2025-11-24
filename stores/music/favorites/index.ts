@@ -29,11 +29,11 @@ export const useFavoritesStore = create<FavoritesStore>()(
           // Get current user from auth store (Discogs auth)
           const authState = useAuthStore.getState();
           const userIdentity = authState.userIdentity;
-          
+
           if (userIdentity?.username) {
             // For now, use username as userId until proper Supabase user linking is set up
             const userId = userIdentity.username;
-            
+
             // Add to database
             const response = await fetch('/api/music/favorites', {
               method: 'POST',
@@ -43,7 +43,10 @@ export const useFavoritesStore = create<FavoritesStore>()(
 
             if (!response.ok) {
               const errorData = await response.json();
-              console.log('Database save failed, continuing with local storage:', errorData);
+              console.log(
+                'Database save failed, continuing with local storage:',
+                errorData,
+              );
               // Continue with local storage even if database fails
             }
           }
@@ -69,11 +72,11 @@ export const useFavoritesStore = create<FavoritesStore>()(
           // Get current user from auth store (Discogs auth)
           const authState = useAuthStore.getState();
           const userIdentity = authState.userIdentity;
-          
+
           if (userIdentity?.username) {
             // For now, use username as userId until proper Supabase user linking is set up
             const userId = userIdentity.username;
-            
+
             // Remove from database
             const response = await fetch('/api/music/favorites', {
               method: 'DELETE',
@@ -83,7 +86,10 @@ export const useFavoritesStore = create<FavoritesStore>()(
 
             if (!response.ok) {
               const errorData = await response.json();
-              console.log('Database remove failed, continuing with local storage:', errorData);
+              console.log(
+                'Database remove failed, continuing with local storage:',
+                errorData,
+              );
               // Continue with local storage even if database fails
             }
           }
@@ -130,25 +136,28 @@ export const useFavoritesStore = create<FavoritesStore>()(
           // Get current user from auth store (Discogs auth)
           const authState = useAuthStore.getState();
           const userIdentity = authState.userIdentity;
-          
+
           if (userIdentity?.username) {
             // For now, use username as userId until proper Supabase user linking is set up
             const userId = userIdentity.username;
-            
+
             // Clear all favorites from database
             const { favoriteTrackIds } = get();
-            const promises = Array.from(favoriteTrackIds).map(trackId =>
+            const promises = Array.from(favoriteTrackIds).map((trackId) =>
               fetch('/api/music/favorites', {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId, trackId }),
-              })
+              }),
             );
-            
+
             try {
               await Promise.all(promises);
             } catch (error) {
-              console.log('Database clear failed, continuing with local storage:', error);
+              console.log(
+                'Database clear failed, continuing with local storage:',
+                error,
+              );
             }
           }
 
@@ -167,7 +176,7 @@ export const useFavoritesStore = create<FavoritesStore>()(
           // Get current user from auth store (Discogs auth)
           const authState = useAuthStore.getState();
           const userIdentity = authState.userIdentity;
-          
+
           if (userIdentity?.username) {
             // For now, use username as userId until proper Supabase user linking is set up
             const userId = userIdentity.username;
@@ -184,21 +193,26 @@ export const useFavoritesStore = create<FavoritesStore>()(
       syncWithDatabase: async (userId: string) => {
         try {
           const response = await fetch(`/api/music/favorites?userId=${userId}`);
-          
+
           if (!response.ok) {
-            console.log('Failed to fetch favorites from database, using local storage');
+            console.log(
+              'Failed to fetch favorites from database, using local storage',
+            );
             set({ isLoading: false });
             return;
           }
 
           const { favoriteTrackIds } = await response.json();
-          
-          set({ 
-            favoriteTrackIds: new Set(favoriteTrackIds || []), 
-            isLoading: false 
+
+          set({
+            favoriteTrackIds: new Set(favoriteTrackIds || []),
+            isLoading: false,
           });
         } catch (error) {
-          console.error('Error syncing with database, using local storage:', error);
+          console.error(
+            'Error syncing with database, using local storage:',
+            error,
+          );
           set({ isLoading: false });
         }
       },

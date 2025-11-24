@@ -12,16 +12,12 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
+    "plugins": [],
     "paths": {
       "@/*": ["./*"]
     },
     "target": "es2015"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "supabase/functions"]
+  "include": ["vite-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", "supabase/functions", ".output"]
 }

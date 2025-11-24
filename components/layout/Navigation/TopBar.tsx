@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from '@tanstack/react-router';
 import { useAuthStore } from '@/stores';
 import { cn } from '@/lib/utils/utils';
 import { logout } from '@/lib/supabase/auth';
@@ -63,7 +63,7 @@ export default function TopBar({
   searchPlaceholder = 'Search tracks, playlists, artists...',
 }: TopBarProps) {
   const { userIdentity } = useAuthStore();
-  const router = useRouter();
+  const navigate = useNavigate();
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [internalSearchQuery, setInternalSearchQuery] = useState('');
   const [searchDropdownOpen, setSearchDropdownOpen] = useState(false);

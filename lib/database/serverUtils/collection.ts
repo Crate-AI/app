@@ -108,7 +108,8 @@ export const CollectionUtils = (supabase: SupabaseClient<Database>) => {
 
     // Fetch tracks in batches to avoid max_rows limit
     const BATCH_SIZE = 1000;
-    let allTracks: Database['public']['Views']['user_releases_and_tracks']['Row'][] = [];
+    let allTracks: Database['public']['Views']['user_releases_and_tracks']['Row'][] =
+      [];
     let offset = 0;
     let hasMore = true;
 
@@ -129,7 +130,7 @@ export const CollectionUtils = (supabase: SupabaseClient<Database>) => {
       } else {
         allTracks = [...allTracks, ...tracksData];
         offset += BATCH_SIZE;
-        
+
         // If we got fewer than BATCH_SIZE, we've reached the end
         if (tracksData.length < BATCH_SIZE) {
           hasMore = false;

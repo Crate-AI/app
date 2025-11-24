@@ -31,12 +31,7 @@ const SearchView = ({
           {error}
         </div>
       )}
-      {!error && (
-        <TrackGrid
-          viewMode={viewMode}
-          items={results}
-        />
-      )}
+      {!error && <TrackGrid viewMode={viewMode} items={results} />}
     </>
   );
 };

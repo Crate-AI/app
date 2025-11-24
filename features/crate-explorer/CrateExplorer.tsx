@@ -31,10 +31,10 @@ const CrateExplorer = ({}: CrateExplorerProps) => {
   } = useDiscogsCollection();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [view, setView] = useState<'search' | 'collection'>('search');
-  
+
   // Initialize player when component mounts
   const { initializePlayer } = usePlayerStore();
-  
+
   useEffect(() => {
     initializePlayer();
   }, [initializePlayer]);

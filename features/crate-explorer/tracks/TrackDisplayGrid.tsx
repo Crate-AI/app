@@ -32,7 +32,8 @@ const TrackDisplayGrid = () => {
     dateAdded,
   } = useTrackContext();
   const [showTracks, setShowTracks] = useState(false);
-  const { playlists, addExternalTrackToPlaylist, fetchPlaylists } = usePlaylistStore();
+  const { playlists, addExternalTrackToPlaylist, fetchPlaylists } =
+    usePlaylistStore();
 
   // Fetch playlists when component mounts
   useEffect(() => {
@@ -41,7 +42,7 @@ const TrackDisplayGrid = () => {
 
   const handleAddToPlaylist = async (playlistId: string) => {
     if (!trackResult) return;
-    
+
     try {
       const track = convertSearchResultToTrack(trackResult);
       await addExternalTrackToPlaylist(playlistId, track);
@@ -137,9 +138,7 @@ const TrackDisplayGrid = () => {
                   </DropdownMenuItem>
                 ))
               ) : (
-                <DropdownMenuItem disabled>
-                  No playlists found
-                </DropdownMenuItem>
+                <DropdownMenuItem disabled>No playlists found</DropdownMenuItem>
               )}
             </DropdownMenuContent>
           </DropdownMenu>

@@ -125,12 +125,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
             isMobile
               ? cn(
                   'fixed inset-y-0 left-0 h-full',
-                  mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+                  mobileMenuOpen ? 'translate-x-0' : '-translate-x-full',
                 )
-              : cn(
-                  'relative',
-                  sidebarCollapsed ? 'w-16' : 'w-64'
-                )
+              : cn('relative', sidebarCollapsed ? 'w-16' : 'w-64'),
           )}
         >
           <Sidebar
@@ -156,9 +153,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
           {/* Scrollable Page Content */}
           <main className="flex-1 overflow-y-auto">
-             <div className="p-6 max-w-7xl mx-auto">
-               {children}
-             </div>
+            <div className="p-6 max-w-7xl mx-auto">{children}</div>
           </main>
         </div>
       </div>

@@ -1,7 +1,4 @@
-'use client';
-
-import { usePathname } from 'next/navigation';
-import Link from 'next/link';
+import { useLocation, Link } from '@tanstack/react-router';
 import { useAuthStore } from '@/stores';
 import { cn } from '@/lib/utils/utils';
 import {
@@ -21,7 +18,7 @@ interface BreadcrumbItem {
 }
 
 export default function Breadcrumbs() {
-  const pathname = usePathname();
+  const { pathname } = useLocation();
   const { userIdentity } = useAuthStore();
 
   if (!userIdentity) return null;
@@ -139,7 +136,7 @@ export default function Breadcrumbs() {
                 </span>
               ) : (
                 <Link
-                  href={item.href!}
+                  to={item.href!}
                   className="flex items-center hover:text-gray-900 transition-colors"
                 >
                   {Icon && <Icon className="w-4 h-4 mr-2" />}

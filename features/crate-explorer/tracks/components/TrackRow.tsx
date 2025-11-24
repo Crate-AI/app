@@ -4,7 +4,7 @@ import { CrateTrack } from '@/types';
 import { cn } from '@/lib/utils/utils';
 import { usePlaylistStore } from '@/stores';
 import { PlaylistActions } from './PlaylistActions';
-import Image from 'next/image';
+import { Image } from '@unpic/react';
 import { useState } from 'react';
 
 interface TrackRowProps {

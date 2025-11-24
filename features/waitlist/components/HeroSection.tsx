@@ -1,10 +1,6 @@
 import React from 'react';
-import dynamic from 'next/dynamic';
-import Image from 'next/image';
 
-const WaitlistForm = dynamic(() => import('./WaitlistForm'), {
-  ssr: false,
-});
+const WaitlistForm = React.lazy(() => import('./WaitlistForm'));
 
 const HeroSection: React.FC = () => {
   return (
@@ -23,7 +19,7 @@ const HeroSection: React.FC = () => {
         </h1>
         <p className="text-medium-title font-mono mb-6 drop-shadow-lg inline-flex items-center">
           Beta under construction, join our waitlist for early access
-          <Image
+          <img
             src="/Smile.svg"
             alt="Smile"
             width={27}
@@ -32,7 +28,9 @@ const HeroSection: React.FC = () => {
           />
         </p>
         <div className="w-full max-w-lg px-8 py-6 text-black shadow-xs rounded-lg transition-transform duration-300 hover:scale-105">
-          <WaitlistForm />
+          <React.Suspense fallback={<div>Loading form...</div>}>
+            <WaitlistForm />
+          </React.Suspense>
         </div>
       </div>
     </div>

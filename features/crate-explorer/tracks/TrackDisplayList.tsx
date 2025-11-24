@@ -32,7 +32,8 @@ const TrackDisplayList = () => {
     dateAdded,
   } = useTrackContext();
   const [showTracks, setShowTracks] = useState(false);
-  const { playlists, addExternalTrackToPlaylist, fetchPlaylists } = usePlaylistStore();
+  const { playlists, addExternalTrackToPlaylist, fetchPlaylists } =
+    usePlaylistStore();
 
   // Fetch playlists when component mounts
   useEffect(() => {
@@ -41,7 +42,7 @@ const TrackDisplayList = () => {
 
   const handleAddToPlaylist = async (playlistId: string) => {
     if (!trackResult) return;
-    
+
     try {
       const track = convertSearchResultToTrack(trackResult);
       await addExternalTrackToPlaylist(playlistId, track);
@@ -103,7 +104,7 @@ const TrackDisplayList = () => {
               <ChevronDown className="w-4 h-4" />
             )}
           </Button>
-          
+
           {/* Add to Playlist Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -123,9 +124,7 @@ const TrackDisplayList = () => {
                   </DropdownMenuItem>
                 ))
               ) : (
-                <DropdownMenuItem disabled>
-                  No playlists found
-                </DropdownMenuItem>
+                <DropdownMenuItem disabled>No playlists found</DropdownMenuItem>
               )}
             </DropdownMenuContent>
           </DropdownMenu>

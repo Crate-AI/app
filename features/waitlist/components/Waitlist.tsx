@@ -1,8 +1,8 @@
 import React from 'react';
 // import Banner from '@/components/Banner';
 import { HeroSection } from '@/features/waitlist';
-import Image from 'next/image';
-import Link from 'next/link';
+// import Image from 'next/image';
+// import Link from 'next/link';
 import { Github, X } from 'lucide-react';
 
 const Waitlist: React.FC = () => {
@@ -16,33 +16,36 @@ const Waitlist: React.FC = () => {
         }}
       >
         <div className="flex items-center">
-          <Image
+          <img
             src="/logo.svg"
             alt="Crate Logo"
             width={64}
             height={64}
-            priority
             className="w-16 h-16"
           />
           {/* <h1 className="text-2xl font-heading text-black ml-4">Welcome to Crate</h1> */}
         </div>
         <div className="flex items-center space-x-4">
-          <Link
+          <a
             href="https://github.com/orgs/Crate-AI/repositories"
             className="transition-transform duration-300 hover:scale-110"
+            target="_blank"
+            rel="noopener noreferrer"
           >
             <div className="p-2 rounded-md border-2 border-black shadow-light dark:shadow-dark">
               <Github className="w-8 h-8" />
             </div>
-          </Link>
-          <Link
+          </a>
+          <a
             href="https://x.com/zpaprikaf"
             className="transition-transform duration-300 hover:scale-110"
+            target="_blank"
+            rel="noopener noreferrer"
           >
             <div className="p-2 rounded-md border-2 border-black shadow-light dark:shadow-dark">
               <X className="w-8 h-8" />
             </div>
-          </Link>
+          </a>
         </div>
       </header>
       <HeroSection />

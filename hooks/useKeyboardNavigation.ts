@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@tanstack/react-router';
 import { useAuthStore } from '@/stores';
 
 export function useKeyboardNavigation() {
@@ -24,46 +24,48 @@ export function useKeyboardNavigation() {
           case '1':
             event.preventDefault();
             if (userIdentity) {
-              router.push(`/${userIdentity.username}`);
+              router.navigate({ to: `/${userIdentity.username}` });
             }
             break;
           case '2':
             event.preventDefault();
             if (userIdentity) {
-              router.push(`/${userIdentity.username}/tracks`);
+              router.navigate({ to: `/${userIdentity.username}/tracks` });
             }
             break;
           case '3':
             event.preventDefault();
             if (userIdentity) {
-              router.push(`/${userIdentity.username}/playlists`);
+              router.navigate({ to: `/${userIdentity.username}/playlists` });
             }
             break;
           case '4':
             event.preventDefault();
             if (userIdentity) {
-              router.push(`/${userIdentity.username}/collection`);
+              router.navigate({ to: `/${userIdentity.username}/collection` });
             }
             break;
           case '5':
             event.preventDefault();
-            router.push('/analyze');
+            router.navigate({ to: '/analyze' });
             break;
           case 'h':
             event.preventDefault();
             if (userIdentity) {
-              router.push(`/${userIdentity.username}`);
+              router.navigate({ to: `/${userIdentity.username}` });
             }
             break;
           case 'n':
             event.preventDefault();
             if (userIdentity) {
-              router.push(`/${userIdentity.username}/playlists/new`);
+              router.navigate({
+                to: `/${userIdentity.username}/playlists/new`,
+              });
             }
             break;
           case 'a':
             event.preventDefault();
-            router.push('/analyze');
+            router.navigate({ to: '/analyze' });
             break;
         }
       }

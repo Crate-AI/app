@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import { usePlayerStore, useFavoritesStore } from '@/stores';
 import { Button } from '@/components/ui/button';
@@ -16,13 +14,11 @@ import {
   List,
   X,
   Music,
-  ChevronUp,
-  ChevronDown,
   Heart,
 } from 'lucide-react';
 import { cn } from '@/lib/utils/utils';
 import { CrateTrack } from '@/types';
-import Image from 'next/image';
+import { Image } from '@unpic/react';
 import { toast } from 'sonner';
 
 const PersistentPlayer = () => {
@@ -48,7 +44,6 @@ const PersistentPlayer = () => {
     seekTo,
   } = usePlayerStore();
 
-  const [isExpanded, setIsExpanded] = useState(false);
   const [showQueue, setShowQueue] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [previousVolume, setPreviousVolume] = useState(volume);
@@ -78,10 +73,10 @@ const PersistentPlayer = () => {
     if (!trackId) return;
 
     const wasFavorite = isFavorite(trackId);
-    
+
     try {
       await toggleFavorite(trackId);
-      
+
       if (wasFavorite) {
         toast.success('Removed from favorites');
       } else {

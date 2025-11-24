@@ -1,18 +1,9 @@
-'use client';
-
-import { usePathname } from 'next/navigation';
-import Link from 'next/link';
+import { useLocation, Link } from '@tanstack/react-router';
 import { useAuthStore } from '@/stores';
 import { cn } from '@/lib/utils/utils';
-import {
-  Home,
-  Music,
-  ListMusic,
-  Search
-} from 'lucide-react';
+import { Home, Music, ListMusic, Search } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import Image from 'next/image';
 
 interface SidebarProps {
   collapsed?: boolean;
@@ -20,7 +11,7 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
-  const pathname = usePathname();
+  const { pathname } = useLocation();
   const { userIdentity } = useAuthStore();
   const [isCollapsed, setIsCollapsed] = useState(collapsed);
 
@@ -86,12 +77,10 @@ export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
           )}
         >
           <div className="relative w-8 h-8 shrink-0">
-            <Image
+            <img
               src="/logo.svg"
               alt="Crate Logo"
-              fill
-              className="object-contain"
-              priority
+              className="w-full h-full object-contain"
             />
           </div>
           {!isCollapsed && (
@@ -112,7 +101,7 @@ export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
           return (
             <Link
               key={item.name}
-              href={item.href}
+              to={item.href}
               className={cn(
                 'group flex items-center space-x-3 px-4 py-3 rounded-base transition-all duration-200 relative border-2',
                 isActive
