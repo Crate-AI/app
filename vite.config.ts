@@ -19,4 +19,7 @@ export default defineConfig({
     }),
     viteReact(),
   ],
+  ssr: {
+    noExternal: ['@tanstack/router-core'],
+  },
 });
