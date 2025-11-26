@@ -1,83 +1,79 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+import { authTables } from "@convex-dev/auth/server";
 
 export default defineSchema({
-  // Discogs releases table
+  ...authTables,
   discogs_releases: defineTable({
-    discogs_release_id: v.string(),
-    basic_release_data: v.optional(v.any()), // JSON data
-    discogs_release_data: v.optional(v.any()), // JSON data
+    discogs_release_id: v.union(v.string(), v.number()), // Can be either
+    discogs_release_data: v.optional(v.any()),
+    basic_release_data: v.optional(v.any()),
     uploaded_at: v.optional(v.string()),
-  }).index("by_discogs_release_id", ["discogs_release_id"]),
+  }).index("by_discogs_id", ["discogs_release_id"]),
 
-  // Tracks table
-  tracks: defineTable({
-    artist: v.string(),
-    artwork: v.optional(v.string()),
-    created_at: v.optional(v.string()),
-    discogs_release_id: v.string(),
-    duration: v.string(),
-    extra_artists: v.optional(v.string()),
-    genres: v.optional(v.string()),
-    position: v.string(),
-    styles: v.optional(v.string()),
-    title: v.string(),
-    youtube_video_id: v.optional(v.string()),
-  })
-    .index("by_discogs_release_id", ["discogs_release_id"])
-    .index("by_artist", ["artist"]),
-
-  // Playlists table
   playlists: defineTable({
+    id: v.string(),
+    user_id: v.string(),
     title: v.string(),
+    description: v.optional(v.string()),
     cover_image_url: v.optional(v.string()),
     created_at: v.optional(v.string()),
-    description: v.optional(v.string()),
-    is_favorites: v.optional(v.boolean()),
-    is_public: v.optional(v.boolean()),
     updated_at: v.optional(v.string()),
-    user_id: v.optional(v.string()),
+    is_public: v.optional(v.union(v.boolean(), v.string())), // Handle "t"/"f" strings
+    is_favorites: v.optional(v.union(v.boolean(), v.string())), // Handle "t"/"f" strings
   })
-    .index("by_user_id", ["user_id"])
-    .index("by_is_public", ["is_public"]),
+    .index("by_old_id", ["id"])
+    .index("by_user", ["user_id"]),
 
-  // Playlist tracks junction table
+  tracks: defineTable({
+    id: v.string(),
+    discogs_release_id: v.union(v.string(), v.number()), // Can be either
+    youtube_video_id: v.optional(v.string()),
+    title: v.string(),
+    artist: v.string(),
+    extra_artists: v.optional(v.string()),
+    position: v.string(),
+    duration: v.string(),
+    genres: v.optional(v.string()),
+    styles: v.optional(v.string()),
+    artwork: v.optional(v.string()),
+    created_at: v.optional(v.string()),
+  })
+    .index("by_old_id", ["id"])
+    .index("by_discogs_release", ["discogs_release_id"])
+    .index("by_discogs_and_position", ["discogs_release_id", "position"]),
+
   playlist_tracks: defineTable({
-    playlist_id: v.id("playlists"),
-    track_id: v.id("tracks"),
+    id: v.string(), // Keep old UUID for reference
+    playlist_id: v.id("playlists"), // Points to playlist's _id
+    track_id: v.id("tracks"), // Points to track's _id
     position: v.number(),
     created_at: v.optional(v.string()),
-  })
-    .index("by_playlist_id", ["playlist_id"])
-    .index("by_track_id", ["track_id"])
-    .index("by_playlist_position", ["playlist_id", "position"]),
+  }),
 
-  // Track analysis table
   track_analysis: defineTable({
-    track_id: v.optional(v.string()),
-    analysis: v.any(), // JSON data
+    id: v.string(),
+    track_id: v.id("tracks"), // Points to track's _id
+    analysis: v.any(),
     bpm: v.optional(v.number()),
     created_at: v.optional(v.string()),
-  }).index("by_track_id", ["track_id"]),
+  }),
 
-  // User Discogs profile
   user_discogs_profile: defineTable({
     username: v.string(),
-    user_id: v.optional(v.string()),
+    user_id: v.string(),
   })
     .index("by_username", ["username"])
-    .index("by_user_id", ["user_id"]),
+    .index("by_user", ["user_id"]),
 
-  // User releases junction table
   user_releases: defineTable({
     user_id: v.string(),
-    discogs_release_id: v.string(),
+    discogs_release_id: v.union(v.string(), v.number()), // Can be either
   })
-    .index("by_user_id", ["user_id"])
-    .index("by_discogs_release_id", ["discogs_release_id"])
+    .index("by_user", ["user_id"])
+    .index("by_discogs_release", ["discogs_release_id"])
     .index("by_user_and_release", ["user_id", "discogs_release_id"]),
 
-  // Waitlist table
   waitlist: defineTable({
     email: v.string(),
     user_type: v.string(),
