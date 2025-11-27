@@ -1,40 +1,39 @@
 import { useNavigate } from '@tanstack/react-router';
-import { useAuthStore } from '@/stores';
+import { Unauthenticated, AuthLoading } from 'convex/react';
 import { LoadingSpinner } from '@/components/ui/loading';
 import SignInButton from '@/components/signIn';
 import { useEffect } from 'react';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 
-interface HomeClientProps {}
+interface HomeClientProps { }
 
-const HomeClient = ({}: HomeClientProps) => {
-  const { userIdentity, isLoading } = useAuthStore();
+const HomeClient = ({ }: HomeClientProps) => {
   const navigate = useNavigate();
+  const user = useQuery(api.users.getCurrentUser);
 
   useEffect(() => {
-    if (userIdentity?.username) {
-      navigate({ to: `/${userIdentity.username}`, replace: true });
+    if (user?._id) {
+      navigate({ to: `/${user._id}`, replace: true });
     }
-  }, [userIdentity, navigate]);
+  }, [user]);
 
-  // Show loading state while authentication is being checked
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner />
-      </div>
-    );
-  }
+  return (
+    <>
+      <AuthLoading>
+        <div className="flex items-center justify-center min-h-screen">
+          <LoadingSpinner />
+        </div>
+      </AuthLoading>
 
-  // If user is authenticated, show loading while redirecting
-  if (userIdentity?.username) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner />
-      </div>
-    );
-  }
+      <Unauthenticated>
+        <LandingPage />
+      </Unauthenticated>
+    </>
+  );
+};
 
-  // Show landing page for non-authenticated users
+function LandingPage() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
@@ -97,13 +96,13 @@ const HomeClient = ({}: HomeClientProps) => {
           <div className="flex flex-col items-center space-y-4">
             <SignInButton />
             <p className="text-sm text-muted-foreground">
-              Sign in with your Discogs account to get started
+              Sign in with your email to get started
             </p>
           </div>
         </div>
       </div>
     </div>
   );
-};
+}
 
 export default HomeClient;

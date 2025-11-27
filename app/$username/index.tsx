@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { Suspense, useEffect, useState } from 'react';
 import {
   useAuthStore,
@@ -25,6 +25,8 @@ import { CrateTrack } from '@/types';
 import { Image } from '@unpic/react';
 import { LoadingSpinner } from '@/components/ui/loading';
 import { toast } from 'sonner';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 
 export const Route = createFileRoute('/$username/')({
   component: UserProfilePage,
@@ -37,11 +39,11 @@ const DashboardStats = ({ tracks }: { tracks: CrateTrack[] }) => {
     avgBpm:
       tracks.filter((t) => t.bpm).length > 0
         ? Math.round(
-            tracks
-              .filter((t) => t.bpm)
-              .reduce((acc, t) => acc + (t.bpm || 0), 0) /
-              tracks.filter((t) => t.bpm).length,
-          )
+          tracks
+            .filter((t) => t.bpm)
+            .reduce((acc, t) => acc + (t.bpm || 0), 0) /
+          tracks.filter((t) => t.bpm).length,
+        )
         : 0,
     totalArtists: new Set(tracks.map((t) => t.artist)).size,
   };
@@ -455,6 +457,16 @@ const DashboardContent = ({ username }: { username: string }) => {
 function UserProfilePage() {
   const { username } = Route.useParams();
   const { userIdentity } = useAuthStore();
+  const navigate = useNavigate();
+  const user = useQuery(api.users.getCurrentUser);
+
+  useEffect(() => {
+    console.log("hii", user)
+    if (!user) {
+      navigate({ to: `/`, replace: true });
+    }
+  }, [user]);
+
 
   if (!userIdentity) {
     return (
