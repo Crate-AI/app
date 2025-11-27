@@ -8,11 +8,23 @@ import {
 import { Suspense } from 'react';
 import { Toaster } from 'sonner';
 import appCss from './globals.css?url';
-import AuthProvider from '@/features/auth/components/AuthProvider';
 import AppLayout from '@/components/layout/Navigation/AppLayout';
 import ErrorBoundary from '@/components/Error/ErrorBoundary';
 import { LoadingSpinner } from '@/components/ui/loading';
 import GlobalError from '@/components/Error/GlobalError';
+import { ConvexReactClient } from "convex/react";
+import { ConvexAuthProvider } from "@convex-dev/auth/react";
+import { Authenticated, Unauthenticated, AuthLoading } from "convex/react";
+import { useRouter } from '@tanstack/react-router';
+import { useEffect } from 'react';
+
+const convexUrl = import.meta.env.VITE_CONVEX_URL;
+
+if (!convexUrl) {
+  throw new Error('VITE_CONVEX_URL environment variable is not set');
+}
+
+const convex = new ConvexReactClient(convexUrl);
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -60,7 +72,7 @@ function RootLayout() {
         }}
       >
         <ErrorBoundary fallback={<GlobalError />}>
-          <AuthProvider>
+          <ConvexAuthProvider client={convex}>
             <AppLayout>
               <ErrorBoundary>
                 <Suspense fallback={<LoadingSpinner />}>
@@ -68,7 +80,7 @@ function RootLayout() {
                 </Suspense>
               </ErrorBoundary>
             </AppLayout>
-          </AuthProvider>
+          </ConvexAuthProvider>
         </ErrorBoundary>
         <Toaster
           position="top-center"
