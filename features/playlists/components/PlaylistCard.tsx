@@ -1,13 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Play, Pause, Trash2, Globe, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils/utils';
-import { PlaylistWithTracks } from '@/types';
 import { Image } from '@unpic/react';
-import { usePlayerStore, usePlaylistStore } from '@/stores';
+import { usePlayerStore } from '@/stores';
+import { usePlaylists } from '@/hooks/usePlaylists';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+
 interface PlaylistCardProps {
-  playlist: PlaylistWithTracks;
+  playlist: any; // Accept Convex playlist format
   handleClick: () => void;
   onExpand: () => void;
 }
@@ -17,11 +18,13 @@ export const PlaylistCard = ({
   handleClick,
   onExpand,
 }: PlaylistCardProps) => {
-  const { deletePlaylist, togglePlaylistPublic } = usePlaylistStore();
+  const { deletePlaylist, updatePlaylist } = usePlaylists();
   const { playingTrackId, isPlaying, togglePlayPause } = usePlayerStore();
+  
+  const playlistId = playlist._id || playlist.id;
 
   const isPlayingThisPlaylist = playlist.tracks?.some(
-    (track) => track.id === playingTrackId,
+    (track: any) => track.id === playingTrackId || track._id === playingTrackId,
   );
 
   const handlePlayPause = (e: React.MouseEvent) => {
@@ -35,10 +38,11 @@ export const PlaylistCard = ({
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
     try {
-      await deletePlaylist(playlist.id);
-      toast.success('Playlist deleted');
+      await deletePlaylist(playlistId);
+      // Toast is handled by the hook
     } catch (error) {
-      toast.error('Failed to delete playlist');
+      // Error toast is handled by the hook
+      console.error('Failed to delete playlist:', error);
     }
   };
 
@@ -111,7 +115,7 @@ export const PlaylistCard = ({
         <div className="flex items-center justify-between pt-3 border-t border-border/50">
           <div className="flex items-center gap-2">
             <label
-              htmlFor={`public-${playlist.id}`}
+              htmlFor={`public-${playlistId}`}
               className="text-xs font-medium cursor-pointer flex items-center gap-1.5"
               onClick={(e) => e.stopPropagation()}
             >

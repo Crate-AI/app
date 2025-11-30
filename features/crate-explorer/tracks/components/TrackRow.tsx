@@ -2,7 +2,7 @@ import { Play, Pause, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CrateTrack } from '@/types';
 import { cn } from '@/lib/utils/utils';
-import { usePlaylistStore } from '@/stores';
+import { usePlaylists } from '@/hooks/usePlaylists';
 import { PlaylistActions } from './PlaylistActions';
 import { Image } from '@unpic/react';
 import { useState } from 'react';
@@ -36,7 +36,7 @@ export const TrackRow = ({
   isPlaying,
   onPlayPause,
 }: TrackRowProps) => {
-  const { playlists } = usePlaylistStore();
+  const { playlists } = usePlaylists();
   const formatArtists = (artist: string, extraArtists: string | null) => {
     if (!extraArtists) return artist;
     return `${artist}, ${extraArtists}`;
@@ -67,9 +67,9 @@ export const TrackRow = ({
           <div className="invisible group-hover:visible">
             <PlaylistActions
               track={track}
-              playlists={playlists.map((playlist) => ({
-                id: playlist.id,
-                name: playlist.title,
+              playlists={playlists.map((playlist: any) => ({
+                id: playlist._id || playlist.id,
+                name: playlist.title || playlist.name,
               }))}
               onAddToPlaylist={onAddToPlaylist}
               onCreateNewPlaylist={onCreateNewPlaylist}

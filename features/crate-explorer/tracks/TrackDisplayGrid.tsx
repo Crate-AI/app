@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Play,
@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import ReleaseTracks from './ReleaseTracks';
 import { useTrackContext } from './TrackDisplay';
-import { usePlaylistStore } from '@/stores';
+import { usePlaylists } from '@/hooks/usePlaylists';
 import { convertSearchResultToTrack } from '@/lib/utils/track-conversion';
 import {
   DropdownMenu,
@@ -32,20 +32,19 @@ const TrackDisplayGrid = () => {
     dateAdded,
   } = useTrackContext();
   const [showTracks, setShowTracks] = useState(false);
-  const { playlists, addExternalTrackToPlaylist, fetchPlaylists } =
-    usePlaylistStore();
-
-  // Fetch playlists when component mounts
-  useEffect(() => {
-    fetchPlaylists();
-  }, [fetchPlaylists]);
+  const { playlists, addTrackToPlaylist } = usePlaylists();
 
   const handleAddToPlaylist = async (playlistId: string) => {
     if (!trackResult) return;
 
     try {
-      const track = convertSearchResultToTrack(trackResult);
-      await addExternalTrackToPlaylist(playlistId, track);
+      const track = convertSearchResultToTrack(trackResult) as any;
+      // Note: External tracks need to be added to the database first
+      if (track._id) {
+        await addTrackToPlaylist(playlistId, track._id);
+      } else {
+        toast.info('External tracks cannot be added to playlists yet');
+      }
     } catch (error) {
       console.error('Error adding to playlist:', error);
     }
