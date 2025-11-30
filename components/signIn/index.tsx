@@ -9,9 +9,9 @@ import { useRef } from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 
-interface SignInButtonProps { }
+interface SignInButtonProps {}
 
-const SignInButton = ({ }: SignInButtonProps) => {
+const SignInButton = ({}: SignInButtonProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [verificationSent, setVerificationSent] = useState(false);
@@ -38,7 +38,11 @@ const SignInButton = ({ }: SignInButtonProps) => {
       setIsLoading(false);
     } catch (error) {
       console.error('Failed to send verification code:', error);
-      setError(error instanceof Error ? error.message : 'Failed to send verification code. Please try again.');
+      setError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to send verification code. Please try again.',
+      );
       setIsLoading(false);
     }
   };
@@ -59,10 +63,10 @@ const SignInButton = ({ }: SignInButtonProps) => {
       console.log('Calling signIn with email and code');
       const result = await signIn('resend-otp', { email, code });
       console.log('signIn result:', result);
-      
+
       // Wait a moment for the user query to update
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       setIsLoading(false);
 
       // Use the Convex user ID as the username
@@ -74,7 +78,11 @@ const SignInButton = ({ }: SignInButtonProps) => {
       }
     } catch (error) {
       console.error('Verification failed:', error);
-      setError(error instanceof Error ? error.message : 'Invalid verification code. Please try again.');
+      setError(
+        error instanceof Error
+          ? error.message
+          : 'Invalid verification code. Please try again.',
+      );
       setIsLoading(false);
       setCode('');
     }

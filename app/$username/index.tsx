@@ -39,11 +39,11 @@ const DashboardStats = ({ tracks }: { tracks: CrateTrack[] }) => {
     avgBpm:
       tracks.filter((t) => t.bpm).length > 0
         ? Math.round(
-          tracks
-            .filter((t) => t.bpm)
-            .reduce((acc, t) => acc + (t.bpm || 0), 0) /
-          tracks.filter((t) => t.bpm).length,
-        )
+            tracks
+              .filter((t) => t.bpm)
+              .reduce((acc, t) => acc + (t.bpm || 0), 0) /
+              tracks.filter((t) => t.bpm).length,
+          )
         : 0,
     totalArtists: new Set(tracks.map((t) => t.artist)).size,
   };
@@ -461,12 +461,11 @@ function UserProfilePage() {
   const user = useQuery(api.users.getCurrentUser);
 
   useEffect(() => {
-    console.log("hii", user)
+    console.log('hii', user);
     if (!user) {
       navigate({ to: `/`, replace: true });
     }
   }, [user]);
-
 
   if (!userIdentity) {
     return (
