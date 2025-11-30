@@ -43,3 +43,7 @@ next-env.d.ts
 storage.json
 .aider*
 .env
+
+# convex data exports
+convex-data.zip
+.env.source

@@ -6,9 +6,9 @@ import { useEffect } from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 
-interface HomeClientProps { }
+interface HomeClientProps {}
 
-const HomeClient = ({ }: HomeClientProps) => {
+const HomeClient = ({}: HomeClientProps) => {
   const navigate = useNavigate();
   const user = useQuery(api.users.getCurrentUser);
 

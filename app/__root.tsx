@@ -1,4 +1,4 @@
-import { QueryClient } from "@tanstack/react-query";
+import { QueryClient } from '@tanstack/react-query';
 import {
   Outlet,
   HeadContent,
@@ -12,9 +12,9 @@ import AppLayout from '@/components/layout/Navigation/AppLayout';
 import ErrorBoundary from '@/components/Error/ErrorBoundary';
 import { LoadingSpinner } from '@/components/ui/loading';
 import GlobalError from '@/components/Error/GlobalError';
-import { ConvexReactClient } from "convex/react";
-import { ConvexAuthProvider } from "@convex-dev/auth/react";
-import { Authenticated, Unauthenticated, AuthLoading } from "convex/react";
+import { ConvexReactClient } from 'convex/react';
+import { ConvexAuthProvider } from '@convex-dev/auth/react';
+import { Authenticated, Unauthenticated, AuthLoading } from 'convex/react';
 import { useRouter } from '@tanstack/react-router';
 import { useEffect } from 'react';
 

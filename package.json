@@ -23,7 +23,11 @@
     "format:check": "prettier --check '**/*.{js,jsx,ts,tsx,json,css,scss,md}'",
     "---------------MAINTENANCE-----------------": "🧹",
     "clean": "rm -rf .next .output dist node_modules",
-    "reinstall": "rm -rf node_modules pnpm-lock.yaml && pnpm install"
+    "reinstall": "rm -rf node_modules pnpm-lock.yaml && pnpm install",
+    "---------------CONVEX DATA SYNC-----------------": "📦",
+    "convex:export:from": "npx convex export --env-file .env.source --path convex-data.zip",
+    "convex:import": "npx convex import convex-data.zip",
+    "convex:import:replace": "npx convex import --replace convex-data.zip"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^1.0.6",
