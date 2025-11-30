@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import { usePlayerStore, useFavoritesStore } from '@/stores';
+import { useState } from 'react';
+import { usePlayerStore } from '@/stores';
+import { useFavorites } from '@/hooks/useFavorites';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -48,7 +49,7 @@ const PersistentPlayer = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [previousVolume, setPreviousVolume] = useState(volume);
 
-  const { toggleFavorite, isFavorite } = useFavoritesStore();
+  const { toggleFavorite, isFavorite } = useFavorites();
 
   const handleVolumeChange = (value: number[]) => {
     const newVolume = value[0];

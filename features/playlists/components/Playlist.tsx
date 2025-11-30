@@ -4,7 +4,8 @@ import { useEffect } from 'react';
 import { Play, Pause, Trash2, Globe, Lock } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils/utils';
-import { usePlaylistStore, usePlayerStore } from '@/stores';
+import { usePlayerStore } from '@/stores';
+import { usePlaylists } from '@/hooks/usePlaylists';
 import { formatDuration } from '@/lib/utils/format';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -14,12 +15,14 @@ interface PlaylistProps {
 }
 
 export const Playlist = ({ activePlaylistId }: PlaylistProps) => {
-  const { playlists, removeTrackFromPlaylist, togglePlaylistPublic } =
-    usePlaylistStore();
+  const { playlists, removeTrackFromPlaylist, updatePlaylist } = usePlaylists();
   const { initializePlayer, playingTrackId, isPlaying, togglePlayPause } =
     usePlayerStore();
 
-  const activePlaylist = playlists.find((p) => p.id === activePlaylistId);
+  // Find playlist by either Convex _id or old id
+  const activePlaylist = playlists.find((p: any) => 
+    p._id === activePlaylistId || p.id === activePlaylistId
+  );
 
   useEffect(() => {
     initializePlayer();
@@ -29,11 +32,25 @@ export const Playlist = ({ activePlaylistId }: PlaylistProps) => {
     return null;
   }
 
+  const playlistId = activePlaylist?._id || activePlaylist?.id;
+
   const handleRemoveTrack = async (trackId: string) => {
+    if (!playlistId) return;
     try {
-      await removeTrackFromPlaylist(activePlaylistId, trackId);
+      await removeTrackFromPlaylist(playlistId, trackId as any);
+      toast.success('Track removed from playlist');
     } catch (error) {
       console.error('Error removing track:', error);
+      toast.error('Failed to remove track');
+    }
+  };
+
+  const handleTogglePublic = async (checked: boolean) => {
+    if (!playlistId) return;
+    try {
+      await updatePlaylist(playlistId, { is_public: checked });
+    } catch (error) {
+      console.error('Error updating playlist visibility:', error);
     }
   };
 
@@ -48,14 +65,12 @@ export const Playlist = ({ activePlaylistId }: PlaylistProps) => {
 
         <div className="flex items-center gap-3 pb-4 border-b border-border">
           <Switch
-            id={`public-${activePlaylist.id}`}
+            id={`public-${playlistId}`}
             checked={activePlaylist.is_public ?? false}
-            onCheckedChange={(checked) => {
-              togglePlaylistPublic(activePlaylist.id, checked);
-            }}
+            onCheckedChange={handleTogglePublic}
           />
           <label
-            htmlFor={`public-${activePlaylist.id}`}
+            htmlFor={`public-${playlistId}`}
             className="text-sm font-medium cursor-pointer flex items-center gap-2"
           >
             {activePlaylist.is_public ? (
@@ -91,10 +106,11 @@ export const Playlist = ({ activePlaylistId }: PlaylistProps) => {
           </tr>
         </thead>
         <tbody className="bg-bg divide-y divide-border">
-          {activePlaylist.tracks?.map((track) => {
-            const isPlayingThisTrack = playingTrackId === track.id;
+          {activePlaylist.tracks?.map((track: any) => {
+            const trackId = track._id || track.id;
+            const isPlayingThisTrack = playingTrackId === trackId || playingTrackId === track.id;
             return (
-              <tr key={track.id} className="hover:bg-bg/50">
+              <tr key={trackId} className="hover:bg-bg/50">
                 <td className="px-4 py-3 whitespace-nowrap">
                   <button
                     onClick={() => togglePlayPause(track)}
@@ -121,7 +137,7 @@ export const Playlist = ({ activePlaylistId }: PlaylistProps) => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => handleRemoveTrack(track.id)}
+                    onClick={() => handleRemoveTrack(trackId)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
