@@ -175,9 +175,14 @@ export const updatePlaylist = mutation({
       throw new Error('Playlist not found');
     }
 
-    // Verify ownership
+    // Verify ownership - check all possible user ID formats
     const user = await ctx.db.get(userId);
-    if (playlist.user_id !== user?.email && playlist.user_id !== userId) {
+    const isOwner =
+      playlist.user_id === user?.email ||
+      playlist.user_id === userId ||
+      playlist.user_id === user?.supabaseUserId;
+
+    if (!isOwner) {
       throw new Error('Not authorized');
     }
 
@@ -206,9 +211,14 @@ export const deletePlaylist = mutation({
       throw new Error('Playlist not found');
     }
 
-    // Verify ownership
+    // Verify ownership - check all possible user ID formats
     const user = await ctx.db.get(userId);
-    if (playlist.user_id !== user?.email && playlist.user_id !== userId) {
+    const isOwner =
+      playlist.user_id === user?.email ||
+      playlist.user_id === userId ||
+      playlist.user_id === user?.supabaseUserId;
+
+    if (!isOwner) {
       throw new Error('Not authorized');
     }
 
