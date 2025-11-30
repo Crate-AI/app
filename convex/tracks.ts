@@ -5,6 +5,14 @@ import { v } from 'convex/values';
 /**
  * Get all tracks for the authenticated user
  * Uses indexed queries to avoid reading the entire tracks table
+ * 
+ * Data sources (checked in order):
+ * 1. supabaseUserId - for existing users with migrated Supabase data
+ * 2. user_discogs_profile by email - fallback for legacy data
+ * 3. user_releases by Convex userId - for new users who connect Discogs directly
+ * 
+ * New users without any Discogs connection will get an empty array,
+ * which is expected - they need to connect Discogs first to import tracks.
  */
 export const getUserTracks = query({
   args: {},
@@ -19,35 +27,35 @@ export const getUserTracks = query({
       return [];
     }
 
-    // Get the legacy user ID for data linking
-    let legacyUserId: string | null = null;
-    
+    // Try multiple strategies to find user's releases
+    let userReleases: any[] = [];
+
+    // Strategy 1: Check supabaseUserId (for migrated Supabase users)
     if (user.supabaseUserId) {
-      legacyUserId = user.supabaseUserId;
+      userReleases = await ctx.db
+        .query('user_releases')
+        .withIndex('by_user', (q) => q.eq('user_id', user.supabaseUserId!))
+        .collect();
     }
-    
-    if (!legacyUserId && user.email) {
-      const profileByEmail = await ctx.db
-        .query('user_discogs_profile')
+
+    // Strategy 2: Check by email (legacy fallback)
+    if (userReleases.length === 0 && user.email) {
+      userReleases = await ctx.db
+        .query('user_releases')
         .withIndex('by_user', (q) => q.eq('user_id', user.email!))
-        .first();
-      
-      if (profileByEmail) {
-        legacyUserId = profileByEmail.user_id;
-      }
+        .collect();
     }
 
-    if (!legacyUserId) {
-      return [];
+    // Strategy 3: Check by Convex userId (for new users who connect Discogs directly)
+    if (userReleases.length === 0) {
+      userReleases = await ctx.db
+        .query('user_releases')
+        .withIndex('by_user', (q) => q.eq('user_id', userId))
+        .collect();
     }
 
-    // Get user's releases using the indexed query
-    const userReleases = await ctx.db
-      .query('user_releases')
-      .withIndex('by_user', (q) => q.eq('user_id', legacyUserId!))
-      .collect();
-
-    if (!userReleases || userReleases.length === 0) {
+    // No releases found - user needs to connect Discogs
+    if (userReleases.length === 0) {
       return [];
     }
 
@@ -66,7 +74,6 @@ export const getUserTracks = query({
       allTracks.push(...releaseTracks);
     }
 
-    // Return tracks without analysis for now (to reduce data size)
     return allTracks;
   },
 });
@@ -87,26 +94,44 @@ export const getUserTracksPaginated = query({
     }
 
     const user = await ctx.db.get(userId);
-    if (!user?.supabaseUserId) {
+    if (!user) {
       return { tracks: [], nextCursor: null };
     }
 
-    // Get user's releases
-    const userReleases = await ctx.db
-      .query('user_releases')
-      .withIndex('by_user', (q) => q.eq('user_id', user.supabaseUserId!))
-      .collect();
+    // Try multiple strategies to find user's releases
+    let userReleases: any[] = [];
 
-    if (!userReleases || userReleases.length === 0) {
+    if (user.supabaseUserId) {
+      userReleases = await ctx.db
+        .query('user_releases')
+        .withIndex('by_user', (q) => q.eq('user_id', user.supabaseUserId!))
+        .collect();
+    }
+
+    if (userReleases.length === 0 && user.email) {
+      userReleases = await ctx.db
+        .query('user_releases')
+        .withIndex('by_user', (q) => q.eq('user_id', user.email!))
+        .collect();
+    }
+
+    if (userReleases.length === 0) {
+      userReleases = await ctx.db
+        .query('user_releases')
+        .withIndex('by_user', (q) => q.eq('user_id', userId))
+        .collect();
+    }
+
+    if (userReleases.length === 0) {
       return { tracks: [], nextCursor: null };
     }
 
     const releaseIds = new Set(userReleases.map(r => String(r.discogs_release_id)));
 
     // Get paginated tracks
-    let query = ctx.db.query('tracks').order('desc');
+    let tracksQuery = ctx.db.query('tracks').order('desc');
     
-    const results = await query.paginate({ 
+    const results = await tracksQuery.paginate({ 
       cursor: cursor ?? null, 
       numItems: limit * 2 // Fetch more to filter
     });
@@ -159,26 +184,43 @@ export const searchTracks = query({
     }
 
     const user = await ctx.db.get(userId);
-    if (!user?.supabaseUserId) {
+    if (!user) {
       return [];
     }
 
-    // Get user's releases first
-    const userReleases = await ctx.db
-      .query('user_releases')
-      .withIndex('by_user', (q) => q.eq('user_id', user.supabaseUserId!))
-      .collect();
+    // Try multiple strategies to find user's releases
+    let userReleases: any[] = [];
 
-    if (!userReleases.length) {
+    if (user.supabaseUserId) {
+      userReleases = await ctx.db
+        .query('user_releases')
+        .withIndex('by_user', (q) => q.eq('user_id', user.supabaseUserId!))
+        .collect();
+    }
+
+    if (userReleases.length === 0 && user.email) {
+      userReleases = await ctx.db
+        .query('user_releases')
+        .withIndex('by_user', (q) => q.eq('user_id', user.email!))
+        .collect();
+    }
+
+    if (userReleases.length === 0) {
+      userReleases = await ctx.db
+        .query('user_releases')
+        .withIndex('by_user', (q) => q.eq('user_id', userId))
+        .collect();
+    }
+
+    if (userReleases.length === 0) {
       return [];
     }
 
-    const releaseIds = new Set(userReleases.map(r => String(r.discogs_release_id)));
     const lowerQuery = searchQuery.toLowerCase();
 
-    // Get user's tracks by fetching each release
+    // Get user's tracks by fetching each release (limit for performance)
     const allTracks: any[] = [];
-    for (const release of userReleases.slice(0, 20)) { // Limit to first 20 releases for search
+    for (const release of userReleases.slice(0, 20)) {
       const releaseTracks = await ctx.db
         .query('tracks')
         .withIndex('by_discogs_release', (q) => 
