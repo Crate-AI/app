@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, ReactNode, useEffect } from 'react';
+import { useState, ReactNode, useEffect, useMemo } from 'react';
 import { X, Sparkles, Bot, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -10,6 +10,8 @@ import { CrateTrack } from '@/types';
 import { useTracksStore } from '@/stores';
 import ErrorBoundary from '@/components/Error/ErrorBoundary';
 import { toast } from 'sonner';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 
 interface AiLayoutProps {
   children: ReactNode;
@@ -17,30 +19,27 @@ interface AiLayoutProps {
 
 export default function AiLayout({ children }: AiLayoutProps) {
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const { allTracks: tracks, setAllTracks } = useTracksStore();
-
+  const { setAllTracks } = useTracksStore();
+  
+  // Use Convex query instead of fetch
+  const convexTracks = useQuery(api.tracks.getUserTracks);
+  const isLoading = convexTracks === undefined;
+  
+  // Map tracks to the expected format - MEMOIZED to prevent infinite re-renders
+  const tracks = useMemo(() => {
+    if (!convexTracks) return [];
+    return convexTracks.map(track => ({
+      ...track,
+      id: track.id || track._id,
+    })) as CrateTrack[];
+  }, [convexTracks]);
+  
+  // Sync to store for other components
   useEffect(() => {
-    async function fetchTracks() {
-      try {
-        const res = await fetch('/api/music/tracks', {
-          credentials: 'include',
-        });
-        if (!res.ok) throw new Error('Failed to fetch tracks');
-        const data = await res.json();
-        if (!data.tracks) {
-          throw new Error('No tracks data received');
-        }
-        setAllTracks(data.tracks);
-      } catch (error) {
-        console.error('Error fetching tracks:', error);
-        toast.error('Failed to load tracks');
-      } finally {
-        setIsLoading(false);
-      }
+    if (tracks.length > 0) {
+      setAllTracks(tracks);
     }
-    fetchTracks();
-  }, [setAllTracks]);
+  }, [tracks, setAllTracks]);
 
   const handleTracksFilter = (filteredTracks: CrateTrack[]) => {
     if (filteredTracks.length > 0) {

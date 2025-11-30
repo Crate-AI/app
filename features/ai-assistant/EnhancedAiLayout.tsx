@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   X,
   Sparkles,
@@ -18,6 +18,8 @@ import { CrateTrack } from '@/types';
 import { useTracksStore, usePlayerStore } from '@/stores';
 import ErrorBoundary from '@/components/Error/ErrorBoundary';
 import { toast } from 'sonner';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 
 interface EnhancedAiLayoutProps {
   children: React.ReactNode;
@@ -25,18 +27,37 @@ interface EnhancedAiLayoutProps {
 
 export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [chatPosition, setChatPosition] = useState<
     'sidebar' | 'overlay' | 'bottom'
   >('sidebar');
-  const { allTracks: tracks, setAllTracks } = useTracksStore();
+  const { setAllTracks } = useTracksStore();
   const { initializePlayer } = usePlayerStore();
+  
+  // Use Convex query instead of fetch
+  const convexTracks = useQuery(api.tracks.getUserTracks);
+  const isLoading = convexTracks === undefined;
+  
+  // Map tracks to the expected format - MEMOIZED to prevent infinite re-renders
+  const tracks = useMemo(() => {
+    if (!convexTracks) return [];
+    return convexTracks.map(track => ({
+      ...track,
+      id: track.id || track._id,
+    })) as CrateTrack[];
+  }, [convexTracks]);
 
   // Initialize player when layout mounts
   useEffect(() => {
     initializePlayer();
   }, [initializePlayer]);
+  
+  // Sync to store for other components
+  useEffect(() => {
+    if (tracks.length > 0) {
+      setAllTracks(tracks);
+    }
+  }, [tracks, setAllTracks]);
 
   // Detect mobile and set appropriate chat position
   useEffect(() => {
@@ -59,34 +80,6 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-
-  // Fetch tracks on mount
-  useEffect(() => {
-    async function fetchTracks() {
-      try {
-        const res = await fetch('/api/music/tracks', {
-          credentials: 'include',
-        });
-        if (!res.ok) throw new Error('Failed to fetch tracks');
-        const data = await res.json();
-        if (!data.tracks) {
-          throw new Error('No tracks data received');
-        }
-        setAllTracks(data.tracks);
-      } catch (error) {
-        console.error('Error fetching tracks:', error);
-        toast.error('Failed to load tracks for AI assistant');
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    if (tracks.length === 0) {
-      fetchTracks();
-    } else {
-      setIsLoading(false);
-    }
-  }, [setAllTracks, tracks.length]);
 
   const handleTracksFilter = (filteredTracks: CrateTrack[]) => {
     if (filteredTracks.length > 0) {

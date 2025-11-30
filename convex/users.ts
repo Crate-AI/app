@@ -1,5 +1,5 @@
 import { getAuthUserId } from '@convex-dev/auth/server';
-import { query, mutation } from './_generated/server';
+import { query, mutation, internalMutation } from './_generated/server';
 import { v } from 'convex/values';
 
 /**
@@ -112,6 +112,174 @@ export const updateProfile = mutation({
     }
 
     await ctx.db.patch(userId, args);
+    return { success: true };
+  },
+});
+
+/**
+ * Link Supabase user ID to current user
+ * This is needed to connect the new Convex user to their old Supabase data
+ */
+export const linkSupabaseUserId = mutation({
+  args: {
+    supabaseUserId: v.string(),
+  },
+  handler: async (ctx, { supabaseUserId }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error('Not authenticated');
+    }
+
+    // Verify this Supabase ID has data associated with it
+    const releases = await ctx.db
+      .query('user_releases')
+      .withIndex('by_user', (q) => q.eq('user_id', supabaseUserId))
+      .first();
+
+    if (!releases) {
+      throw new Error('No data found for this Supabase user ID');
+    }
+
+    await ctx.db.patch(userId, { supabaseUserId });
+    return { success: true };
+  },
+});
+
+/**
+ * Try to automatically link legacy data based on matching criteria
+ * Call this during onboarding to find and link existing data
+ */
+export const tryAutoLinkLegacyData = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error('Not authenticated');
+    }
+
+    const user = await ctx.db.get(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Already linked
+    if (user.supabaseUserId) {
+      return { success: true, linked: true, supabaseUserId: user.supabaseUserId };
+    }
+
+    // Try to find matching data
+    // Strategy: Look for a user_discogs_profile or user_releases entry
+    // that might belong to this user
+    
+    // For now, we'll look for any user_discogs_profile and try to match
+    // In a production app, you'd want a more sophisticated matching strategy
+    
+    // Get all user_discogs_profiles and check if any have data
+    const profiles = await ctx.db.query('user_discogs_profile').collect();
+    
+    for (const profile of profiles) {
+      // Check if this profile has releases
+      const releases = await ctx.db
+        .query('user_releases')
+        .withIndex('by_user', (q) => q.eq('user_id', profile.user_id))
+        .first();
+      
+      if (releases) {
+        // Found a profile with data, link it
+        // Note: In production, you'd want better verification
+        console.log('Found potential legacy data with user_id:', profile.user_id);
+        
+        // For safety, don't auto-link without confirmation
+        // Return the found ID so the user can confirm
+        return { 
+          success: true, 
+          linked: false, 
+          potentialSupabaseUserId: profile.user_id,
+          discogsUsername: profile.username,
+        };
+      }
+    }
+
+    return { success: true, linked: false, potentialSupabaseUserId: null };
+  },
+});
+
+/**
+ * Get the current user's Discogs profile
+ * Returns null if not connected
+ */
+export const getDiscogsProfile = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      return null;
+    }
+
+    const user = await ctx.db.get(userId);
+    if (!user?.supabaseUserId) {
+      return null;
+    }
+
+    return await ctx.db
+      .query('user_discogs_profile')
+      .withIndex('by_user', (q) => q.eq('user_id', user.supabaseUserId!))
+      .first();
+  },
+});
+
+/**
+ * Get legacy data stats for a potential Supabase user ID
+ * Used to show the user what data will be linked
+ */
+export const getLegacyDataStats = query({
+  args: { supabaseUserId: v.string() },
+  handler: async (ctx, { supabaseUserId }) => {
+    const releases = await ctx.db
+      .query('user_releases')
+      .withIndex('by_user', (q) => q.eq('user_id', supabaseUserId))
+      .collect();
+
+    const playlists = await ctx.db
+      .query('playlists')
+      .withIndex('by_user', (q) => q.eq('user_id', supabaseUserId))
+      .collect();
+
+    const profile = await ctx.db
+      .query('user_discogs_profile')
+      .withIndex('by_user', (q) => q.eq('user_id', supabaseUserId))
+      .first();
+
+    return {
+      releaseCount: releases.length,
+      playlistCount: playlists.length,
+      discogsUsername: profile?.username || null,
+    };
+  },
+});
+
+/**
+ * Admin mutation to directly link a Supabase user ID to a Convex user
+ * This is a temporary function for data migration
+ * Call: users:adminLinkSupabaseId with convexUserId and supabaseUserId
+ */
+export const adminLinkSupabaseId = mutation({
+  args: {
+    convexUserId: v.id('users'),
+    supabaseUserId: v.string(),
+  },
+  handler: async (ctx, { convexUserId, supabaseUserId }) => {
+    // Verify the Supabase ID has data
+    const releases = await ctx.db
+      .query('user_releases')
+      .withIndex('by_user', (q) => q.eq('user_id', supabaseUserId))
+      .first();
+    
+    if (!releases) {
+      throw new Error('No data found for this Supabase user ID');
+    }
+    
+    await ctx.db.patch(convexUserId, { supabaseUserId });
     return { success: true };
   },
 });

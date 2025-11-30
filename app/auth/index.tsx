@@ -33,9 +33,13 @@ function AuthenticatedRedirect() {
   const user = useQuery(api.users.getCurrentUser);
   
   if (user) {
-    const email = user.email as string | undefined;
-    const username = email?.split('@')[0] || user._id;
-    return <Navigate to={`/${username}`} replace />;
+    // Check if user has completed onboarding (has username)
+    if (!user.username || !user.onboardingComplete) {
+      return <Navigate to="/onboarding" replace />;
+    }
+    
+    // User has username, redirect to their profile
+    return <Navigate to={`/${user.username}`} replace />;
   }
   
   return (

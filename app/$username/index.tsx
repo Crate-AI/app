@@ -2,11 +2,10 @@ import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { Suspense, useEffect, useState } from 'react';
 import {
   useTracksStore,
-  usePlaylistStore,
   usePlayerStore,
-  useFavoritesStore,
 } from '@/stores';
 import { useAuth } from '@/hooks/useAuth';
+import { useFavorites } from '@/hooks/useFavorites';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -109,15 +108,13 @@ const FavoritesSection = ({ allTracks, username }: { allTracks: CrateTrack[]; us
     toggleFavorite,
     isFavorite,
     isLoading,
-    loadFavorites,
-  } = useFavoritesStore();
+  } = useFavorites();
   const favoriteTracks = getFavoriteTracksFromAllTracks(allTracks).slice(0, 6);
 
-  // Initialize player and load favorites when component mounts
+  // Initialize player when component mounts
   useEffect(() => {
     initializePlayer();
-    loadFavorites();
-  }, [initializePlayer, loadFavorites]);
+  }, [initializePlayer]);
 
   const handlePlayTrack = (track: CrateTrack) => {
     if (!track.youtube_video_id) {
@@ -402,35 +399,26 @@ const WelcomeSection = ({ username }: { username: string }) => {
 };
 
 const DashboardContent = ({ username }: { username: string }) => {
-  const { allTracks, setAllTracks } = useTracksStore();
-  const { fetchPlaylists } = usePlaylistStore();
-  const [loading, setLoading] = useState(true);
-
+  const { setAllTracks } = useTracksStore();
+  
+  // Use Convex queries instead of fetch
+  const convexTracks = useQuery(api.tracks.getUserTracks);
+  const convexPlaylists = useQuery(api.playlists.getUserPlaylists);
+  
+  const loading = convexTracks === undefined || convexPlaylists === undefined;
+  
+  // Sync Convex tracks to the store for components that still use it
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch tracks
-        const tracksRes = await fetch('/api/music/tracks', {
-          credentials: 'include',
-        });
-        if (tracksRes.ok) {
-          const tracksData = await tracksRes.json();
-          if (tracksData.tracks) {
-            setAllTracks(tracksData.tracks);
-          }
-        }
-
-        // Fetch playlists
-        await fetchPlaylists();
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [setAllTracks, fetchPlaylists]);
+    if (convexTracks && convexTracks.length > 0) {
+      // Map Convex tracks to CrateTrack format
+      const mappedTracks = convexTracks.map(track => ({
+        ...track,
+        id: track.id || track._id, // Use old id or Convex _id
+        _convexId: track._id,
+      }));
+      setAllTracks(mappedTracks as any);
+    }
+  }, [convexTracks, setAllTracks]);
 
   if (loading) {
     return (
@@ -439,6 +427,13 @@ const DashboardContent = ({ username }: { username: string }) => {
       </div>
     );
   }
+
+  // Map tracks for the dashboard
+  const allTracks = (convexTracks || []).map(track => ({
+    ...track,
+    id: track.id || track._id,
+    _convexId: track._id,
+  })) as CrateTrack[];
 
   return (
     <div className="space-y-8">
