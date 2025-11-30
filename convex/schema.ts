@@ -15,9 +15,12 @@ export default defineSchema({
     displayName: v.optional(v.string()),
     avatarUrl: v.optional(v.string()),
     onboardingComplete: v.optional(v.boolean()),
+    // Legacy Supabase user ID - used to link to migrated data
+    supabaseUserId: v.optional(v.string()),
   })
     .index('by_username', ['username'])
-    .index('by_email', ['email']),
+    .index('by_email', ['email'])
+    .index('by_supabase_id', ['supabaseUserId']),
 
   // Music service connections (for Discogs, Spotify, etc.)
   user_music_connections: defineTable({

@@ -9,10 +9,13 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as favorites from "../favorites.js";
 import type * as http from "../http.js";
 import type * as migrations from "../migrations.js";
 import type * as musicConnections from "../musicConnections.js";
+import type * as playlists from "../playlists.js";
 import type * as resendOTP from "../resendOTP.js";
+import type * as tracks from "../tracks.js";
 import type * as users from "../users.js";
 
 import type {
@@ -23,10 +26,13 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  favorites: typeof favorites;
   http: typeof http;
   migrations: typeof migrations;
   musicConnections: typeof musicConnections;
+  playlists: typeof playlists;
   resendOTP: typeof resendOTP;
+  tracks: typeof tracks;
   users: typeof users;
 }>;
 

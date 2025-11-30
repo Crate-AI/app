@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { CrateTrack } from '@/types';
-import { useTracksStore, usePlaylistStore, usePlayerStore } from '@/stores';
+import { useTracksStore, usePlayerStore } from '@/stores';
+import { useFavorites } from '@/hooks/useFavorites';
+import { usePlaylists } from '@/hooks/usePlaylists';
 import { SearchInput } from './components/SearchInput';
 import { Button } from '@/components/ui/button';
 import {
@@ -63,8 +65,12 @@ import { toast } from 'sonner';
 
 export default function TracksTable() {
   const { allTracks, suggestedTrackIds } = useTracksStore();
-  const { createPlaylist, addTrackToPlaylist, fetchPlaylists } =
-    usePlaylistStore();
+  const { 
+    playlists: convexPlaylists, 
+    createPlaylist, 
+    addTrackToPlaylist,
+    isLoading: playlistsLoading 
+  } = usePlaylists();
   const {
     playingTrackId,
     isReady,
@@ -83,7 +89,6 @@ export default function TracksTable() {
   });
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [rowHover, setRowHover] = useState<string | null>(null);
-  const [playlists, setPlaylists] = useState<any[]>([]);
   const [isCreatingPlaylist, setIsCreatingPlaylist] = useState(false);
   const [newPlaylistName, setNewPlaylistName] = useState('');
   const [selectedTrack, setSelectedTrack] = useState<CrateTrack | null>(null);
@@ -101,37 +106,22 @@ export default function TracksTable() {
       timestamp: number;
     }>
   >([]);
-  const [favoriteTrackIds, setFavoriteTrackIds] = useState<Set<string>>(
-    new Set(),
-  );
-  const [favoritesPlaylistId, setFavoritesPlaylistId] = useState<string | null>(
-    null,
-  );
   const [isTogglingFavorite, setIsTogglingFavorite] = useState<string | null>(
     null,
   );
+  
+  // Use Convex favorites hook
+  const { 
+    favoriteTrackIds, 
+    isFavorite: checkIsFavorite, 
+    toggleFavorite: convexToggleFavorite,
+    isLoading: favoritesLoading 
+  } = useFavorites();
 
   // Initialize player when component mounts
   useEffect(() => {
     initializePlayer();
   }, [initializePlayer]);
-
-  // Fetch favorites on mount
-  useEffect(() => {
-    const fetchFavorites = async () => {
-      try {
-        const response = await fetch('/api/music/favorites');
-        if (response.ok) {
-          const data = await response.json();
-          setFavoriteTrackIds(new Set(data.favoriteTrackIds || []));
-        }
-      } catch (error) {
-        console.error('Error fetching favorites:', error);
-      }
-    };
-
-    fetchFavorites();
-  }, []);
 
   const handlePlayToggle = async (track: CrateTrack) => {
     if (!track.youtube_video_id) {
@@ -166,110 +156,31 @@ export default function TracksTable() {
   };
 
   const handleToggleFavorite = async (track: CrateTrack) => {
-    if (!favoritesPlaylistId) {
-      toast.error('Favorites playlist not found');
-      return;
-    }
-
     setIsTogglingFavorite(track.id);
     try {
-      const isFavorite = favoriteTrackIds.has(track.id);
+      const isFavorite = checkIsFavorite(track.id);
+      await convexToggleFavorite(track.id);
 
       if (isFavorite) {
-        // Remove from favorites
-        const response = await fetch('/api/music/favorites', {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ trackId: track.id }),
-        });
-
-        if (response.ok) {
-          setFavoriteTrackIds((prev) => {
-            const newSet = new Set(prev);
-            newSet.delete(track.id);
-            return newSet;
-          });
-          toast.success('Removed from favorites');
-        } else {
-          toast.error('Failed to remove from favorites');
-        }
+        toast.success('Removed from favorites');
       } else {
-        // Add to favorites
-        const response = await fetch('/api/music/favorites', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ trackId: track.id }),
-        });
-
-        if (response.ok) {
-          setFavoriteTrackIds((prev) => new Set([...prev, track.id]));
-          toast.success('Added to favorites');
-        } else {
-          toast.error('Failed to add to favorites');
-        }
+        toast.success('Added to favorites');
       }
     } catch (error) {
       console.error('Error toggling favorite:', error);
-      toast.error('Failed to update favorite');
+      toast.error('Failed to update favorites');
     } finally {
       setIsTogglingFavorite(null);
     }
   };
 
-  useEffect(() => {
-    const getPlaylists = async () => {
-      try {
-        // FIXME: incorrect type returned by fetchPlaylists
-        const fetchedPlaylists: any[] = await fetchPlaylists();
-        const favPlaylist = fetchedPlaylists.find((p) => p.is_favorites);
-        if (favPlaylist) {
-          setFavoritesPlaylistId(favPlaylist.id);
-        }
-        setPlaylists(fetchedPlaylists);
-      } catch (error) {
-        console.error('Error fetching playlists:', error);
-        setError('Failed to fetch playlists');
-      }
-    };
-
-    getPlaylists();
-  }, [fetchPlaylists]);
-
-  const handleAddToPlaylist = async (playlistId: string, trackId: string) => {
+  const handleAddToPlaylist = async (playlistId: any, trackId: any) => {
     try {
-      // Track the action for potential undo
-      const actionId = Date.now();
-      const action = {
-        type: 'addToPlaylist' as const,
-        data: { playlistId, trackId },
-        timestamp: actionId,
-      };
-
-      setActionHistory((prev) => [...prev, action]);
-
       await addTrackToPlaylist(playlistId, trackId);
-
-      // Get playlist name for the toast
-      const playlistName =
-        playlists.find((p) => p.id === playlistId)?.name || 'playlist';
-
-      // Show toast with undo option
-      toast.success(`Added to ${playlistName}`, {
-        duration: 5000,
-        action: {
-          label: 'Undo',
-          onClick: () => {
-            // In a real app, this would call a remove API
-            toast.info(`Removed from ${playlistName}`);
-            // Remove from history
-            setActionHistory((prev) =>
-              prev.filter((a) => a.timestamp !== actionId),
-            );
-          },
-        },
-      });
+      // Toast is handled by the hook
     } catch (error) {
-      toast.error('Failed to add to playlist');
+      // Error toast is handled by the hook
+      console.error('Failed to add to playlist:', error);
     }
   };
 
@@ -279,38 +190,18 @@ export default function TracksTable() {
     setIsLoading(true);
     try {
       const playlistId = await createPlaylist(newPlaylistName);
-
-      // Track the action for potential undo
-      const actionId = Date.now();
-      const action = {
-        type: 'createPlaylist' as const,
-        data: { playlistId, name: newPlaylistName, trackId: selectedTrack.id },
-        timestamp: actionId,
-      };
-
-      setActionHistory((prev) => [...prev, action]);
-
-      await addTrackToPlaylist(playlistId, selectedTrack.id);
+      
+      if (playlistId && selectedTrack) {
+        // Use the track's _id (Convex) or id (old format)
+        const trackIdToUse = (selectedTrack as any)._id ?? selectedTrack.id;
+        await addTrackToPlaylist(playlistId, trackIdToUse);
+      }
+      
       setNewPlaylistName('');
       setIsCreatingPlaylist(false);
-
-      // Show toast with undo option
-      toast.success(`Created playlist "${newPlaylistName}"`, {
-        duration: 5000,
-        action: {
-          label: 'Undo',
-          onClick: () => {
-            // In a real app, this would call a delete playlist API
-            toast.info(`Deleted playlist "${newPlaylistName}"`);
-            // Remove from history
-            setActionHistory((prev) =>
-              prev.filter((a) => a.timestamp !== actionId),
-            );
-          },
-        },
-      });
+      // Toast is handled by the hook
     } catch (error) {
-      toast.error('Failed to create playlist');
+      console.error('Failed to create playlist:', error);
     } finally {
       setIsLoading(false);
       setSelectedTrack(null);
@@ -341,6 +232,10 @@ export default function TracksTable() {
       const aiPlaylistName = `AI Mix ${new Date().toLocaleDateString()}`;
       const playlistId = await createPlaylist(aiPlaylistName);
 
+      if (!playlistId) {
+        throw new Error('Failed to create playlist');
+      }
+
       // Add suggested tracks to the playlist
       const tracksToAdd = table
         .getFilteredRowModel()
@@ -349,7 +244,8 @@ export default function TracksTable() {
         .slice(0, 10);
 
       for (const track of tracksToAdd) {
-        await addTrackToPlaylist(playlistId, track.id);
+        const trackIdToUse = (track as any)._id ?? track.id;
+        await addTrackToPlaylist(playlistId, trackIdToUse);
       }
     } catch (error) {
       console.error('Error creating AI playlist:', error);
@@ -377,7 +273,7 @@ export default function TracksTable() {
         header: '',
         cell: ({ row }) => {
           const track = row.original;
-          const isFavorite = favoriteTrackIds.has(track.id);
+          const isFavorite = checkIsFavorite(track.id);
           const isToggling = isTogglingFavorite === track.id;
 
           return (
@@ -584,15 +480,12 @@ export default function TracksTable() {
         ),
       }),
     ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       playingTrackId,
       isReady,
       isPlaying,
       rowHover,
-      handlePlayToggle,
-      handleAddToPlaylist,
-      playlists,
-      favoriteTrackIds,
       isTogglingFavorite,
     ],
   );
@@ -756,7 +649,7 @@ export default function TracksTable() {
 
   return (
     <div className="space-y-4 ml-8">
-      <style jsx>{marqueeStyles}</style>
+      <style>{marqueeStyles}</style>
       <div className="flex justify-between items-center mb-4">
         <div></div>
         <SearchInput
@@ -894,28 +787,29 @@ export default function TracksTable() {
             <DialogTitle>Add to Playlist</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            {playlists && playlists.length > 0 ? (
+            {convexPlaylists && convexPlaylists.length > 0 ? (
               <div className="grid gap-2">
-                {playlists.map((playlist) => (
+                {convexPlaylists.map((playlist: any) => (
                   <Button
-                    key={playlist.id}
+                    key={playlist._id || playlist.id}
                     variant="outline"
                     className="w-full justify-start"
                     onClick={() => {
                       if (selectedTrack && showPlaylistOptions) {
-                        handleAddToPlaylist(playlist.id, selectedTrack.id);
+                        const trackIdToUse = (selectedTrack as any)._id ?? selectedTrack.id;
+                        handleAddToPlaylist(playlist._id || playlist.id, trackIdToUse);
                         setShowPlaylistOptions(null);
                       }
                     }}
                   >
                     <ListPlus className="mr-2 h-4 w-4" />
-                    {playlist.name}
+                    {playlist.title || playlist.name}
                   </Button>
                 ))}
               </div>
             ) : (
               <div className="text-center py-2 text-muted-foreground">
-                No playlists yet
+                {playlistsLoading ? 'Loading playlists...' : 'No playlists yet'}
               </div>
             )}
             <Button

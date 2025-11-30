@@ -4,10 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { LoaderCircle } from 'lucide-react';
 import { useAuthActions } from '@convex-dev/auth/react';
-import { useRouter } from '@tanstack/react-router';
 import { useRef } from 'react';
-import { useQuery } from 'convex/react';
-import { api } from '@/convex/_generated/api';
 
 interface SignInButtonProps {}
 
@@ -18,9 +15,7 @@ const SignInButton = ({}: SignInButtonProps) => {
   const [code, setCode] = useState('');
   const [error, setError] = useState<string | null>(null);
   const { signIn } = useAuthActions();
-  const router = useRouter();
   const emailInputRef = useRef<HTMLInputElement>(null);
-  const currentUser = useQuery(api.users.getCurrentUser);
 
   const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +28,7 @@ const SignInButton = ({}: SignInButtonProps) => {
     setError(null);
 
     try {
-      const result = await signIn('resend-otp', { email });
+      await signIn('resend-otp', { email });
       setVerificationSent(true);
       setIsLoading(false);
     } catch (error) {
@@ -49,7 +44,6 @@ const SignInButton = ({}: SignInButtonProps) => {
 
   const handleVerifyCode = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('handleVerifyCode called with code:', code);
 
     if (!code) {
       setError('Please enter the verification code');
@@ -60,22 +54,10 @@ const SignInButton = ({}: SignInButtonProps) => {
     setError(null);
 
     try {
-      console.log('Calling signIn with email and code');
-      const result = await signIn('resend-otp', { email, code });
-      console.log('signIn result:', result);
-
-      // Wait a moment for the user query to update
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
+      await signIn('resend-otp', { email, code });
+      // After successful sign-in, ConvexAuthProvider will update auth state
+      // HomeClient's AuthenticatedRedirect will handle routing to /onboarding or /username
       setIsLoading(false);
-
-      // Use the Convex user ID as the username
-      if (currentUser?._id) {
-        // Redirect to user area using the Convex user ID
-        await router.navigate({ to: `/${currentUser._id}` });
-      } else {
-        setError('Failed to retrieve user information. Please try again.');
-      }
     } catch (error) {
       console.error('Verification failed:', error);
       setError(

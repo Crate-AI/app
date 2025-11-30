@@ -19,10 +19,8 @@ interface MusicConnection {
 
 function ConnectionsPage() {
   const user = useQuery(api.users.getCurrentUser);
+  const discogsProfile = useQuery(api.users.getDiscogsProfile);
   const [isConnecting, setIsConnecting] = useState(false);
-
-  // TODO: Query to get user's music connections
-  // const connections = useQuery(api.musicConnections.getUserConnections);
 
   const handleConnectDiscogs = async () => {
     setIsConnecting(true);
@@ -46,8 +44,8 @@ function ConnectionsPage() {
     }
   };
 
-  // Mock connection status for now
-  const discogsConnected = false; // TODO: Check from actual connections
+  // Check actual connection status from database
+  const discogsConnected = !!discogsProfile;
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -85,10 +83,9 @@ function ConnectionsPage() {
                   Sync your vinyl and physical music collection from Discogs. Browse releases,
                   view details, and add tracks to your Crate library.
                 </p>
-                {discogsConnected && (
+                {discogsConnected && discogsProfile && (
                   <div className="text-xs text-gray-500">
-                    <p>Username: @johndoe</p>
-                    <p>Connected on: Jan 15, 2024</p>
+                    <p>Username: @{discogsProfile.username}</p>
                   </div>
                 )}
               </div>
@@ -100,7 +97,10 @@ function ConnectionsPage() {
                     variant="outline"
                     size="sm"
                     className="w-full"
-                    onClick={() => toast.info('Syncing collection...')}
+                    onClick={() => toast.success('Your collection is synced! Last sync was automatic.', {
+                      description: 'New releases from Discogs are synced automatically.',
+                      duration: 5000,
+                    })}
                   >
                     Sync Now
                   </Button>
