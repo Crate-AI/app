@@ -39,17 +39,24 @@ export const checkUsernameAvailable = query({
     if (username.length < 3 || username.length > 30) {
       return { available: false, error: 'Username must be 3-30 characters' };
     }
-    
+
     if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
-      return { available: false, error: 'Username can only contain letters, numbers, underscores, and hyphens' };
+      return {
+        available: false,
+        error:
+          'Username can only contain letters, numbers, underscores, and hyphens',
+      };
     }
 
     const existing = await ctx.db
       .query('users')
       .withIndex('by_username', (q) => q.eq('username', username))
       .first();
-    
-    return { available: !existing, error: existing ? 'Username is already taken' : null };
+
+    return {
+      available: !existing,
+      error: existing ? 'Username is already taken' : null,
+    };
   },
 });
 
@@ -57,7 +64,7 @@ export const checkUsernameAvailable = query({
  * Set username for the current user (during onboarding)
  */
 export const setUsername = mutation({
-  args: { 
+  args: {
     username: v.string(),
     displayName: v.optional(v.string()),
   },
@@ -71,9 +78,11 @@ export const setUsername = mutation({
     if (username.length < 3 || username.length > 30) {
       throw new Error('Username must be 3-30 characters');
     }
-    
+
     if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
-      throw new Error('Username can only contain letters, numbers, underscores, and hyphens');
+      throw new Error(
+        'Username can only contain letters, numbers, underscores, and hyphens',
+      );
     }
 
     // Check if username is already taken
@@ -81,7 +90,7 @@ export const setUsername = mutation({
       .query('users')
       .withIndex('by_username', (q) => q.eq('username', username))
       .first();
-    
+
     if (existing && existing._id !== userId) {
       throw new Error('Username is already taken');
     }
@@ -164,36 +173,43 @@ export const tryAutoLinkLegacyData = mutation({
 
     // Already linked
     if (user.supabaseUserId) {
-      return { success: true, linked: true, supabaseUserId: user.supabaseUserId };
+      return {
+        success: true,
+        linked: true,
+        supabaseUserId: user.supabaseUserId,
+      };
     }
 
     // Try to find matching data
     // Strategy: Look for a user_discogs_profile or user_releases entry
     // that might belong to this user
-    
+
     // For now, we'll look for any user_discogs_profile and try to match
     // In a production app, you'd want a more sophisticated matching strategy
-    
+
     // Get all user_discogs_profiles and check if any have data
     const profiles = await ctx.db.query('user_discogs_profile').collect();
-    
+
     for (const profile of profiles) {
       // Check if this profile has releases
       const releases = await ctx.db
         .query('user_releases')
         .withIndex('by_user', (q) => q.eq('user_id', profile.user_id))
         .first();
-      
+
       if (releases) {
         // Found a profile with data, link it
         // Note: In production, you'd want better verification
-        console.log('Found potential legacy data with user_id:', profile.user_id);
-        
+        console.log(
+          'Found potential legacy data with user_id:',
+          profile.user_id,
+        );
+
         // For safety, don't auto-link without confirmation
         // Return the found ID so the user can confirm
-        return { 
-          success: true, 
-          linked: false, 
+        return {
+          success: true,
+          linked: false,
           potentialSupabaseUserId: profile.user_id,
           discogsUsername: profile.username,
         };
@@ -274,11 +290,11 @@ export const adminLinkSupabaseId = mutation({
       .query('user_releases')
       .withIndex('by_user', (q) => q.eq('user_id', supabaseUserId))
       .first();
-    
+
     if (!releases) {
       throw new Error('No data found for this Supabase user ID');
     }
-    
+
     await ctx.db.patch(convexUserId, { supabaseUserId });
     return { success: true };
   },

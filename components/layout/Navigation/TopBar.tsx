@@ -131,7 +131,7 @@ export default function TopBar({
 
   const handleQuickAction = (action: string) => {
     if (!username) return;
-    
+
     switch (action) {
       case 'new-playlist':
         navigate({ to: `/${username}/playlists/new` });
@@ -497,7 +497,11 @@ export default function TopBar({
                   <User className="w-4 h-4 mr-2" />
                   Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate({ to: `/${username}/settings/connections` })}>
+                <DropdownMenuItem
+                  onClick={() =>
+                    navigate({ to: `/${username}/settings/connections` })
+                  }
+                >
                   <Settings className="w-4 h-4 mr-2" />
                   Settings
                 </DropdownMenuItem>

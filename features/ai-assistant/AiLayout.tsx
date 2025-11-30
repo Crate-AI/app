@@ -20,20 +20,20 @@ interface AiLayoutProps {
 export default function AiLayout({ children }: AiLayoutProps) {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const { setAllTracks } = useTracksStore();
-  
+
   // Use Convex query instead of fetch
   const convexTracks = useQuery(api.tracks.getUserTracks);
   const isLoading = convexTracks === undefined;
-  
+
   // Map tracks to the expected format - MEMOIZED to prevent infinite re-renders
   const tracks = useMemo(() => {
     if (!convexTracks) return [];
-    return convexTracks.map(track => ({
+    return convexTracks.map((track) => ({
       ...track,
       id: track.id || track._id,
     })) as CrateTrack[];
   }, [convexTracks]);
-  
+
   // Sync to store for other components
   useEffect(() => {
     if (tracks.length > 0) {

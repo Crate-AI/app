@@ -57,14 +57,16 @@ export const getUserPlaylists = query({
           playlistTracks.map(async (pt) => {
             const track = await ctx.db.get(pt.track_id);
             return track ? { ...track, position: pt.position } : null;
-          })
+          }),
         );
 
         return {
           ...playlist,
-          tracks: tracks.filter(Boolean).sort((a, b) => (a?.position || 0) - (b?.position || 0)),
+          tracks: tracks
+            .filter(Boolean)
+            .sort((a, b) => (a?.position || 0) - (b?.position || 0)),
         };
-      })
+      }),
     );
 
     return playlistsWithTracks;
@@ -93,12 +95,14 @@ export const getPlaylist = query({
       playlistTracks.map(async (pt) => {
         const track = await ctx.db.get(pt.track_id);
         return track ? { ...track, position: pt.position } : null;
-      })
+      }),
     );
 
     return {
       ...playlist,
-      tracks: tracks.filter(Boolean).sort((a, b) => (a?.position || 0) - (b?.position || 0)),
+      tracks: tracks
+        .filter(Boolean)
+        .sort((a, b) => (a?.position || 0) - (b?.position || 0)),
     };
   },
 });
@@ -252,11 +256,11 @@ export const addTrackToPlaylist = mutation({
 
     const maxPosition = existingTracks.reduce(
       (max, pt) => Math.max(max, pt.position),
-      -1
+      -1,
     );
 
     // Check if track already in playlist
-    const existing = existingTracks.find(pt => pt.track_id === trackId);
+    const existing = existingTracks.find((pt) => pt.track_id === trackId);
     if (existing) {
       return { success: true, message: 'Track already in playlist' };
     }
@@ -289,11 +293,11 @@ export const removeTrackFromPlaylist = mutation({
 
     const playlistTrack = await ctx.db
       .query('playlist_tracks')
-      .filter((q) => 
+      .filter((q) =>
         q.and(
           q.eq(q.field('playlist_id'), playlistId),
-          q.eq(q.field('track_id'), trackId)
-        )
+          q.eq(q.field('track_id'), trackId),
+        ),
       )
       .first();
 
@@ -304,4 +308,3 @@ export const removeTrackFromPlaylist = mutation({
     return { success: true };
   },
 });
-

@@ -5,13 +5,20 @@ import { v } from 'convex/values';
 /**
  * Helper to get or create the user's favorites playlist
  */
-async function getOrCreateFavoritesPlaylist(ctx: any, userId: string, userEmail: string | undefined) {
+async function getOrCreateFavoritesPlaylist(
+  ctx: any,
+  userId: string,
+  userEmail: string | undefined,
+) {
   // First, try to find existing favorites playlist
   const allPlaylists = await ctx.db.query('playlists').collect();
-  
-  let favoritesPlaylist = allPlaylists.find((p: any) => 
-    (p.user_id === userEmail || p.user_id === userId) && 
-    (p.is_favorites === true || p.is_favorites === 't' || p.is_favorites === 'true')
+
+  let favoritesPlaylist = allPlaylists.find(
+    (p: any) =>
+      (p.user_id === userEmail || p.user_id === userId) &&
+      (p.is_favorites === true ||
+        p.is_favorites === 't' ||
+        p.is_favorites === 'true'),
   );
 
   if (!favoritesPlaylist) {
@@ -50,9 +57,12 @@ export const getFavorites = query({
 
     // Find the favorites playlist
     const allPlaylists = await ctx.db.query('playlists').collect();
-    const favoritesPlaylist = allPlaylists.find((p) => 
-      (p.user_id === user.email || p.user_id === userId) && 
-      (p.is_favorites === true || p.is_favorites === 't' || p.is_favorites === 'true')
+    const favoritesPlaylist = allPlaylists.find(
+      (p) =>
+        (p.user_id === user.email || p.user_id === userId) &&
+        (p.is_favorites === true ||
+          p.is_favorites === 't' ||
+          p.is_favorites === 'true'),
     );
 
     if (!favoritesPlaylist) {
@@ -69,17 +79,19 @@ export const getFavorites = query({
     const favorites = await Promise.all(
       playlistTracks.map(async (pt) => {
         const track = await ctx.db.get(pt.track_id);
-        return track ? {
-          track_id: track.id, // Old string ID for compatibility
-          _trackId: track._id, // Convex ID
-          created_at: pt.created_at,
-          tracks: track, // Nested track for API compatibility
-        } : null;
-      })
+        return track
+          ? {
+              track_id: track.id, // Old string ID for compatibility
+              _trackId: track._id, // Convex ID
+              created_at: pt.created_at,
+              tracks: track, // Nested track for API compatibility
+            }
+          : null;
+      }),
     );
 
     const validFavorites = favorites.filter(Boolean);
-    const favoriteTrackIds = validFavorites.map(f => f?.track_id);
+    const favoriteTrackIds = validFavorites.map((f) => f?.track_id);
 
     return {
       favoriteTrackIds,
@@ -92,7 +104,7 @@ export const getFavorites = query({
  * Add a track to favorites
  */
 export const addFavorite = mutation({
-  args: { 
+  args: {
     trackId: v.union(v.id('tracks'), v.string()), // Accept both Convex ID and old string ID
   },
   handler: async (ctx, { trackId }) => {
@@ -107,7 +119,11 @@ export const addFavorite = mutation({
     }
 
     // Get or create favorites playlist
-    const favoritesPlaylist = await getOrCreateFavoritesPlaylist(ctx, userId, user.email);
+    const favoritesPlaylist = await getOrCreateFavoritesPlaylist(
+      ctx,
+      userId,
+      user.email,
+    );
 
     // Resolve track ID - if string, look up by old ID
     let convexTrackId = trackId;
@@ -117,7 +133,7 @@ export const addFavorite = mutation({
         .query('tracks')
         .withIndex('by_old_id', (q) => q.eq('id', trackId))
         .first();
-      
+
       if (!track) {
         throw new Error('Track not found');
       }
@@ -130,7 +146,9 @@ export const addFavorite = mutation({
       .filter((q) => q.eq(q.field('playlist_id'), favoritesPlaylist._id))
       .collect();
 
-    const alreadyFavorited = existingTracks.some(pt => pt.track_id === convexTrackId);
+    const alreadyFavorited = existingTracks.some(
+      (pt) => pt.track_id === convexTrackId,
+    );
     if (alreadyFavorited) {
       return { success: true, message: 'Track already in favorites' };
     }
@@ -138,7 +156,7 @@ export const addFavorite = mutation({
     // Get highest position
     const maxPosition = existingTracks.reduce(
       (max, pt) => Math.max(max, pt.position),
-      -1
+      -1,
     );
 
     // Add to favorites
@@ -158,7 +176,7 @@ export const addFavorite = mutation({
  * Remove a track from favorites
  */
 export const removeFavorite = mutation({
-  args: { 
+  args: {
     trackId: v.union(v.id('tracks'), v.string()),
   },
   handler: async (ctx, { trackId }) => {
@@ -174,9 +192,12 @@ export const removeFavorite = mutation({
 
     // Find favorites playlist
     const allPlaylists = await ctx.db.query('playlists').collect();
-    const favoritesPlaylist = allPlaylists.find((p) => 
-      (p.user_id === user.email || p.user_id === userId) && 
-      (p.is_favorites === true || p.is_favorites === 't' || p.is_favorites === 'true')
+    const favoritesPlaylist = allPlaylists.find(
+      (p) =>
+        (p.user_id === user.email || p.user_id === userId) &&
+        (p.is_favorites === true ||
+          p.is_favorites === 't' ||
+          p.is_favorites === 'true'),
     );
 
     if (!favoritesPlaylist) {
@@ -190,7 +211,7 @@ export const removeFavorite = mutation({
         .query('tracks')
         .withIndex('by_old_id', (q) => q.eq('id', trackId))
         .first();
-      
+
       if (track) {
         convexTrackId = track._id;
       }
@@ -199,11 +220,11 @@ export const removeFavorite = mutation({
     // Find and remove
     const playlistTrack = await ctx.db
       .query('playlist_tracks')
-      .filter((q) => 
+      .filter((q) =>
         q.and(
           q.eq(q.field('playlist_id'), favoritesPlaylist._id),
-          q.eq(q.field('track_id'), convexTrackId)
-        )
+          q.eq(q.field('track_id'), convexTrackId),
+        ),
       )
       .first();
 
@@ -233,9 +254,12 @@ export const isFavorited = query({
 
     // Find favorites playlist
     const allPlaylists = await ctx.db.query('playlists').collect();
-    const favoritesPlaylist = allPlaylists.find((p) => 
-      (p.user_id === user.email || p.user_id === userId) && 
-      (p.is_favorites === true || p.is_favorites === 't' || p.is_favorites === 'true')
+    const favoritesPlaylist = allPlaylists.find(
+      (p) =>
+        (p.user_id === user.email || p.user_id === userId) &&
+        (p.is_favorites === true ||
+          p.is_favorites === 't' ||
+          p.is_favorites === 'true'),
     );
 
     if (!favoritesPlaylist) {
@@ -249,7 +273,7 @@ export const isFavorited = query({
         .query('tracks')
         .withIndex('by_old_id', (q) => q.eq('id', trackId))
         .first();
-      
+
       if (track) {
         convexTrackId = track._id;
       }
@@ -258,15 +282,14 @@ export const isFavorited = query({
     // Check if in favorites
     const playlistTrack = await ctx.db
       .query('playlist_tracks')
-      .filter((q) => 
+      .filter((q) =>
         q.and(
           q.eq(q.field('playlist_id'), favoritesPlaylist._id),
-          q.eq(q.field('track_id'), convexTrackId)
-        )
+          q.eq(q.field('track_id'), convexTrackId),
+        ),
       )
       .first();
 
     return !!playlistTrack;
   },
 });
-

@@ -10,10 +10,10 @@ import { useConvexAuth } from 'convex/react';
 export function useAuth() {
   // Get Convex auth loading state
   const { isLoading: isAuthLoading, isAuthenticated } = useConvexAuth();
-  
+
   // Get current user data
   const user = useQuery(api.users.getCurrentUser);
-  
+
   // Compute loading state - we're loading if auth is initializing OR if we're authenticated but user data hasn't loaded yet
   const isLoading = isAuthLoading || (isAuthenticated && user === undefined);
 
@@ -24,15 +24,17 @@ export function useAuth() {
     email: user?.email || null,
     displayName: user?.displayName || null,
     avatarUrl: user?.avatarUrl || null,
-    
+
     // Auth state
     isAuthenticated: isAuthenticated && !!user,
     isLoading,
-    
+
     // Onboarding state
-    needsOnboarding: isAuthenticated && user !== undefined && (!user?.username || !user?.onboardingComplete),
+    needsOnboarding:
+      isAuthenticated &&
+      user !== undefined &&
+      (!user?.username || !user?.onboardingComplete),
   };
 }
 
 export default useAuth;
-

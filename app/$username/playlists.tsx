@@ -53,7 +53,9 @@ function PlaylistPage() {
           {playlists.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <p className="text-lg">No playlists yet</p>
-              <p className="text-sm mt-2">Create your first playlist from the Tracks page</p>
+              <p className="text-sm mt-2">
+                Create your first playlist from the Tracks page
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
@@ -62,7 +64,9 @@ function PlaylistPage() {
                   key={playlist._id || playlist.id}
                   playlist={playlist}
                   handleClick={() => handlePlaylistClick(playlist)}
-                  onExpand={() => handlePlaylistExpand(playlist._id || playlist.id)}
+                  onExpand={() =>
+                    handlePlaylistExpand(playlist._id || playlist.id)
+                  }
                 />
               ))}
             </div>

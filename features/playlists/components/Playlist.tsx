@@ -20,8 +20,8 @@ export const Playlist = ({ activePlaylistId }: PlaylistProps) => {
     usePlayerStore();
 
   // Find playlist by either Convex _id or old id
-  const activePlaylist = playlists.find((p: any) => 
-    p._id === activePlaylistId || p.id === activePlaylistId
+  const activePlaylist = playlists.find(
+    (p: any) => p._id === activePlaylistId || p.id === activePlaylistId,
   );
 
   useEffect(() => {
@@ -108,7 +108,8 @@ export const Playlist = ({ activePlaylistId }: PlaylistProps) => {
         <tbody className="bg-bg divide-y divide-border">
           {activePlaylist.tracks?.map((track: any) => {
             const trackId = track._id || track.id;
-            const isPlayingThisTrack = playingTrackId === trackId || playingTrackId === track.id;
+            const isPlayingThisTrack =
+              playingTrackId === trackId || playingTrackId === track.id;
             return (
               <tr key={trackId} className="hover:bg-bg/50">
                 <td className="px-4 py-3 whitespace-nowrap">

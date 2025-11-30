@@ -5,12 +5,12 @@ import { v } from 'convex/values';
 /**
  * Get all tracks for the authenticated user
  * Uses indexed queries to avoid reading the entire tracks table
- * 
+ *
  * Data sources (checked in order):
  * 1. supabaseUserId - for existing users with migrated Supabase data
  * 2. user_discogs_profile by email - fallback for legacy data
  * 3. user_releases by Convex userId - for new users who connect Discogs directly
- * 
+ *
  * New users without any Discogs connection will get an empty array,
  * which is expected - they need to connect Discogs first to import tracks.
  */
@@ -62,15 +62,15 @@ export const getUserTracks = query({
     // Fetch tracks for each release using the index
     // This is more efficient than fetching ALL tracks
     const allTracks: any[] = [];
-    
+
     for (const release of userReleases) {
       const releaseTracks = await ctx.db
         .query('tracks')
-        .withIndex('by_discogs_release', (q) => 
-          q.eq('discogs_release_id', release.discogs_release_id)
+        .withIndex('by_discogs_release', (q) =>
+          q.eq('discogs_release_id', release.discogs_release_id),
         )
         .collect();
-      
+
       allTracks.push(...releaseTracks);
     }
 
@@ -126,20 +126,22 @@ export const getUserTracksPaginated = query({
       return { tracks: [], nextCursor: null };
     }
 
-    const releaseIds = new Set(userReleases.map(r => String(r.discogs_release_id)));
+    const releaseIds = new Set(
+      userReleases.map((r) => String(r.discogs_release_id)),
+    );
 
     // Get paginated tracks
     let tracksQuery = ctx.db.query('tracks').order('desc');
-    
-    const results = await tracksQuery.paginate({ 
-      cursor: cursor ?? null, 
-      numItems: limit * 2 // Fetch more to filter
+
+    const results = await tracksQuery.paginate({
+      cursor: cursor ?? null,
+      numItems: limit * 2, // Fetch more to filter
     });
 
     // Filter to only user's tracks
-    const userTracks = results.page.filter(track => 
-      releaseIds.has(String(track.discogs_release_id))
-    ).slice(0, limit);
+    const userTracks = results.page
+      .filter((track) => releaseIds.has(String(track.discogs_release_id)))
+      .slice(0, limit);
 
     return {
       tracks: userTracks,
@@ -223,8 +225,8 @@ export const searchTracks = query({
     for (const release of userReleases.slice(0, 20)) {
       const releaseTracks = await ctx.db
         .query('tracks')
-        .withIndex('by_discogs_release', (q) => 
-          q.eq('discogs_release_id', release.discogs_release_id)
+        .withIndex('by_discogs_release', (q) =>
+          q.eq('discogs_release_id', release.discogs_release_id),
         )
         .collect();
       allTracks.push(...releaseTracks);
@@ -232,9 +234,10 @@ export const searchTracks = query({
 
     // Filter by search query
     return allTracks
-      .filter(track => 
-        track.title.toLowerCase().includes(lowerQuery) ||
-        track.artist.toLowerCase().includes(lowerQuery)
+      .filter(
+        (track) =>
+          track.title.toLowerCase().includes(lowerQuery) ||
+          track.artist.toLowerCase().includes(lowerQuery),
       )
       .slice(0, 50);
   },
