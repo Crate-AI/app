@@ -15,16 +15,16 @@ function OnboardingPage() {
   const navigate = useNavigate();
   const user = useQuery(api.users.getCurrentUser);
   const setUsernameMutation = useMutation(api.users.setUsername);
-  
+
   const [username, setUsername] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
-  
+
   // Check username availability (skip if empty or invalid)
   const checkAvailability = useQuery(
     api.users.checkUsernameAvailable,
-    username.length >= 3 && !validationError ? { username } : 'skip'
+    username.length >= 3 && !validationError ? { username } : 'skip',
   );
 
   // Redirect if user already has username
@@ -61,7 +61,9 @@ function OnboardingPage() {
     }
 
     if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
-      setValidationError('Only letters, numbers, underscores, and hyphens allowed');
+      setValidationError(
+        'Only letters, numbers, underscores, and hyphens allowed',
+      );
       return;
     }
 
@@ -70,7 +72,7 @@ function OnboardingPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (validationError) {
       toast.error(validationError);
       return;
@@ -93,7 +95,9 @@ function OnboardingPage() {
       navigate({ to: `/${result.username}`, replace: true });
     } catch (error) {
       console.error('Failed to set username:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to set username');
+      toast.error(
+        error instanceof Error ? error.message : 'Failed to set username',
+      );
       setIsSubmitting(false);
     }
   };
@@ -128,7 +132,10 @@ function OnboardingPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Username Input */}
             <div>
-              <label htmlFor="username" className="block text-sm font-medium mb-2">
+              <label
+                htmlFor="username"
+                className="block text-sm font-medium mb-2"
+              >
                 Username
               </label>
               <div className="relative">
@@ -155,27 +162,39 @@ function OnboardingPage() {
                   </div>
                 )}
               </div>
-              
+
               {/* Preview URL */}
               <p className="mt-2 text-sm text-gray-500">
-                Your profile: <span className="font-mono">crate.audio/{username || '...'}</span>
+                Your profile:{' '}
+                <span className="font-mono">
+                  crate.audio/{username || '...'}
+                </span>
               </p>
 
               {/* Validation Messages */}
               {validationError && (
                 <p className="mt-2 text-sm text-red-600">{validationError}</p>
               )}
-              {!validationError && checkAvailability && !checkAvailability.available && (
-                <p className="mt-2 text-sm text-red-600">{checkAvailability.error}</p>
-              )}
+              {!validationError &&
+                checkAvailability &&
+                !checkAvailability.available && (
+                  <p className="mt-2 text-sm text-red-600">
+                    {checkAvailability.error}
+                  </p>
+                )}
               {!validationError && isAvailable && (
-                <p className="mt-2 text-sm text-green-600">Username is available!</p>
+                <p className="mt-2 text-sm text-green-600">
+                  Username is available!
+                </p>
               )}
             </div>
 
             {/* Display Name Input */}
             <div>
-              <label htmlFor="displayName" className="block text-sm font-medium mb-2">
+              <label
+                htmlFor="displayName"
+                className="block text-sm font-medium mb-2"
+              >
                 Display Name (Optional)
               </label>
               <input
@@ -220,4 +239,3 @@ function OnboardingPage() {
     </div>
   );
 }
-

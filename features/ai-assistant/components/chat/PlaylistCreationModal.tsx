@@ -37,7 +37,7 @@ export default function PlaylistCreationModal({
     new Set(suggestedTracks.map((track) => track.id)),
   );
   const [isCreating, setIsCreating] = useState(false);
-  
+
   const { createPlaylist, addTrackToPlaylist } = usePlaylists();
 
   const toggleTrackSelection = (trackId: string) => {
@@ -67,7 +67,8 @@ export default function PlaylistCreationModal({
       // Create the playlist using Convex
       const playlist = await createPlaylist(
         playlistName,
-        description || `AI-generated playlist with ${selectedTracks.size} tracks`
+        description ||
+          `AI-generated playlist with ${selectedTracks.size} tracks`,
       );
 
       if (!playlist) {

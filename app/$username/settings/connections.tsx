@@ -4,7 +4,13 @@ import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Music, CheckCircle, XCircle, Loader2, ExternalLink } from 'lucide-react';
+import {
+  Music,
+  CheckCircle,
+  XCircle,
+  Loader2,
+  ExternalLink,
+} from 'lucide-react';
 import { toast } from 'sonner';
 
 export const Route = createFileRoute('/$username/settings/connections')({
@@ -24,17 +30,17 @@ function ConnectionsPage() {
 
   const handleConnectDiscogs = async () => {
     setIsConnecting(true);
-    
+
     try {
       // Make a request to get the Discogs OAuth URL
       const response = await fetch('/api/auth/discogs/request-token');
-      
+
       if (!response.ok) {
         throw new Error('Failed to initiate Discogs connection');
       }
-      
+
       const { authUrl } = await response.json();
-      
+
       // Redirect to Discogs OAuth
       window.location.href = authUrl;
     } catch (error) {
@@ -52,7 +58,8 @@ function ConnectionsPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Music Service Connections</h1>
         <p className="text-gray-600">
-          Connect your music services to sync your collection and enhance your Crate experience
+          Connect your music services to sync your collection and enhance your
+          Crate experience
         </p>
       </div>
 
@@ -80,8 +87,9 @@ function ConnectionsPage() {
                   )}
                 </div>
                 <p className="text-sm text-gray-600 mb-3">
-                  Sync your vinyl and physical music collection from Discogs. Browse releases,
-                  view details, and add tracks to your Crate library.
+                  Sync your vinyl and physical music collection from Discogs.
+                  Browse releases, view details, and add tracks to your Crate
+                  library.
                 </p>
                 {discogsConnected && discogsProfile && (
                   <div className="text-xs text-gray-500">
@@ -97,10 +105,16 @@ function ConnectionsPage() {
                     variant="outline"
                     size="sm"
                     className="w-full"
-                    onClick={() => toast.success('Your collection is synced! Last sync was automatic.', {
-                      description: 'New releases from Discogs are synced automatically.',
-                      duration: 5000,
-                    })}
+                    onClick={() =>
+                      toast.success(
+                        'Your collection is synced! Last sync was automatic.',
+                        {
+                          description:
+                            'New releases from Discogs are synced automatically.',
+                          duration: 5000,
+                        },
+                      )
+                    }
                   >
                     Sync Now
                   </Button>
@@ -108,7 +122,9 @@ function ConnectionsPage() {
                     variant="ghost"
                     size="sm"
                     className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
-                    onClick={() => toast.info('Disconnect functionality coming soon')}
+                    onClick={() =>
+                      toast.info('Disconnect functionality coming soon')
+                    }
                   >
                     Disconnect
                   </Button>
@@ -148,16 +164,13 @@ function ConnectionsPage() {
                   </span>
                 </div>
                 <p className="text-sm text-gray-600">
-                  Connect your Spotify account to sync your playlists and listening history.
-                  Create cross-platform playlists combining your digital and physical music.
+                  Connect your Spotify account to sync your playlists and
+                  listening history. Create cross-platform playlists combining
+                  your digital and physical music.
                 </p>
               </div>
             </div>
-            <Button
-              disabled
-              variant="outline"
-              className="ml-4"
-            >
+            <Button disabled variant="outline" className="ml-4">
               Connect Spotify
             </Button>
           </div>
@@ -178,16 +191,12 @@ function ConnectionsPage() {
                   </span>
                 </div>
                 <p className="text-sm text-gray-600">
-                  Sync your Apple Music library and playlists. Seamlessly integrate your
-                  digital music collection with Crate.
+                  Sync your Apple Music library and playlists. Seamlessly
+                  integrate your digital music collection with Crate.
                 </p>
               </div>
             </div>
-            <Button
-              disabled
-              variant="outline"
-              className="ml-4"
-            >
+            <Button disabled variant="outline" className="ml-4">
               Connect Apple Music
             </Button>
           </div>
@@ -196,7 +205,9 @@ function ConnectionsPage() {
 
       {/* Help Section */}
       <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <h4 className="font-semibold text-blue-900 mb-2">About Music Connections</h4>
+        <h4 className="font-semibold text-blue-900 mb-2">
+          About Music Connections
+        </h4>
         <ul className="text-sm text-blue-800 space-y-1">
           <li>• Connect multiple music services to create a unified library</li>
           <li>• Your connections are secure and encrypted</li>
@@ -216,4 +227,3 @@ function ConnectionsPage() {
     </div>
   );
 }
-

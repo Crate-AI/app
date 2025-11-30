@@ -33,15 +33,15 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
   >('sidebar');
   const { setAllTracks } = useTracksStore();
   const { initializePlayer } = usePlayerStore();
-  
+
   // Use Convex query instead of fetch
   const convexTracks = useQuery(api.tracks.getUserTracks);
   const isLoading = convexTracks === undefined;
-  
+
   // Map tracks to the expected format - MEMOIZED to prevent infinite re-renders
   const tracks = useMemo(() => {
     if (!convexTracks) return [];
-    return convexTracks.map(track => ({
+    return convexTracks.map((track) => ({
       ...track,
       id: track.id || track._id,
     })) as CrateTrack[];
@@ -51,7 +51,7 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
   useEffect(() => {
     initializePlayer();
   }, [initializePlayer]);
-  
+
   // Sync to store for other components
   useEffect(() => {
     if (tracks.length > 0) {

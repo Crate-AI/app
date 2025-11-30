@@ -20,7 +20,7 @@ export const PlaylistCard = ({
 }: PlaylistCardProps) => {
   const { deletePlaylist, updatePlaylist } = usePlaylists();
   const { playingTrackId, isPlaying, togglePlayPause } = usePlayerStore();
-  
+
   const playlistId = playlist._id || playlist.id;
 
   const isPlayingThisPlaylist = playlist.tracks?.some(

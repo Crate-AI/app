@@ -33,8 +33,8 @@ export const getConnectionByProvider = query({
 
     return await ctx.db
       .query('user_music_connections')
-      .withIndex('by_user_provider', (q) => 
-        q.eq('userId', userId).eq('provider', provider)
+      .withIndex('by_user_provider', (q) =>
+        q.eq('userId', userId).eq('provider', provider),
       )
       .first();
   },
@@ -62,8 +62,8 @@ export const upsertConnection = mutation({
     // Check if connection already exists
     const existing = await ctx.db
       .query('user_music_connections')
-      .withIndex('by_user_provider', (q) => 
-        q.eq('userId', userId).eq('provider', args.provider)
+      .withIndex('by_user_provider', (q) =>
+        q.eq('userId', userId).eq('provider', args.provider),
       )
       .first();
 
@@ -108,8 +108,8 @@ export const removeConnection = mutation({
 
     const connection = await ctx.db
       .query('user_music_connections')
-      .withIndex('by_user_provider', (q) => 
-        q.eq('userId', userId).eq('provider', provider)
+      .withIndex('by_user_provider', (q) =>
+        q.eq('userId', userId).eq('provider', provider),
       )
       .first();
 
@@ -121,4 +121,3 @@ export const removeConnection = mutation({
     return { success: true };
   },
 });
-

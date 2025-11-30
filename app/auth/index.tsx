@@ -31,17 +31,17 @@ function AuthPage() {
 
 function AuthenticatedRedirect() {
   const user = useQuery(api.users.getCurrentUser);
-  
+
   if (user) {
     // Check if user has completed onboarding (has username)
     if (!user.username || !user.onboardingComplete) {
       return <Navigate to="/onboarding" replace />;
     }
-    
+
     // User has username, redirect to their profile
     return <Navigate to={`/${user.username}`} replace />;
   }
-  
+
   return (
     <div className="flex items-center justify-center min-h-screen">
       <LoadingSpinner />

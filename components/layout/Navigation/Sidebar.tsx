@@ -95,8 +95,7 @@ export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
           const Icon = item.icon;
           const isActive =
             pathname === item.href ||
-            (item.href !== `/${username}` &&
-              pathname.startsWith(item.href));
+            (item.href !== `/${username}` && pathname.startsWith(item.href));
 
           return (
             <Link

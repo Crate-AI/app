@@ -4,7 +4,7 @@ import { authTables } from '@convex-dev/auth/server';
 
 export default defineSchema({
   ...authTables,
-  
+
   // Extend the users table from authTables with custom fields
   users: defineTable({
     // Email fields from Convex Auth

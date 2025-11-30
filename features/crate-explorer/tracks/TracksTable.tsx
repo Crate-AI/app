@@ -65,11 +65,11 @@ import { toast } from 'sonner';
 
 export default function TracksTable() {
   const { allTracks, suggestedTrackIds } = useTracksStore();
-  const { 
-    playlists: convexPlaylists, 
-    createPlaylist, 
+  const {
+    playlists: convexPlaylists,
+    createPlaylist,
     addTrackToPlaylist,
-    isLoading: playlistsLoading 
+    isLoading: playlistsLoading,
   } = usePlaylists();
   const {
     playingTrackId,
@@ -109,13 +109,13 @@ export default function TracksTable() {
   const [isTogglingFavorite, setIsTogglingFavorite] = useState<string | null>(
     null,
   );
-  
+
   // Use Convex favorites hook
-  const { 
-    favoriteTrackIds, 
-    isFavorite: checkIsFavorite, 
+  const {
+    favoriteTrackIds,
+    isFavorite: checkIsFavorite,
     toggleFavorite: convexToggleFavorite,
-    isLoading: favoritesLoading 
+    isLoading: favoritesLoading,
   } = useFavorites();
 
   // Initialize player when component mounts
@@ -190,13 +190,13 @@ export default function TracksTable() {
     setIsLoading(true);
     try {
       const playlistId = await createPlaylist(newPlaylistName);
-      
+
       if (playlistId && selectedTrack) {
         // Use the track's _id (Convex) or id (old format)
         const trackIdToUse = (selectedTrack as any)._id ?? selectedTrack.id;
         await addTrackToPlaylist(playlistId, trackIdToUse);
       }
-      
+
       setNewPlaylistName('');
       setIsCreatingPlaylist(false);
       // Toast is handled by the hook
@@ -481,13 +481,7 @@ export default function TracksTable() {
       }),
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      playingTrackId,
-      isReady,
-      isPlaying,
-      rowHover,
-      isTogglingFavorite,
-    ],
+    [playingTrackId, isReady, isPlaying, rowHover, isTogglingFavorite],
   );
 
   const globalFilter: FilterFn<CrateTrack> = (row, columnId, value) => {
@@ -796,8 +790,12 @@ export default function TracksTable() {
                     className="w-full justify-start"
                     onClick={() => {
                       if (selectedTrack && showPlaylistOptions) {
-                        const trackIdToUse = (selectedTrack as any)._id ?? selectedTrack.id;
-                        handleAddToPlaylist(playlist._id || playlist.id, trackIdToUse);
+                        const trackIdToUse =
+                          (selectedTrack as any)._id ?? selectedTrack.id;
+                        handleAddToPlaylist(
+                          playlist._id || playlist.id,
+                          trackIdToUse,
+                        );
                         setShowPlaylistOptions(null);
                       }
                     }}
