@@ -12,18 +12,22 @@ import { Route as rootRouteImport } from './app/__root'
 import { Route as WaitlistRouteImport } from './app/waitlist'
 import { Route as AnalyzeRouteImport } from './app/analyze'
 import { Route as IndexRouteImport } from './app/index'
+import { Route as OnboardingIndexRouteImport } from './app/onboarding/index'
+import { Route as AuthIndexRouteImport } from './app/auth/index'
 import { Route as UsernameIndexRouteImport } from './app/$username/index'
 import { Route as ApiWaitlistRouteImport } from './app/api/waitlist'
 import { Route as AnalyzeChatRouteImport } from './app/analyze.chat'
 import { Route as UsernameTracksRouteImport } from './app/$username/tracks'
 import { Route as UsernamePlaylistsRouteImport } from './app/$username/playlists'
 import { Route as UsernameCollectionRouteImport } from './app/$username/collection'
+import { Route as UsernameSettingsIndexRouteImport } from './app/$username/settings/index'
 import { Route as ApiMusicTracksRouteImport } from './app/api/music/tracks'
 import { Route as ApiMusicPlaylistsRouteImport } from './app/api/music/playlists'
 import { Route as ApiMusicFavoritesRouteImport } from './app/api/music/favorites'
 import { Route as ApiAuthUserRouteImport } from './app/api/auth/user'
 import { Route as ApiAuthSetRedirectRouteImport } from './app/api/auth/set-redirect'
 import { Route as ApiAiChatRouteImport } from './app/api/ai/chat'
+import { Route as UsernameSettingsConnectionsRouteImport } from './app/$username/settings/connections'
 import { Route as ApiMusicTracksDiscogsReleaseIdRouteImport } from './app/api/music/tracks/$discogsReleaseId'
 import { Route as ApiMusicPlaylistsPlaylistIdRouteImport } from './app/api/music/playlists/$playlistId'
 import { Route as ApiExternalYoutubeSearchRouteImport } from './app/api/external/youtube/search'
@@ -49,6 +53,16 @@ const AnalyzeRoute = AnalyzeRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingIndexRoute = OnboardingIndexRouteImport.update({
+  id: '/onboarding/',
+  path: '/onboarding/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthIndexRoute = AuthIndexRouteImport.update({
+  id: '/auth/',
+  path: '/auth/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const UsernameIndexRoute = UsernameIndexRouteImport.update({
@@ -81,6 +95,11 @@ const UsernameCollectionRoute = UsernameCollectionRouteImport.update({
   path: '/$username/collection',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UsernameSettingsIndexRoute = UsernameSettingsIndexRouteImport.update({
+  id: '/$username/settings/',
+  path: '/$username/settings/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiMusicTracksRoute = ApiMusicTracksRouteImport.update({
   id: '/api/music/tracks',
   path: '/api/music/tracks',
@@ -111,6 +130,12 @@ const ApiAiChatRoute = ApiAiChatRouteImport.update({
   path: '/api/ai/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UsernameSettingsConnectionsRoute =
+  UsernameSettingsConnectionsRouteImport.update({
+    id: '/$username/settings/connections',
+    path: '/$username/settings/connections',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiMusicTracksDiscogsReleaseIdRoute =
   ApiMusicTracksDiscogsReleaseIdRouteImport.update({
     id: '/$discogsReleaseId',
@@ -187,12 +212,16 @@ export interface FileRoutesByFullPath {
   '/analyze/chat': typeof AnalyzeChatRoute
   '/api/waitlist': typeof ApiWaitlistRoute
   '/$username': typeof UsernameIndexRoute
+  '/auth': typeof AuthIndexRoute
+  '/onboarding': typeof OnboardingIndexRoute
+  '/$username/settings/connections': typeof UsernameSettingsConnectionsRoute
   '/api/ai/chat': typeof ApiAiChatRoute
   '/api/auth/set-redirect': typeof ApiAuthSetRedirectRoute
   '/api/auth/user': typeof ApiAuthUserRoute
   '/api/music/favorites': typeof ApiMusicFavoritesRoute
   '/api/music/playlists': typeof ApiMusicPlaylistsRouteWithChildren
   '/api/music/tracks': typeof ApiMusicTracksRouteWithChildren
+  '/$username/settings': typeof UsernameSettingsIndexRoute
   '/api/auth/discogs/callback': typeof ApiAuthDiscogsCallbackRoute
   '/api/auth/discogs/request-token': typeof ApiAuthDiscogsRequestTokenRoute
   '/api/external/discogs/collection': typeof ApiExternalDiscogsCollectionRoute
@@ -215,12 +244,16 @@ export interface FileRoutesByTo {
   '/analyze/chat': typeof AnalyzeChatRoute
   '/api/waitlist': typeof ApiWaitlistRoute
   '/$username': typeof UsernameIndexRoute
+  '/auth': typeof AuthIndexRoute
+  '/onboarding': typeof OnboardingIndexRoute
+  '/$username/settings/connections': typeof UsernameSettingsConnectionsRoute
   '/api/ai/chat': typeof ApiAiChatRoute
   '/api/auth/set-redirect': typeof ApiAuthSetRedirectRoute
   '/api/auth/user': typeof ApiAuthUserRoute
   '/api/music/favorites': typeof ApiMusicFavoritesRoute
   '/api/music/playlists': typeof ApiMusicPlaylistsRouteWithChildren
   '/api/music/tracks': typeof ApiMusicTracksRouteWithChildren
+  '/$username/settings': typeof UsernameSettingsIndexRoute
   '/api/auth/discogs/callback': typeof ApiAuthDiscogsCallbackRoute
   '/api/auth/discogs/request-token': typeof ApiAuthDiscogsRequestTokenRoute
   '/api/external/discogs/collection': typeof ApiExternalDiscogsCollectionRoute
@@ -244,12 +277,16 @@ export interface FileRoutesById {
   '/analyze/chat': typeof AnalyzeChatRoute
   '/api/waitlist': typeof ApiWaitlistRoute
   '/$username/': typeof UsernameIndexRoute
+  '/auth/': typeof AuthIndexRoute
+  '/onboarding/': typeof OnboardingIndexRoute
+  '/$username/settings/connections': typeof UsernameSettingsConnectionsRoute
   '/api/ai/chat': typeof ApiAiChatRoute
   '/api/auth/set-redirect': typeof ApiAuthSetRedirectRoute
   '/api/auth/user': typeof ApiAuthUserRoute
   '/api/music/favorites': typeof ApiMusicFavoritesRoute
   '/api/music/playlists': typeof ApiMusicPlaylistsRouteWithChildren
   '/api/music/tracks': typeof ApiMusicTracksRouteWithChildren
+  '/$username/settings/': typeof UsernameSettingsIndexRoute
   '/api/auth/discogs/callback': typeof ApiAuthDiscogsCallbackRoute
   '/api/auth/discogs/request-token': typeof ApiAuthDiscogsRequestTokenRoute
   '/api/external/discogs/collection': typeof ApiExternalDiscogsCollectionRoute
@@ -274,12 +311,16 @@ export interface FileRouteTypes {
     | '/analyze/chat'
     | '/api/waitlist'
     | '/$username'
+    | '/auth'
+    | '/onboarding'
+    | '/$username/settings/connections'
     | '/api/ai/chat'
     | '/api/auth/set-redirect'
     | '/api/auth/user'
     | '/api/music/favorites'
     | '/api/music/playlists'
     | '/api/music/tracks'
+    | '/$username/settings'
     | '/api/auth/discogs/callback'
     | '/api/auth/discogs/request-token'
     | '/api/external/discogs/collection'
@@ -302,12 +343,16 @@ export interface FileRouteTypes {
     | '/analyze/chat'
     | '/api/waitlist'
     | '/$username'
+    | '/auth'
+    | '/onboarding'
+    | '/$username/settings/connections'
     | '/api/ai/chat'
     | '/api/auth/set-redirect'
     | '/api/auth/user'
     | '/api/music/favorites'
     | '/api/music/playlists'
     | '/api/music/tracks'
+    | '/$username/settings'
     | '/api/auth/discogs/callback'
     | '/api/auth/discogs/request-token'
     | '/api/external/discogs/collection'
@@ -330,12 +375,16 @@ export interface FileRouteTypes {
     | '/analyze/chat'
     | '/api/waitlist'
     | '/$username/'
+    | '/auth/'
+    | '/onboarding/'
+    | '/$username/settings/connections'
     | '/api/ai/chat'
     | '/api/auth/set-redirect'
     | '/api/auth/user'
     | '/api/music/favorites'
     | '/api/music/playlists'
     | '/api/music/tracks'
+    | '/$username/settings/'
     | '/api/auth/discogs/callback'
     | '/api/auth/discogs/request-token'
     | '/api/external/discogs/collection'
@@ -358,12 +407,16 @@ export interface RootRouteChildren {
   UsernameTracksRoute: typeof UsernameTracksRoute
   ApiWaitlistRoute: typeof ApiWaitlistRoute
   UsernameIndexRoute: typeof UsernameIndexRoute
+  AuthIndexRoute: typeof AuthIndexRoute
+  OnboardingIndexRoute: typeof OnboardingIndexRoute
+  UsernameSettingsConnectionsRoute: typeof UsernameSettingsConnectionsRoute
   ApiAiChatRoute: typeof ApiAiChatRoute
   ApiAuthSetRedirectRoute: typeof ApiAuthSetRedirectRoute
   ApiAuthUserRoute: typeof ApiAuthUserRoute
   ApiMusicFavoritesRoute: typeof ApiMusicFavoritesRoute
   ApiMusicPlaylistsRoute: typeof ApiMusicPlaylistsRouteWithChildren
   ApiMusicTracksRoute: typeof ApiMusicTracksRouteWithChildren
+  UsernameSettingsIndexRoute: typeof UsernameSettingsIndexRoute
   ApiAuthDiscogsCallbackRoute: typeof ApiAuthDiscogsCallbackRoute
   ApiAuthDiscogsRequestTokenRoute: typeof ApiAuthDiscogsRequestTokenRoute
   ApiExternalDiscogsCollectionRoute: typeof ApiExternalDiscogsCollectionRoute
@@ -394,6 +447,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding/': {
+      id: '/onboarding/'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/': {
+      id: '/auth/'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$username/': {
@@ -438,6 +505,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UsernameCollectionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$username/settings/': {
+      id: '/$username/settings/'
+      path: '/$username/settings'
+      fullPath: '/$username/settings'
+      preLoaderRoute: typeof UsernameSettingsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/music/tracks': {
       id: '/api/music/tracks'
       path: '/api/music/tracks'
@@ -478,6 +552,13 @@ declare module '@tanstack/react-router' {
       path: '/api/ai/chat'
       fullPath: '/api/ai/chat'
       preLoaderRoute: typeof ApiAiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$username/settings/connections': {
+      id: '/$username/settings/connections'
+      path: '/$username/settings/connections'
+      fullPath: '/$username/settings/connections'
+      preLoaderRoute: typeof UsernameSettingsConnectionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/music/tracks/$discogsReleaseId': {
@@ -622,12 +703,16 @@ const rootRouteChildren: RootRouteChildren = {
   UsernameTracksRoute: UsernameTracksRoute,
   ApiWaitlistRoute: ApiWaitlistRoute,
   UsernameIndexRoute: UsernameIndexRoute,
+  AuthIndexRoute: AuthIndexRoute,
+  OnboardingIndexRoute: OnboardingIndexRoute,
+  UsernameSettingsConnectionsRoute: UsernameSettingsConnectionsRoute,
   ApiAiChatRoute: ApiAiChatRoute,
   ApiAuthSetRedirectRoute: ApiAuthSetRedirectRoute,
   ApiAuthUserRoute: ApiAuthUserRoute,
   ApiMusicFavoritesRoute: ApiMusicFavoritesRoute,
   ApiMusicPlaylistsRoute: ApiMusicPlaylistsRouteWithChildren,
   ApiMusicTracksRoute: ApiMusicTracksRouteWithChildren,
+  UsernameSettingsIndexRoute: UsernameSettingsIndexRoute,
   ApiAuthDiscogsCallbackRoute: ApiAuthDiscogsCallbackRoute,
   ApiAuthDiscogsRequestTokenRoute: ApiAuthDiscogsRequestTokenRoute,
   ApiExternalDiscogsCollectionRoute: ApiExternalDiscogsCollectionRoute,

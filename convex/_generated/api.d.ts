@@ -11,6 +11,7 @@
 import type * as auth from "../auth.js";
 import type * as http from "../http.js";
 import type * as migrations from "../migrations.js";
+import type * as musicConnections from "../musicConnections.js";
 import type * as resendOTP from "../resendOTP.js";
 import type * as users from "../users.js";
 
@@ -24,6 +25,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   http: typeof http;
   migrations: typeof migrations;
+  musicConnections: typeof musicConnections;
   resendOTP: typeof resendOTP;
   users: typeof users;
 }>;
