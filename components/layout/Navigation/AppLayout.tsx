@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuthStore } from '@/stores';
+import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils/utils';
 import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
 import Sidebar from './Sidebar';
@@ -14,7 +14,7 @@ interface AppLayoutProps {
 }
 
 export default function AppLayout({ children }: AppLayoutProps) {
-  const { userIdentity } = useAuthStore();
+  const { isAuthenticated } = useAuth();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -102,7 +102,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   }, [sidebarCollapsed, mobileMenuOpen, isMobile]);
 
   // Don't render navigation for unauthenticated users
-  if (!userIdentity) {
+  if (!isAuthenticated) {
     return <div className="min-h-screen">{children}</div>;
   }
 

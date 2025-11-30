@@ -1,12 +1,12 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { Suspense, useEffect, useState } from 'react';
 import {
-  useAuthStore,
   useTracksStore,
   usePlaylistStore,
   usePlayerStore,
   useFavoritesStore,
 } from '@/stores';
+import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -95,7 +95,7 @@ const DashboardStats = ({ tracks }: { tracks: CrateTrack[] }) => {
   );
 };
 
-const FavoritesSection = ({ allTracks }: { allTracks: CrateTrack[] }) => {
+const FavoritesSection = ({ allTracks, username }: { allTracks: CrateTrack[]; username: string }) => {
   const {
     togglePlayPause,
     playingTrackId,
@@ -256,7 +256,7 @@ const FavoritesSection = ({ allTracks }: { allTracks: CrateTrack[] }) => {
           <Link
             to="/$username/tracks"
             params={{
-              username: useAuthStore.getState().userIdentity?.username || '',
+              username: username,
             }}
           >
             <Button variant="outline" className="w-full">
@@ -447,7 +447,7 @@ const DashboardContent = ({ username }: { username: string }) => {
       <DashboardStats tracks={allTracks} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <FavoritesSection allTracks={allTracks} />
+        <FavoritesSection allTracks={allTracks} username={username} />
         <QuickActionsSection username={username} />
       </div>
     </div>
@@ -456,18 +456,17 @@ const DashboardContent = ({ username }: { username: string }) => {
 
 function UserProfilePage() {
   const { username } = Route.useParams();
-  const { userIdentity } = useAuthStore();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const user = useQuery(api.users.getCurrentUser);
 
   useEffect(() => {
-    console.log('hii', user);
     if (!user) {
       navigate({ to: `/`, replace: true });
     }
   }, [user]);
 
-  if (!userIdentity) {
+  if (!isAuthenticated) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <LoadingSpinner />

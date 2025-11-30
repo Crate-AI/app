@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { useAuthStore } from '@/stores';
+import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils/utils';
-import { logout } from '@/lib/supabase/auth';
+import { useAuthActions } from '@convex-dev/auth/react';
 import {
   Search,
   Bell,
@@ -62,7 +62,8 @@ export default function TopBar({
   searchQuery: externalSearchQuery,
   searchPlaceholder = 'Search tracks, playlists, artists...',
 }: TopBarProps) {
-  const { userIdentity } = useAuthStore();
+  const { user, username } = useAuth();
+  const { signOut } = useAuthActions();
   const navigate = useNavigate();
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [internalSearchQuery, setInternalSearchQuery] = useState('');
@@ -120,31 +121,32 @@ export default function TopBar({
 
   const handleLogout = async () => {
     try {
-      await logout();
-      // The AuthProvider will handle redirecting to '/' and clearing the auth state
+      await signOut();
+      navigate({ to: '/' });
     } catch (error) {
       console.error('Failed to logout:', error);
-      // Fallback to manual redirect if logout fails
-      router.push('/');
+      navigate({ to: '/' });
     }
   };
 
   const handleQuickAction = (action: string) => {
+    if (!username) return;
+    
     switch (action) {
       case 'new-playlist':
-        router.push(`/${userIdentity?.username}/playlists/new`);
+        navigate({ to: `/${username}/playlists/new` });
         break;
       case 'analyze-track':
-        router.push('/analyze');
+        navigate({ to: '/analyze' });
         break;
       case 'add-track':
-        router.push(`/${userIdentity?.username}/tracks/add`);
+        navigate({ to: `/${username}/tracks/add` });
         break;
     }
   };
 
   const generateCommands = (): CommandItem[] => {
-    if (!userIdentity) return [];
+    if (!username) return [];
 
     const commands: CommandItem[] = [
       // Navigation
@@ -153,47 +155,47 @@ export default function TopBar({
         title: 'Dashboard',
         description: 'Go to your personal dashboard',
         icon: Home,
-        action: () => router.push(`/${userIdentity.username}`),
+        action: () => navigate({ to: `/${username}` }),
         keywords: ['dashboard', 'home', 'overview', 'profile'],
         category: 'navigation',
-        href: `/${userIdentity.username}`,
+        href: `/${username}`,
       },
       {
         id: 'nav-tracks',
         title: 'Tracks',
         description: 'Browse your complete track collection',
         icon: ListMusic,
-        action: () => router.push(`/${userIdentity.username}/tracks`),
+        action: () => navigate({ to: `/${username}/tracks` }),
         keywords: ['tracks', 'music', 'collection', 'songs'],
         category: 'navigation',
-        href: `/${userIdentity.username}/tracks`,
+        href: `/${username}/tracks`,
       },
       {
         id: 'nav-playlists',
         title: 'Playlists',
         description: 'Create and manage your playlists',
         icon: ListMusic,
-        action: () => router.push(`/${userIdentity.username}/playlists`),
+        action: () => navigate({ to: `/${username}/playlists` }),
         keywords: ['playlists', 'lists', 'music', 'collections'],
         category: 'navigation',
-        href: `/${userIdentity.username}/playlists`,
+        href: `/${username}/playlists`,
       },
       {
         id: 'nav-collection',
         title: 'Collection',
         description: 'Explore your synced Discogs collection',
         icon: Search,
-        action: () => router.push(`/${userIdentity.username}/collection`),
+        action: () => navigate({ to: `/${username}/collection` }),
         keywords: ['collection', 'discogs', 'explore', 'vinyl', 'records'],
         category: 'navigation',
-        href: `/${userIdentity.username}/collection`,
+        href: `/${username}/collection`,
       },
       {
         id: 'nav-analyze',
         title: 'AI Analysis',
         description: 'Analyze music with AI-powered insights',
         icon: Brain,
-        action: () => router.push('/analyze'),
+        action: () => navigate({ to: '/analyze' }),
         keywords: ['analyze', 'ai', 'analysis', 'insights', 'smart'],
         category: 'navigation',
         href: '/analyze',
@@ -204,10 +206,10 @@ export default function TopBar({
         title: 'Settings',
         description: 'Manage your account and preferences',
         icon: Settings,
-        action: () => router.push('/settings'),
+        action: () => navigate({ to: `/${username}/settings/connections` }),
         keywords: ['settings', 'preferences', 'config', 'account'],
         category: 'navigation',
-        href: '/settings',
+        href: `/${username}/settings/connections`,
       },
 
       // Quick Actions
@@ -216,7 +218,7 @@ export default function TopBar({
         title: 'Create Playlist',
         description: 'Start building a new playlist',
         icon: Plus,
-        action: () => router.push(`/${userIdentity.username}/playlists/new`),
+        action: () => navigate({ to: `/${username}/playlists/new` }),
         keywords: ['create', 'new', 'playlist', 'make'],
         category: 'actions',
         badge: 'Quick',
@@ -226,7 +228,7 @@ export default function TopBar({
         title: 'Analyze Track',
         description: 'Get AI-powered track analysis',
         icon: Zap,
-        action: () => router.push('/analyze'),
+        action: () => navigate({ to: '/analyze' }),
         keywords: ['analyze', 'track', 'ai', 'quick'],
         category: 'actions',
         badge: 'AI',
@@ -236,7 +238,7 @@ export default function TopBar({
         title: 'Add Track',
         description: 'Add new music to your collection',
         icon: ListMusic,
-        action: () => router.push(`/${userIdentity.username}/tracks/add`),
+        action: () => navigate({ to: `/${username}/tracks/add` }),
         keywords: ['add', 'track', 'music', 'upload'],
         category: 'actions',
       },
@@ -470,7 +472,7 @@ export default function TopBar({
           </Button>
 
           {/* User Menu */}
-          {userIdentity ? (
+          {username ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -478,24 +480,24 @@ export default function TopBar({
                   className="flex items-center space-x-2 hover:bg-gray-100 p-2"
                 >
                   <Avatar className="w-8 h-8">
-                    <AvatarImage src={userIdentity.avatarUrl} />
+                    <AvatarImage src={user?.avatarUrl || ''} />
                     <AvatarFallback className="bg-main text-black border-2 border-gray-800">
-                      {userIdentity.username.charAt(0).toUpperCase()}
+                      {username.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <span className="hidden sm:block font-medium">
-                    {userIdentity.username}
+                    {username}
                   </span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuItem
-                  onClick={() => router.push(`/${userIdentity.username}`)}
+                  onClick={() => navigate({ to: `/${username}` })}
                 >
                   <User className="w-4 h-4 mr-2" />
                   Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push('/settings')}>
+                <DropdownMenuItem onClick={() => navigate({ to: `/${username}/settings/connections` })}>
                   <Settings className="w-4 h-4 mr-2" />
                   Settings
                 </DropdownMenuItem>
@@ -511,7 +513,7 @@ export default function TopBar({
             </DropdownMenu>
           ) : (
             <Button
-              onClick={() => router.push('/auth/signin')}
+              onClick={() => navigate({ to: '/auth' })}
               className="text-sm"
             >
               Sign In

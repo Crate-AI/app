@@ -1,23 +1,15 @@
 import { useNavigate } from '@tanstack/react-router';
-import { Unauthenticated, AuthLoading } from 'convex/react';
+import { Unauthenticated, AuthLoading, Authenticated } from 'convex/react';
 import { LoadingSpinner } from '@/components/ui/loading';
 import SignInButton from '@/components/signIn';
 import { useEffect } from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
+import { useAuthStore } from '@/stores';
 
 interface HomeClientProps {}
 
 const HomeClient = ({}: HomeClientProps) => {
-  const navigate = useNavigate();
-  const user = useQuery(api.users.getCurrentUser);
-
-  useEffect(() => {
-    if (user?._id) {
-      navigate({ to: `/${user._id}`, replace: true });
-    }
-  }, [user]);
-
   return (
     <>
       <AuthLoading>
@@ -26,12 +18,49 @@ const HomeClient = ({}: HomeClientProps) => {
         </div>
       </AuthLoading>
 
+      <Authenticated>
+        <AuthenticatedRedirect />
+      </Authenticated>
+
       <Unauthenticated>
         <LandingPage />
       </Unauthenticated>
     </>
   );
 };
+
+// Separate component to handle authenticated redirect
+function AuthenticatedRedirect() {
+  const navigate = useNavigate();
+  const user = useQuery(api.users.getCurrentUser);
+  const { setUserIdentity } = useAuthStore();
+
+  useEffect(() => {
+    if (user) {
+      // Check if user has completed onboarding
+      if (!user.username || !user.onboardingComplete) {
+        // New user - needs to create username
+        navigate({ to: '/onboarding', replace: true });
+        return;
+      }
+
+      // Sync Convex auth to Zustand store for legacy components
+      setUserIdentity({
+        username: user.username,
+        avatarUrl: user.avatarUrl || '',
+      });
+
+      // Navigate to user's dashboard
+      navigate({ to: `/${user.username}`, replace: true });
+    }
+  }, [user, navigate, setUserIdentity]);
+
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <LoadingSpinner />
+    </div>
+  );
+}
 
 function LandingPage() {
   return (

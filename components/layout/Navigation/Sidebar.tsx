@@ -1,5 +1,5 @@
 import { useLocation, Link } from '@tanstack/react-router';
-import { useAuthStore } from '@/stores';
+import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils/utils';
 import { Home, Music, ListMusic, Search } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -12,7 +12,7 @@ interface SidebarProps {
 
 export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
   const { pathname } = useLocation();
-  const { userIdentity } = useAuthStore();
+  const { username, user } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(collapsed);
 
   // Sync internal state with prop
@@ -26,30 +26,30 @@ export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
     onToggle?.();
   };
 
-  if (!userIdentity) return null;
+  if (!username) return null;
 
   const navigationItems = [
     {
       name: 'Dashboard',
-      href: `/${userIdentity.username}`,
+      href: `/${username}`,
       icon: Home,
       description: 'Overview',
     },
     {
       name: 'Tracks',
-      href: `/${userIdentity.username}/tracks`,
+      href: `/${username}/tracks`,
       icon: Music,
       description: 'Library',
     },
     {
       name: 'Playlists',
-      href: `/${userIdentity.username}/playlists`,
+      href: `/${username}/playlists`,
       icon: ListMusic,
       description: 'Collections',
     },
     {
       name: 'Collection',
-      href: `/${userIdentity.username}/collection`,
+      href: `/${username}/collection`,
       icon: Search,
       description: 'Discogs',
     },
@@ -95,7 +95,7 @@ export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
           const Icon = item.icon;
           const isActive =
             pathname === item.href ||
-            (item.href !== `/${userIdentity.username}` &&
+            (item.href !== `/${username}` &&
               pathname.startsWith(item.href));
 
           return (
@@ -152,16 +152,16 @@ export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
           )}
         >
           <Avatar className="w-9 h-9 border-2 border-gray-800 shrink-0">
-            <AvatarImage src={userIdentity.avatarUrl ?? ''} />
+            <AvatarImage src={user?.avatarUrl ?? ''} />
             <AvatarFallback className="bg-main font-bold text-sm">
-              {userIdentity.username?.charAt(0).toUpperCase() ?? ''}
+              {username?.charAt(0).toUpperCase() ?? ''}
             </AvatarFallback>
           </Avatar>
 
           {!isCollapsed && (
             <div className="flex-1 min-w-0 overflow-hidden">
               <div className="font-medium text-sm truncate text-black">
-                {userIdentity.username}
+                {username}
               </div>
               <div className="text-xs text-gray-500 truncate">View Profile</div>
             </div>

@@ -4,6 +4,35 @@ import { authTables } from '@convex-dev/auth/server';
 
 export default defineSchema({
   ...authTables,
+  
+  // Extend the users table from authTables with custom fields
+  users: defineTable({
+    // Email fields from Convex Auth
+    email: v.optional(v.string()),
+    emailVerificationTime: v.optional(v.number()),
+    // Custom fields for Crate
+    username: v.optional(v.string()),
+    displayName: v.optional(v.string()),
+    avatarUrl: v.optional(v.string()),
+    onboardingComplete: v.optional(v.boolean()),
+  })
+    .index('by_username', ['username'])
+    .index('by_email', ['email']),
+
+  // Music service connections (for Discogs, Spotify, etc.)
+  user_music_connections: defineTable({
+    userId: v.id('users'),
+    provider: v.string(), // 'discogs' | 'spotify' etc
+    accessToken: v.string(),
+    refreshToken: v.optional(v.string()),
+    expiresAt: v.optional(v.number()),
+    providerUserId: v.string(),
+    providerUsername: v.optional(v.string()),
+    providerData: v.optional(v.any()), // Store additional provider-specific data
+  })
+    .index('by_user', ['userId'])
+    .index('by_user_provider', ['userId', 'provider']),
+
   discogs_releases: defineTable({
     discogs_release_id: v.union(v.string(), v.number()), // Can be either
     discogs_release_data: v.optional(v.any()),
