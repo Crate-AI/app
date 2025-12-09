@@ -175,6 +175,44 @@ export const getTrackByOldId = query({
 });
 
 /**
+ * Get tracks by Discogs release ID
+ * This is used to display tracks for a specific release
+ */
+export const getTracksByReleaseId = query({
+  args: { releaseId: v.union(v.string(), v.number()) },
+  handler: async (ctx, { releaseId }) => {
+    // Convert to string for consistent comparison since the index may store either
+    const releaseIdStr = String(releaseId);
+    const releaseIdNum = Number(releaseId);
+
+    // Try string first
+    let tracks = await ctx.db
+      .query('tracks')
+      .withIndex('by_discogs_release', (q) =>
+        q.eq('discogs_release_id', releaseIdStr),
+      )
+      .collect();
+
+    // If no results, try number (for legacy data)
+    if (tracks.length === 0 && !isNaN(releaseIdNum)) {
+      tracks = await ctx.db
+        .query('tracks')
+        .withIndex('by_discogs_release', (q) =>
+          q.eq('discogs_release_id', releaseIdNum),
+        )
+        .collect();
+    }
+
+    // Sort by position
+    return tracks.sort((a, b) => {
+      const posA = a.position || '';
+      const posB = b.position || '';
+      return posA.localeCompare(posB, undefined, { numeric: true });
+    });
+  },
+});
+
+/**
  * Search tracks by title or artist
  */
 export const searchTracks = query({

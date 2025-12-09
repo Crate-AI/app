@@ -1,18 +1,16 @@
 import { PlaybackError } from '@/types';
 import { TrackList } from './TrackList';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { usePlayerStore } from '@/stores';
 import { CrateTrack } from '@/types';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 
 interface Props {
   releaseId: number;
 }
 
 const ReleaseTracks = ({ releaseId }: Props) => {
-  const [tracks, setTracks] = useState<CrateTrack[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<PlaybackError | null>(null);
-
   const {
     player,
     isReady,
@@ -20,6 +18,32 @@ const ReleaseTracks = ({ releaseId }: Props) => {
     setPlayingTrackId,
     initializePlayer,
   } = usePlayerStore();
+
+  // Use Convex query instead of fetch
+  const convexTracks = useQuery(api.tracks.getTracksByReleaseId, {
+    releaseId: releaseId,
+  });
+
+  const loading = convexTracks === undefined;
+  const error = null; // Convex handles errors differently
+
+  // Map Convex tracks to CrateTrack format
+  const tracks: CrateTrack[] = (convexTracks || []).map((track) => ({
+    ...track,
+    id: track.id || track._id,
+    _convexId: track._id,
+    // Parse genres and styles from comma-separated strings if needed
+    genres: track.genres
+      ? typeof track.genres === 'string'
+        ? track.genres.split(',').map((g: string) => g.trim())
+        : track.genres
+      : [],
+    styles: track.styles
+      ? typeof track.styles === 'string'
+        ? track.styles.split(',').map((s: string) => s.trim())
+        : track.styles
+      : [],
+  })) as CrateTrack[];
 
   useEffect(() => {
     initializePlayer();
@@ -32,11 +56,7 @@ const ReleaseTracks = ({ releaseId }: Props) => {
         : !player
           ? 'YouTube player not initialized'
           : 'Player not ready';
-      setError({
-        message: 'Cannot play track',
-        details: reason,
-        trackPosition: track.position,
-      });
+      console.error('Cannot play track:', reason);
       return;
     }
 
@@ -58,36 +78,9 @@ const ReleaseTracks = ({ releaseId }: Props) => {
         setPlayingTrackId(track.position);
       }
     } catch (err) {
-      setError({
-        message: 'Failed to play track',
-        details: err instanceof Error ? err.message : 'Unknown error',
-        trackPosition: track.position,
-      });
+      console.error('Failed to play track:', err);
     }
   };
-
-  useEffect(() => {
-    const fetchTracks = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const response = await fetch(`/api/music/tracks/${releaseId}`);
-        if (!response.ok) throw new Error('Failed to fetch release');
-
-        const tracksWithMetadata: CrateTrack[] = await response.json();
-        setTracks(tracksWithMetadata);
-      } catch (err) {
-        setError({
-          message: err instanceof Error ? err.message : 'Failed to load tracks',
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTracks();
-  }, [releaseId]);
 
   if (loading) {
     return (
@@ -99,29 +92,21 @@ const ReleaseTracks = ({ releaseId }: Props) => {
     );
   }
 
-  if (error) {
+  if (tracks.length === 0) {
     return (
-      <div className="text-red-500 dark:text-red-400 p-4 text-center">
-        <p className="font-semibold">{error.message}</p>
-        {error.details && (
-          <p className="text-sm mt-1 text-red-400 dark:text-red-300">
-            {error.details}
-            {error.trackPosition && ` (Track ${error.trackPosition})`}
-          </p>
-        )}
+      <div className="text-muted-foreground p-4 text-center">
+        <p>No tracks found for this release</p>
       </div>
     );
   }
 
   return (
-    <>
-      <TrackList
-        tracks={tracks}
-        playingTrackId={playingTrackId}
-        onPlayToggle={handlePlayToggle}
-        isPlayerReady={isReady}
-      />
-    </>
+    <TrackList
+      tracks={tracks}
+      playingTrackId={playingTrackId}
+      onPlayToggle={handlePlayToggle}
+      isPlayerReady={isReady}
+    />
   );
 };
 
