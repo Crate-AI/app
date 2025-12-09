@@ -1,8 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { DiscogsSDK } from '@crate.ai/discogs-sdk';
-import { createClient } from '@/lib/supabase/server';
 import { parse, serialize } from 'cookie';
 
+/**
+ * Discogs OAuth Callback Handler
+ * 
+ * This handles the OAuth callback from Discogs and stores the access tokens.
+ * Primary authentication is handled by Convex Auth (email OTP).
+ * Discogs OAuth is only for connecting to the user's Discogs account.
+ */
 export const Route = createFileRoute('/api/auth/discogs/callback')({
   server: {
     handlers: {
@@ -53,6 +59,7 @@ export const Route = createFileRoute('/api/auth/discogs/callback')({
             throw new Error('Invalid response from Discogs callback');
           }
 
+          // Get user identity from Discogs
           const userIdentity = await sdk.auth.getUserIdentity();
           const userProfile = await fetch(userIdentity.resource_url).then(
             (res) => res.json(),
@@ -60,13 +67,6 @@ export const Route = createFileRoute('/api/auth/discogs/callback')({
 
           // Prepare headers for response
           const headers = new Headers();
-
-          // sync state with supabase auth
-          const supabase = await createClient({ request, headers });
-          const user = await sdk.user.getUser({
-            username: userIdentity.username,
-          });
-          const password = `discogs_${userIdentity.id}`;
 
           // Clear request tokens
           headers.append(
@@ -78,7 +78,7 @@ export const Route = createFileRoute('/api/auth/discogs/callback')({
             serialize('request_token_secret', '', { maxAge: -1, path: '/' }),
           );
 
-          // Set access tokens
+          // Set access tokens for Discogs API calls
           headers.append(
             'Set-Cookie',
             serialize('access_token', tokens.token, {
@@ -98,80 +98,24 @@ export const Route = createFileRoute('/api/auth/discogs/callback')({
             }),
           );
 
-          // Try to sign in or sign up
-          // Note: createClient probably needs to handle cookies/headers context
-          // For now assuming it works or we fix it later.
+          // Store Discogs user data (for display purposes)
+          const userDataToSet = {
+            username: userIdentity.username,
+            avatarUrl: userProfile.avatar_url || '/default-avatar.png',
+            discogsId: userIdentity.id,
+          };
 
-          // ... (Authentication logic skipped for brevity, implementing redirect)
-          // In real migration we need all the logic. I will include it.
+          headers.append(
+            'Set-Cookie',
+            serialize('user_data', JSON.stringify(userDataToSet), {
+              httpOnly: true,
+              secure: process.env.NODE_ENV === 'production',
+              sameSite: 'lax',
+              path: '/',
+            }),
+          );
 
-          let targetUrl = authRedirect || '/';
-
-          const { data: signInData, error: signInError } =
-            await supabase.auth.signInWithPassword({
-              email: user.email,
-              password,
-            });
-
-          let userDataToSet = null;
-
-          if (signInData?.user) {
-            userDataToSet = {
-              userId: signInData.user.id,
-              username: userIdentity.username,
-              avatarUrl: userProfile.avatar_url || '/default-avatar.png',
-            };
-
-            await supabase.from('user_discogs_profile').upsert({
-              user_id: signInData.user.id,
-              username: userIdentity.username,
-            });
-
-            // createFavoritesPlaylist logic...
-          } else {
-            // Sign up
-            const { data: signUpData, error: signUpError } =
-              await supabase.auth.signUp({
-                email: user.email,
-                password,
-                options: {
-                  data: {
-                    discogs_username: userIdentity.username,
-                    discogs_id: userIdentity.id,
-                  },
-                },
-              });
-
-            if (signUpError || !signUpData.user) {
-              return Response.redirect(
-                new URL('/?error=signup_failed', baseUrl),
-              );
-            }
-
-            await supabase.from('user_discogs_profile').upsert({
-              user_id: signUpData.user.id,
-              username: userIdentity.username,
-            });
-
-            userDataToSet = {
-              userId: signUpData.user.id,
-              username: userIdentity.username,
-              avatarUrl: userProfile.avatar_url || '/default-avatar.png',
-            };
-          }
-
-          if (userDataToSet) {
-            headers.append(
-              'Set-Cookie',
-              serialize('user_data', JSON.stringify(userDataToSet), {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                path: '/',
-              }),
-            );
-          }
-
+          // Clear auth redirect cookie if set
           if (authRedirect) {
             headers.append(
               'Set-Cookie',
@@ -179,7 +123,8 @@ export const Route = createFileRoute('/api/auth/discogs/callback')({
             );
           }
 
-          // We need to return the redirect response WITH the headers
+          // Redirect to the target URL
+          const targetUrl = authRedirect || '/';
           const redirectUrl = new URL(targetUrl, baseUrl).toString();
           headers.set('Location', redirectUrl);
 

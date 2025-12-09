@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -25,6 +27,7 @@ import {
 const WaitListForm: React.FC = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const addToWaitlist = useMutation(api.waitlist.addToWaitlist);
 
   const form = useForm({
     resolver: zodResolver(waitlistSchema),
@@ -37,19 +40,12 @@ const WaitListForm: React.FC = () => {
 
   const handleSubmit = async (data: any) => {
     try {
-      const response = await fetch('/api/waitlist', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+      const result = await addToWaitlist({
+        email: data.email,
+        user_type: data.user_type,
       });
 
-      if (!response.ok) {
-        throw new Error(await response.text());
-      }
-
-      setMessage('Successfully added to waitlist!');
+      setMessage(result.message);
       setError(null);
 
       setTimeout(() => setMessage(null), 3000); // Clear message after 3 seconds

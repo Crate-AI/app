@@ -19,5 +19,5 @@
     "target": "es2015"
   },
   "include": ["vite-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "supabase/functions", ".output"]
+  "exclude": ["node_modules", ".output"]
 }
