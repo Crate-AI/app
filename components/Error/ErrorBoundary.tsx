@@ -14,7 +14,7 @@ const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
-    const handleError = (error: Error, errorInfo: any) => {
+    const handleError = (error: Error, errorInfo: unknown) => {
       console.error('ErrorBoundary caught an error:', error, errorInfo);
       setHasError(true);
     };

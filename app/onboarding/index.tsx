@@ -96,7 +96,7 @@ function OnboardingPage() {
     setIsSubmitting(true);
 
     try {
-      const result = await setUsernameMutation({
+      await setUsernameMutation({
         username: username.toLowerCase(),
         displayName: displayName || username,
       });
