@@ -42,6 +42,9 @@ jobs:
           VITE_DISCOGS_CONSUMER_SECRET: ${{ secrets.VITE_DISCOGS_CONSUMER_SECRET }}
         run: pnpm build
 
+      - name: Clean wrangler cache
+        run: rm -rf .wrangler
+
       - name: Deploy to Cloudflare Workers (Staging)
         uses: cloudflare/wrangler-action@v3
         with:
