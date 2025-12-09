@@ -15,6 +15,10 @@
     "build": "vite build",
     "start": "wrangler dev",
     "preview": "vite preview",
+    "---------------TESTING-----------------": "🧪",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "---------------CODE QUALITY-----------------": "🔍",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint . --ext ts,tsx --fix",
@@ -83,6 +87,9 @@
   "devDependencies": {
     "@antfu/ni": "^27.0.1",
     "@tailwindcss/vite": "^4.1.17",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/cookie": "^1.0.0",
     "@types/node": "^20",
     "@types/react": "^18",
@@ -91,6 +98,7 @@
     "@typescript-eslint/parser": "^7.16.1",
     "@vitejs/plugin-react": "^5.1.1",
     "eslint": "^8",
+    "jsdom": "^27.3.0",
     "npm-run-all": "^4.1.5",
     "postcss": "^8",
     "tailwindcss": "^4.1.17",
@@ -98,6 +106,7 @@
     "vinxi": "^0.5.8",
     "vite": "^7.2.4",
     "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^4.0.15",
     "wrangler": "^4.50.0"
   }
 }
