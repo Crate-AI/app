@@ -8,21 +8,21 @@
  * @module
  */
 
-import type * as auth from "../auth.js";
-import type * as favorites from "../favorites.js";
-import type * as http from "../http.js";
-import type * as migrations from "../migrations.js";
-import type * as musicConnections from "../musicConnections.js";
-import type * as playlists from "../playlists.js";
-import type * as resendOTP from "../resendOTP.js";
-import type * as tracks from "../tracks.js";
-import type * as users from "../users.js";
+import type * as auth from '../auth.js';
+import type * as favorites from '../favorites.js';
+import type * as http from '../http.js';
+import type * as migrations from '../migrations.js';
+import type * as musicConnections from '../musicConnections.js';
+import type * as playlists from '../playlists.js';
+import type * as resendOTP from '../resendOTP.js';
+import type * as tracks from '../tracks.js';
+import type * as users from '../users.js';
 
 import type {
   ApiFromModules,
   FilterApi,
   FunctionReference,
-} from "convex/server";
+} from 'convex/server';
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
@@ -46,7 +46,7 @@ declare const fullApi: ApiFromModules<{
  */
 export declare const api: FilterApi<
   typeof fullApi,
-  FunctionReference<any, "public">
+  FunctionReference<any, 'public'>
 >;
 
 /**
@@ -59,15 +59,15 @@ export declare const api: FilterApi<
  */
 export declare const internal: FilterApi<
   typeof fullApi,
-  FunctionReference<any, "internal">
+  FunctionReference<any, 'internal'>
 >;
 
 export declare const components: {
   migrations: {
     lib: {
       cancel: FunctionReference<
-        "mutation",
-        "internal",
+        'mutation',
+        'internal',
         { name: string },
         {
           batchSize?: number;
@@ -79,12 +79,12 @@ export declare const components: {
           name: string;
           next?: Array<string>;
           processed: number;
-          state: "inProgress" | "success" | "failed" | "canceled" | "unknown";
+          state: 'inProgress' | 'success' | 'failed' | 'canceled' | 'unknown';
         }
       >;
       cancelAll: FunctionReference<
-        "mutation",
-        "internal",
+        'mutation',
+        'internal',
         { sinceTs?: number },
         Array<{
           batchSize?: number;
@@ -96,18 +96,18 @@ export declare const components: {
           name: string;
           next?: Array<string>;
           processed: number;
-          state: "inProgress" | "success" | "failed" | "canceled" | "unknown";
+          state: 'inProgress' | 'success' | 'failed' | 'canceled' | 'unknown';
         }>
       >;
       clearAll: FunctionReference<
-        "mutation",
-        "internal",
+        'mutation',
+        'internal',
         { before?: number },
         null
       >;
       getStatus: FunctionReference<
-        "query",
-        "internal",
+        'query',
+        'internal',
         { limit?: number; names?: Array<string> },
         Array<{
           batchSize?: number;
@@ -119,12 +119,12 @@ export declare const components: {
           name: string;
           next?: Array<string>;
           processed: number;
-          state: "inProgress" | "success" | "failed" | "canceled" | "unknown";
+          state: 'inProgress' | 'success' | 'failed' | 'canceled' | 'unknown';
         }>
       >;
       migrate: FunctionReference<
-        "mutation",
-        "internal",
+        'mutation',
+        'internal',
         {
           batchSize?: number;
           cursor?: string | null;
@@ -144,7 +144,7 @@ export declare const components: {
           name: string;
           next?: Array<string>;
           processed: number;
-          state: "inProgress" | "success" | "failed" | "canceled" | "unknown";
+          state: 'inProgress' | 'success' | 'failed' | 'canceled' | 'unknown';
         }
       >;
     };

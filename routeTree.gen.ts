@@ -8,299 +8,299 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './app/__root'
-import { Route as WaitlistRouteImport } from './app/waitlist'
-import { Route as AnalyzeRouteImport } from './app/analyze'
-import { Route as IndexRouteImport } from './app/index'
-import { Route as OnboardingIndexRouteImport } from './app/onboarding/index'
-import { Route as AuthIndexRouteImport } from './app/auth/index'
-import { Route as UsernameIndexRouteImport } from './app/$username/index'
-import { Route as ApiWaitlistRouteImport } from './app/api/waitlist'
-import { Route as AnalyzeChatRouteImport } from './app/analyze.chat'
-import { Route as UsernameTracksRouteImport } from './app/$username/tracks'
-import { Route as UsernamePlaylistsRouteImport } from './app/$username/playlists'
-import { Route as UsernameCollectionRouteImport } from './app/$username/collection'
-import { Route as UsernameSettingsIndexRouteImport } from './app/$username/settings/index'
-import { Route as ApiMusicTracksRouteImport } from './app/api/music/tracks'
-import { Route as ApiMusicPlaylistsRouteImport } from './app/api/music/playlists'
-import { Route as ApiMusicFavoritesRouteImport } from './app/api/music/favorites'
-import { Route as ApiAuthUserRouteImport } from './app/api/auth/user'
-import { Route as ApiAuthSetRedirectRouteImport } from './app/api/auth/set-redirect'
-import { Route as ApiAiChatRouteImport } from './app/api/ai/chat'
-import { Route as UsernameSettingsConnectionsRouteImport } from './app/$username/settings/connections'
-import { Route as ApiMusicTracksDiscogsReleaseIdRouteImport } from './app/api/music/tracks/$discogsReleaseId'
-import { Route as ApiMusicPlaylistsPlaylistIdRouteImport } from './app/api/music/playlists/$playlistId'
-import { Route as ApiExternalYoutubeSearchRouteImport } from './app/api/external/youtube/search'
-import { Route as ApiExternalYoutubeVideoIdRouteImport } from './app/api/external/youtube/$videoId'
-import { Route as ApiExternalDiscogsSearchRouteImport } from './app/api/external/discogs/search'
-import { Route as ApiExternalDiscogsCollectionRouteImport } from './app/api/external/discogs/collection'
-import { Route as ApiAuthDiscogsRequestTokenRouteImport } from './app/api/auth/discogs/request-token'
-import { Route as ApiAuthDiscogsCallbackRouteImport } from './app/api/auth/discogs/callback'
-import { Route as ApiMusicPlaylistsPlaylistIdTracksRouteImport } from './app/api/music/playlists/$playlistId.tracks'
-import { Route as ApiMusicPlaylistsPlaylistIdExternalTracksRouteImport } from './app/api/music/playlists/$playlistId.external-tracks'
-import { Route as ApiExternalDiscogsReleaseIdRouteImport } from './app/api/external/discogs/release/$id'
+import { Route as rootRouteImport } from './app/__root';
+import { Route as WaitlistRouteImport } from './app/waitlist';
+import { Route as AnalyzeRouteImport } from './app/analyze';
+import { Route as IndexRouteImport } from './app/index';
+import { Route as OnboardingIndexRouteImport } from './app/onboarding/index';
+import { Route as AuthIndexRouteImport } from './app/auth/index';
+import { Route as UsernameIndexRouteImport } from './app/$username/index';
+import { Route as ApiWaitlistRouteImport } from './app/api/waitlist';
+import { Route as AnalyzeChatRouteImport } from './app/analyze.chat';
+import { Route as UsernameTracksRouteImport } from './app/$username/tracks';
+import { Route as UsernamePlaylistsRouteImport } from './app/$username/playlists';
+import { Route as UsernameCollectionRouteImport } from './app/$username/collection';
+import { Route as UsernameSettingsIndexRouteImport } from './app/$username/settings/index';
+import { Route as ApiMusicTracksRouteImport } from './app/api/music/tracks';
+import { Route as ApiMusicPlaylistsRouteImport } from './app/api/music/playlists';
+import { Route as ApiMusicFavoritesRouteImport } from './app/api/music/favorites';
+import { Route as ApiAuthUserRouteImport } from './app/api/auth/user';
+import { Route as ApiAuthSetRedirectRouteImport } from './app/api/auth/set-redirect';
+import { Route as ApiAiChatRouteImport } from './app/api/ai/chat';
+import { Route as UsernameSettingsConnectionsRouteImport } from './app/$username/settings/connections';
+import { Route as ApiMusicTracksDiscogsReleaseIdRouteImport } from './app/api/music/tracks/$discogsReleaseId';
+import { Route as ApiMusicPlaylistsPlaylistIdRouteImport } from './app/api/music/playlists/$playlistId';
+import { Route as ApiExternalYoutubeSearchRouteImport } from './app/api/external/youtube/search';
+import { Route as ApiExternalYoutubeVideoIdRouteImport } from './app/api/external/youtube/$videoId';
+import { Route as ApiExternalDiscogsSearchRouteImport } from './app/api/external/discogs/search';
+import { Route as ApiExternalDiscogsCollectionRouteImport } from './app/api/external/discogs/collection';
+import { Route as ApiAuthDiscogsRequestTokenRouteImport } from './app/api/auth/discogs/request-token';
+import { Route as ApiAuthDiscogsCallbackRouteImport } from './app/api/auth/discogs/callback';
+import { Route as ApiMusicPlaylistsPlaylistIdTracksRouteImport } from './app/api/music/playlists/$playlistId.tracks';
+import { Route as ApiMusicPlaylistsPlaylistIdExternalTracksRouteImport } from './app/api/music/playlists/$playlistId.external-tracks';
+import { Route as ApiExternalDiscogsReleaseIdRouteImport } from './app/api/external/discogs/release/$id';
 
 const WaitlistRoute = WaitlistRouteImport.update({
   id: '/waitlist',
   path: '/waitlist',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const AnalyzeRoute = AnalyzeRouteImport.update({
   id: '/analyze',
   path: '/analyze',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const OnboardingIndexRoute = OnboardingIndexRouteImport.update({
   id: '/onboarding/',
   path: '/onboarding/',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const AuthIndexRoute = AuthIndexRouteImport.update({
   id: '/auth/',
   path: '/auth/',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const UsernameIndexRoute = UsernameIndexRouteImport.update({
   id: '/$username/',
   path: '/$username/',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ApiWaitlistRoute = ApiWaitlistRouteImport.update({
   id: '/api/waitlist',
   path: '/api/waitlist',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const AnalyzeChatRoute = AnalyzeChatRouteImport.update({
   id: '/chat',
   path: '/chat',
   getParentRoute: () => AnalyzeRoute,
-} as any)
+} as any);
 const UsernameTracksRoute = UsernameTracksRouteImport.update({
   id: '/$username/tracks',
   path: '/$username/tracks',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const UsernamePlaylistsRoute = UsernamePlaylistsRouteImport.update({
   id: '/$username/playlists',
   path: '/$username/playlists',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const UsernameCollectionRoute = UsernameCollectionRouteImport.update({
   id: '/$username/collection',
   path: '/$username/collection',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const UsernameSettingsIndexRoute = UsernameSettingsIndexRouteImport.update({
   id: '/$username/settings/',
   path: '/$username/settings/',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ApiMusicTracksRoute = ApiMusicTracksRouteImport.update({
   id: '/api/music/tracks',
   path: '/api/music/tracks',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ApiMusicPlaylistsRoute = ApiMusicPlaylistsRouteImport.update({
   id: '/api/music/playlists',
   path: '/api/music/playlists',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ApiMusicFavoritesRoute = ApiMusicFavoritesRouteImport.update({
   id: '/api/music/favorites',
   path: '/api/music/favorites',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ApiAuthUserRoute = ApiAuthUserRouteImport.update({
   id: '/api/auth/user',
   path: '/api/auth/user',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ApiAuthSetRedirectRoute = ApiAuthSetRedirectRouteImport.update({
   id: '/api/auth/set-redirect',
   path: '/api/auth/set-redirect',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ApiAiChatRoute = ApiAiChatRouteImport.update({
   id: '/api/ai/chat',
   path: '/api/ai/chat',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const UsernameSettingsConnectionsRoute =
   UsernameSettingsConnectionsRouteImport.update({
     id: '/$username/settings/connections',
     path: '/$username/settings/connections',
     getParentRoute: () => rootRouteImport,
-  } as any)
+  } as any);
 const ApiMusicTracksDiscogsReleaseIdRoute =
   ApiMusicTracksDiscogsReleaseIdRouteImport.update({
     id: '/$discogsReleaseId',
     path: '/$discogsReleaseId',
     getParentRoute: () => ApiMusicTracksRoute,
-  } as any)
+  } as any);
 const ApiMusicPlaylistsPlaylistIdRoute =
   ApiMusicPlaylistsPlaylistIdRouteImport.update({
     id: '/$playlistId',
     path: '/$playlistId',
     getParentRoute: () => ApiMusicPlaylistsRoute,
-  } as any)
+  } as any);
 const ApiExternalYoutubeSearchRoute =
   ApiExternalYoutubeSearchRouteImport.update({
     id: '/api/external/youtube/search',
     path: '/api/external/youtube/search',
     getParentRoute: () => rootRouteImport,
-  } as any)
+  } as any);
 const ApiExternalYoutubeVideoIdRoute =
   ApiExternalYoutubeVideoIdRouteImport.update({
     id: '/api/external/youtube/$videoId',
     path: '/api/external/youtube/$videoId',
     getParentRoute: () => rootRouteImport,
-  } as any)
+  } as any);
 const ApiExternalDiscogsSearchRoute =
   ApiExternalDiscogsSearchRouteImport.update({
     id: '/api/external/discogs/search',
     path: '/api/external/discogs/search',
     getParentRoute: () => rootRouteImport,
-  } as any)
+  } as any);
 const ApiExternalDiscogsCollectionRoute =
   ApiExternalDiscogsCollectionRouteImport.update({
     id: '/api/external/discogs/collection',
     path: '/api/external/discogs/collection',
     getParentRoute: () => rootRouteImport,
-  } as any)
+  } as any);
 const ApiAuthDiscogsRequestTokenRoute =
   ApiAuthDiscogsRequestTokenRouteImport.update({
     id: '/api/auth/discogs/request-token',
     path: '/api/auth/discogs/request-token',
     getParentRoute: () => rootRouteImport,
-  } as any)
+  } as any);
 const ApiAuthDiscogsCallbackRoute = ApiAuthDiscogsCallbackRouteImport.update({
   id: '/api/auth/discogs/callback',
   path: '/api/auth/discogs/callback',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ApiMusicPlaylistsPlaylistIdTracksRoute =
   ApiMusicPlaylistsPlaylistIdTracksRouteImport.update({
     id: '/tracks',
     path: '/tracks',
     getParentRoute: () => ApiMusicPlaylistsPlaylistIdRoute,
-  } as any)
+  } as any);
 const ApiMusicPlaylistsPlaylistIdExternalTracksRoute =
   ApiMusicPlaylistsPlaylistIdExternalTracksRouteImport.update({
     id: '/external-tracks',
     path: '/external-tracks',
     getParentRoute: () => ApiMusicPlaylistsPlaylistIdRoute,
-  } as any)
+  } as any);
 const ApiExternalDiscogsReleaseIdRoute =
   ApiExternalDiscogsReleaseIdRouteImport.update({
     id: '/api/external/discogs/release/$id',
     path: '/api/external/discogs/release/$id',
     getParentRoute: () => rootRouteImport,
-  } as any)
+  } as any);
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/analyze': typeof AnalyzeRouteWithChildren
-  '/waitlist': typeof WaitlistRoute
-  '/$username/collection': typeof UsernameCollectionRoute
-  '/$username/playlists': typeof UsernamePlaylistsRoute
-  '/$username/tracks': typeof UsernameTracksRoute
-  '/analyze/chat': typeof AnalyzeChatRoute
-  '/api/waitlist': typeof ApiWaitlistRoute
-  '/$username': typeof UsernameIndexRoute
-  '/auth': typeof AuthIndexRoute
-  '/onboarding': typeof OnboardingIndexRoute
-  '/$username/settings/connections': typeof UsernameSettingsConnectionsRoute
-  '/api/ai/chat': typeof ApiAiChatRoute
-  '/api/auth/set-redirect': typeof ApiAuthSetRedirectRoute
-  '/api/auth/user': typeof ApiAuthUserRoute
-  '/api/music/favorites': typeof ApiMusicFavoritesRoute
-  '/api/music/playlists': typeof ApiMusicPlaylistsRouteWithChildren
-  '/api/music/tracks': typeof ApiMusicTracksRouteWithChildren
-  '/$username/settings': typeof UsernameSettingsIndexRoute
-  '/api/auth/discogs/callback': typeof ApiAuthDiscogsCallbackRoute
-  '/api/auth/discogs/request-token': typeof ApiAuthDiscogsRequestTokenRoute
-  '/api/external/discogs/collection': typeof ApiExternalDiscogsCollectionRoute
-  '/api/external/discogs/search': typeof ApiExternalDiscogsSearchRoute
-  '/api/external/youtube/$videoId': typeof ApiExternalYoutubeVideoIdRoute
-  '/api/external/youtube/search': typeof ApiExternalYoutubeSearchRoute
-  '/api/music/playlists/$playlistId': typeof ApiMusicPlaylistsPlaylistIdRouteWithChildren
-  '/api/music/tracks/$discogsReleaseId': typeof ApiMusicTracksDiscogsReleaseIdRoute
-  '/api/external/discogs/release/$id': typeof ApiExternalDiscogsReleaseIdRoute
-  '/api/music/playlists/$playlistId/external-tracks': typeof ApiMusicPlaylistsPlaylistIdExternalTracksRoute
-  '/api/music/playlists/$playlistId/tracks': typeof ApiMusicPlaylistsPlaylistIdTracksRoute
+  '/': typeof IndexRoute;
+  '/analyze': typeof AnalyzeRouteWithChildren;
+  '/waitlist': typeof WaitlistRoute;
+  '/$username/collection': typeof UsernameCollectionRoute;
+  '/$username/playlists': typeof UsernamePlaylistsRoute;
+  '/$username/tracks': typeof UsernameTracksRoute;
+  '/analyze/chat': typeof AnalyzeChatRoute;
+  '/api/waitlist': typeof ApiWaitlistRoute;
+  '/$username': typeof UsernameIndexRoute;
+  '/auth': typeof AuthIndexRoute;
+  '/onboarding': typeof OnboardingIndexRoute;
+  '/$username/settings/connections': typeof UsernameSettingsConnectionsRoute;
+  '/api/ai/chat': typeof ApiAiChatRoute;
+  '/api/auth/set-redirect': typeof ApiAuthSetRedirectRoute;
+  '/api/auth/user': typeof ApiAuthUserRoute;
+  '/api/music/favorites': typeof ApiMusicFavoritesRoute;
+  '/api/music/playlists': typeof ApiMusicPlaylistsRouteWithChildren;
+  '/api/music/tracks': typeof ApiMusicTracksRouteWithChildren;
+  '/$username/settings': typeof UsernameSettingsIndexRoute;
+  '/api/auth/discogs/callback': typeof ApiAuthDiscogsCallbackRoute;
+  '/api/auth/discogs/request-token': typeof ApiAuthDiscogsRequestTokenRoute;
+  '/api/external/discogs/collection': typeof ApiExternalDiscogsCollectionRoute;
+  '/api/external/discogs/search': typeof ApiExternalDiscogsSearchRoute;
+  '/api/external/youtube/$videoId': typeof ApiExternalYoutubeVideoIdRoute;
+  '/api/external/youtube/search': typeof ApiExternalYoutubeSearchRoute;
+  '/api/music/playlists/$playlistId': typeof ApiMusicPlaylistsPlaylistIdRouteWithChildren;
+  '/api/music/tracks/$discogsReleaseId': typeof ApiMusicTracksDiscogsReleaseIdRoute;
+  '/api/external/discogs/release/$id': typeof ApiExternalDiscogsReleaseIdRoute;
+  '/api/music/playlists/$playlistId/external-tracks': typeof ApiMusicPlaylistsPlaylistIdExternalTracksRoute;
+  '/api/music/playlists/$playlistId/tracks': typeof ApiMusicPlaylistsPlaylistIdTracksRoute;
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/analyze': typeof AnalyzeRouteWithChildren
-  '/waitlist': typeof WaitlistRoute
-  '/$username/collection': typeof UsernameCollectionRoute
-  '/$username/playlists': typeof UsernamePlaylistsRoute
-  '/$username/tracks': typeof UsernameTracksRoute
-  '/analyze/chat': typeof AnalyzeChatRoute
-  '/api/waitlist': typeof ApiWaitlistRoute
-  '/$username': typeof UsernameIndexRoute
-  '/auth': typeof AuthIndexRoute
-  '/onboarding': typeof OnboardingIndexRoute
-  '/$username/settings/connections': typeof UsernameSettingsConnectionsRoute
-  '/api/ai/chat': typeof ApiAiChatRoute
-  '/api/auth/set-redirect': typeof ApiAuthSetRedirectRoute
-  '/api/auth/user': typeof ApiAuthUserRoute
-  '/api/music/favorites': typeof ApiMusicFavoritesRoute
-  '/api/music/playlists': typeof ApiMusicPlaylistsRouteWithChildren
-  '/api/music/tracks': typeof ApiMusicTracksRouteWithChildren
-  '/$username/settings': typeof UsernameSettingsIndexRoute
-  '/api/auth/discogs/callback': typeof ApiAuthDiscogsCallbackRoute
-  '/api/auth/discogs/request-token': typeof ApiAuthDiscogsRequestTokenRoute
-  '/api/external/discogs/collection': typeof ApiExternalDiscogsCollectionRoute
-  '/api/external/discogs/search': typeof ApiExternalDiscogsSearchRoute
-  '/api/external/youtube/$videoId': typeof ApiExternalYoutubeVideoIdRoute
-  '/api/external/youtube/search': typeof ApiExternalYoutubeSearchRoute
-  '/api/music/playlists/$playlistId': typeof ApiMusicPlaylistsPlaylistIdRouteWithChildren
-  '/api/music/tracks/$discogsReleaseId': typeof ApiMusicTracksDiscogsReleaseIdRoute
-  '/api/external/discogs/release/$id': typeof ApiExternalDiscogsReleaseIdRoute
-  '/api/music/playlists/$playlistId/external-tracks': typeof ApiMusicPlaylistsPlaylistIdExternalTracksRoute
-  '/api/music/playlists/$playlistId/tracks': typeof ApiMusicPlaylistsPlaylistIdTracksRoute
+  '/': typeof IndexRoute;
+  '/analyze': typeof AnalyzeRouteWithChildren;
+  '/waitlist': typeof WaitlistRoute;
+  '/$username/collection': typeof UsernameCollectionRoute;
+  '/$username/playlists': typeof UsernamePlaylistsRoute;
+  '/$username/tracks': typeof UsernameTracksRoute;
+  '/analyze/chat': typeof AnalyzeChatRoute;
+  '/api/waitlist': typeof ApiWaitlistRoute;
+  '/$username': typeof UsernameIndexRoute;
+  '/auth': typeof AuthIndexRoute;
+  '/onboarding': typeof OnboardingIndexRoute;
+  '/$username/settings/connections': typeof UsernameSettingsConnectionsRoute;
+  '/api/ai/chat': typeof ApiAiChatRoute;
+  '/api/auth/set-redirect': typeof ApiAuthSetRedirectRoute;
+  '/api/auth/user': typeof ApiAuthUserRoute;
+  '/api/music/favorites': typeof ApiMusicFavoritesRoute;
+  '/api/music/playlists': typeof ApiMusicPlaylistsRouteWithChildren;
+  '/api/music/tracks': typeof ApiMusicTracksRouteWithChildren;
+  '/$username/settings': typeof UsernameSettingsIndexRoute;
+  '/api/auth/discogs/callback': typeof ApiAuthDiscogsCallbackRoute;
+  '/api/auth/discogs/request-token': typeof ApiAuthDiscogsRequestTokenRoute;
+  '/api/external/discogs/collection': typeof ApiExternalDiscogsCollectionRoute;
+  '/api/external/discogs/search': typeof ApiExternalDiscogsSearchRoute;
+  '/api/external/youtube/$videoId': typeof ApiExternalYoutubeVideoIdRoute;
+  '/api/external/youtube/search': typeof ApiExternalYoutubeSearchRoute;
+  '/api/music/playlists/$playlistId': typeof ApiMusicPlaylistsPlaylistIdRouteWithChildren;
+  '/api/music/tracks/$discogsReleaseId': typeof ApiMusicTracksDiscogsReleaseIdRoute;
+  '/api/external/discogs/release/$id': typeof ApiExternalDiscogsReleaseIdRoute;
+  '/api/music/playlists/$playlistId/external-tracks': typeof ApiMusicPlaylistsPlaylistIdExternalTracksRoute;
+  '/api/music/playlists/$playlistId/tracks': typeof ApiMusicPlaylistsPlaylistIdTracksRoute;
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/analyze': typeof AnalyzeRouteWithChildren
-  '/waitlist': typeof WaitlistRoute
-  '/$username/collection': typeof UsernameCollectionRoute
-  '/$username/playlists': typeof UsernamePlaylistsRoute
-  '/$username/tracks': typeof UsernameTracksRoute
-  '/analyze/chat': typeof AnalyzeChatRoute
-  '/api/waitlist': typeof ApiWaitlistRoute
-  '/$username/': typeof UsernameIndexRoute
-  '/auth/': typeof AuthIndexRoute
-  '/onboarding/': typeof OnboardingIndexRoute
-  '/$username/settings/connections': typeof UsernameSettingsConnectionsRoute
-  '/api/ai/chat': typeof ApiAiChatRoute
-  '/api/auth/set-redirect': typeof ApiAuthSetRedirectRoute
-  '/api/auth/user': typeof ApiAuthUserRoute
-  '/api/music/favorites': typeof ApiMusicFavoritesRoute
-  '/api/music/playlists': typeof ApiMusicPlaylistsRouteWithChildren
-  '/api/music/tracks': typeof ApiMusicTracksRouteWithChildren
-  '/$username/settings/': typeof UsernameSettingsIndexRoute
-  '/api/auth/discogs/callback': typeof ApiAuthDiscogsCallbackRoute
-  '/api/auth/discogs/request-token': typeof ApiAuthDiscogsRequestTokenRoute
-  '/api/external/discogs/collection': typeof ApiExternalDiscogsCollectionRoute
-  '/api/external/discogs/search': typeof ApiExternalDiscogsSearchRoute
-  '/api/external/youtube/$videoId': typeof ApiExternalYoutubeVideoIdRoute
-  '/api/external/youtube/search': typeof ApiExternalYoutubeSearchRoute
-  '/api/music/playlists/$playlistId': typeof ApiMusicPlaylistsPlaylistIdRouteWithChildren
-  '/api/music/tracks/$discogsReleaseId': typeof ApiMusicTracksDiscogsReleaseIdRoute
-  '/api/external/discogs/release/$id': typeof ApiExternalDiscogsReleaseIdRoute
-  '/api/music/playlists/$playlistId/external-tracks': typeof ApiMusicPlaylistsPlaylistIdExternalTracksRoute
-  '/api/music/playlists/$playlistId/tracks': typeof ApiMusicPlaylistsPlaylistIdTracksRoute
+  __root__: typeof rootRouteImport;
+  '/': typeof IndexRoute;
+  '/analyze': typeof AnalyzeRouteWithChildren;
+  '/waitlist': typeof WaitlistRoute;
+  '/$username/collection': typeof UsernameCollectionRoute;
+  '/$username/playlists': typeof UsernamePlaylistsRoute;
+  '/$username/tracks': typeof UsernameTracksRoute;
+  '/analyze/chat': typeof AnalyzeChatRoute;
+  '/api/waitlist': typeof ApiWaitlistRoute;
+  '/$username/': typeof UsernameIndexRoute;
+  '/auth/': typeof AuthIndexRoute;
+  '/onboarding/': typeof OnboardingIndexRoute;
+  '/$username/settings/connections': typeof UsernameSettingsConnectionsRoute;
+  '/api/ai/chat': typeof ApiAiChatRoute;
+  '/api/auth/set-redirect': typeof ApiAuthSetRedirectRoute;
+  '/api/auth/user': typeof ApiAuthUserRoute;
+  '/api/music/favorites': typeof ApiMusicFavoritesRoute;
+  '/api/music/playlists': typeof ApiMusicPlaylistsRouteWithChildren;
+  '/api/music/tracks': typeof ApiMusicTracksRouteWithChildren;
+  '/$username/settings/': typeof UsernameSettingsIndexRoute;
+  '/api/auth/discogs/callback': typeof ApiAuthDiscogsCallbackRoute;
+  '/api/auth/discogs/request-token': typeof ApiAuthDiscogsRequestTokenRoute;
+  '/api/external/discogs/collection': typeof ApiExternalDiscogsCollectionRoute;
+  '/api/external/discogs/search': typeof ApiExternalDiscogsSearchRoute;
+  '/api/external/youtube/$videoId': typeof ApiExternalYoutubeVideoIdRoute;
+  '/api/external/youtube/search': typeof ApiExternalYoutubeSearchRoute;
+  '/api/music/playlists/$playlistId': typeof ApiMusicPlaylistsPlaylistIdRouteWithChildren;
+  '/api/music/tracks/$discogsReleaseId': typeof ApiMusicTracksDiscogsReleaseIdRoute;
+  '/api/external/discogs/release/$id': typeof ApiExternalDiscogsReleaseIdRoute;
+  '/api/music/playlists/$playlistId/external-tracks': typeof ApiMusicPlaylistsPlaylistIdExternalTracksRoute;
+  '/api/music/playlists/$playlistId/tracks': typeof ApiMusicPlaylistsPlaylistIdTracksRoute;
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
+  fileRoutesByFullPath: FileRoutesByFullPath;
   fullPaths:
     | '/'
     | '/analyze'
@@ -331,8 +331,8 @@ export interface FileRouteTypes {
     | '/api/music/tracks/$discogsReleaseId'
     | '/api/external/discogs/release/$id'
     | '/api/music/playlists/$playlistId/external-tracks'
-    | '/api/music/playlists/$playlistId/tracks'
-  fileRoutesByTo: FileRoutesByTo
+    | '/api/music/playlists/$playlistId/tracks';
+  fileRoutesByTo: FileRoutesByTo;
   to:
     | '/'
     | '/analyze'
@@ -363,7 +363,7 @@ export interface FileRouteTypes {
     | '/api/music/tracks/$discogsReleaseId'
     | '/api/external/discogs/release/$id'
     | '/api/music/playlists/$playlistId/external-tracks'
-    | '/api/music/playlists/$playlistId/tracks'
+    | '/api/music/playlists/$playlistId/tracks';
   id:
     | '__root__'
     | '/'
@@ -395,266 +395,266 @@ export interface FileRouteTypes {
     | '/api/music/tracks/$discogsReleaseId'
     | '/api/external/discogs/release/$id'
     | '/api/music/playlists/$playlistId/external-tracks'
-    | '/api/music/playlists/$playlistId/tracks'
-  fileRoutesById: FileRoutesById
+    | '/api/music/playlists/$playlistId/tracks';
+  fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AnalyzeRoute: typeof AnalyzeRouteWithChildren
-  WaitlistRoute: typeof WaitlistRoute
-  UsernameCollectionRoute: typeof UsernameCollectionRoute
-  UsernamePlaylistsRoute: typeof UsernamePlaylistsRoute
-  UsernameTracksRoute: typeof UsernameTracksRoute
-  ApiWaitlistRoute: typeof ApiWaitlistRoute
-  UsernameIndexRoute: typeof UsernameIndexRoute
-  AuthIndexRoute: typeof AuthIndexRoute
-  OnboardingIndexRoute: typeof OnboardingIndexRoute
-  UsernameSettingsConnectionsRoute: typeof UsernameSettingsConnectionsRoute
-  ApiAiChatRoute: typeof ApiAiChatRoute
-  ApiAuthSetRedirectRoute: typeof ApiAuthSetRedirectRoute
-  ApiAuthUserRoute: typeof ApiAuthUserRoute
-  ApiMusicFavoritesRoute: typeof ApiMusicFavoritesRoute
-  ApiMusicPlaylistsRoute: typeof ApiMusicPlaylistsRouteWithChildren
-  ApiMusicTracksRoute: typeof ApiMusicTracksRouteWithChildren
-  UsernameSettingsIndexRoute: typeof UsernameSettingsIndexRoute
-  ApiAuthDiscogsCallbackRoute: typeof ApiAuthDiscogsCallbackRoute
-  ApiAuthDiscogsRequestTokenRoute: typeof ApiAuthDiscogsRequestTokenRoute
-  ApiExternalDiscogsCollectionRoute: typeof ApiExternalDiscogsCollectionRoute
-  ApiExternalDiscogsSearchRoute: typeof ApiExternalDiscogsSearchRoute
-  ApiExternalYoutubeVideoIdRoute: typeof ApiExternalYoutubeVideoIdRoute
-  ApiExternalYoutubeSearchRoute: typeof ApiExternalYoutubeSearchRoute
-  ApiExternalDiscogsReleaseIdRoute: typeof ApiExternalDiscogsReleaseIdRoute
+  IndexRoute: typeof IndexRoute;
+  AnalyzeRoute: typeof AnalyzeRouteWithChildren;
+  WaitlistRoute: typeof WaitlistRoute;
+  UsernameCollectionRoute: typeof UsernameCollectionRoute;
+  UsernamePlaylistsRoute: typeof UsernamePlaylistsRoute;
+  UsernameTracksRoute: typeof UsernameTracksRoute;
+  ApiWaitlistRoute: typeof ApiWaitlistRoute;
+  UsernameIndexRoute: typeof UsernameIndexRoute;
+  AuthIndexRoute: typeof AuthIndexRoute;
+  OnboardingIndexRoute: typeof OnboardingIndexRoute;
+  UsernameSettingsConnectionsRoute: typeof UsernameSettingsConnectionsRoute;
+  ApiAiChatRoute: typeof ApiAiChatRoute;
+  ApiAuthSetRedirectRoute: typeof ApiAuthSetRedirectRoute;
+  ApiAuthUserRoute: typeof ApiAuthUserRoute;
+  ApiMusicFavoritesRoute: typeof ApiMusicFavoritesRoute;
+  ApiMusicPlaylistsRoute: typeof ApiMusicPlaylistsRouteWithChildren;
+  ApiMusicTracksRoute: typeof ApiMusicTracksRouteWithChildren;
+  UsernameSettingsIndexRoute: typeof UsernameSettingsIndexRoute;
+  ApiAuthDiscogsCallbackRoute: typeof ApiAuthDiscogsCallbackRoute;
+  ApiAuthDiscogsRequestTokenRoute: typeof ApiAuthDiscogsRequestTokenRoute;
+  ApiExternalDiscogsCollectionRoute: typeof ApiExternalDiscogsCollectionRoute;
+  ApiExternalDiscogsSearchRoute: typeof ApiExternalDiscogsSearchRoute;
+  ApiExternalYoutubeVideoIdRoute: typeof ApiExternalYoutubeVideoIdRoute;
+  ApiExternalYoutubeSearchRoute: typeof ApiExternalYoutubeSearchRoute;
+  ApiExternalDiscogsReleaseIdRoute: typeof ApiExternalDiscogsReleaseIdRoute;
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
     '/waitlist': {
-      id: '/waitlist'
-      path: '/waitlist'
-      fullPath: '/waitlist'
-      preLoaderRoute: typeof WaitlistRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/waitlist';
+      path: '/waitlist';
+      fullPath: '/waitlist';
+      preLoaderRoute: typeof WaitlistRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/analyze': {
-      id: '/analyze'
-      path: '/analyze'
-      fullPath: '/analyze'
-      preLoaderRoute: typeof AnalyzeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/analyze';
+      path: '/analyze';
+      fullPath: '/analyze';
+      preLoaderRoute: typeof AnalyzeRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/';
+      path: '/';
+      fullPath: '/';
+      preLoaderRoute: typeof IndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/onboarding/': {
-      id: '/onboarding/'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof OnboardingIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/onboarding/';
+      path: '/onboarding';
+      fullPath: '/onboarding';
+      preLoaderRoute: typeof OnboardingIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/auth/': {
-      id: '/auth/'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/auth/';
+      path: '/auth';
+      fullPath: '/auth';
+      preLoaderRoute: typeof AuthIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/$username/': {
-      id: '/$username/'
-      path: '/$username'
-      fullPath: '/$username'
-      preLoaderRoute: typeof UsernameIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/$username/';
+      path: '/$username';
+      fullPath: '/$username';
+      preLoaderRoute: typeof UsernameIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/api/waitlist': {
-      id: '/api/waitlist'
-      path: '/api/waitlist'
-      fullPath: '/api/waitlist'
-      preLoaderRoute: typeof ApiWaitlistRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/api/waitlist';
+      path: '/api/waitlist';
+      fullPath: '/api/waitlist';
+      preLoaderRoute: typeof ApiWaitlistRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/analyze/chat': {
-      id: '/analyze/chat'
-      path: '/chat'
-      fullPath: '/analyze/chat'
-      preLoaderRoute: typeof AnalyzeChatRouteImport
-      parentRoute: typeof AnalyzeRoute
-    }
+      id: '/analyze/chat';
+      path: '/chat';
+      fullPath: '/analyze/chat';
+      preLoaderRoute: typeof AnalyzeChatRouteImport;
+      parentRoute: typeof AnalyzeRoute;
+    };
     '/$username/tracks': {
-      id: '/$username/tracks'
-      path: '/$username/tracks'
-      fullPath: '/$username/tracks'
-      preLoaderRoute: typeof UsernameTracksRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/$username/tracks';
+      path: '/$username/tracks';
+      fullPath: '/$username/tracks';
+      preLoaderRoute: typeof UsernameTracksRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/$username/playlists': {
-      id: '/$username/playlists'
-      path: '/$username/playlists'
-      fullPath: '/$username/playlists'
-      preLoaderRoute: typeof UsernamePlaylistsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/$username/playlists';
+      path: '/$username/playlists';
+      fullPath: '/$username/playlists';
+      preLoaderRoute: typeof UsernamePlaylistsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/$username/collection': {
-      id: '/$username/collection'
-      path: '/$username/collection'
-      fullPath: '/$username/collection'
-      preLoaderRoute: typeof UsernameCollectionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/$username/collection';
+      path: '/$username/collection';
+      fullPath: '/$username/collection';
+      preLoaderRoute: typeof UsernameCollectionRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/$username/settings/': {
-      id: '/$username/settings/'
-      path: '/$username/settings'
-      fullPath: '/$username/settings'
-      preLoaderRoute: typeof UsernameSettingsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/$username/settings/';
+      path: '/$username/settings';
+      fullPath: '/$username/settings';
+      preLoaderRoute: typeof UsernameSettingsIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/api/music/tracks': {
-      id: '/api/music/tracks'
-      path: '/api/music/tracks'
-      fullPath: '/api/music/tracks'
-      preLoaderRoute: typeof ApiMusicTracksRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/api/music/tracks';
+      path: '/api/music/tracks';
+      fullPath: '/api/music/tracks';
+      preLoaderRoute: typeof ApiMusicTracksRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/api/music/playlists': {
-      id: '/api/music/playlists'
-      path: '/api/music/playlists'
-      fullPath: '/api/music/playlists'
-      preLoaderRoute: typeof ApiMusicPlaylistsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/api/music/playlists';
+      path: '/api/music/playlists';
+      fullPath: '/api/music/playlists';
+      preLoaderRoute: typeof ApiMusicPlaylistsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/api/music/favorites': {
-      id: '/api/music/favorites'
-      path: '/api/music/favorites'
-      fullPath: '/api/music/favorites'
-      preLoaderRoute: typeof ApiMusicFavoritesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/api/music/favorites';
+      path: '/api/music/favorites';
+      fullPath: '/api/music/favorites';
+      preLoaderRoute: typeof ApiMusicFavoritesRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/api/auth/user': {
-      id: '/api/auth/user'
-      path: '/api/auth/user'
-      fullPath: '/api/auth/user'
-      preLoaderRoute: typeof ApiAuthUserRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/api/auth/user';
+      path: '/api/auth/user';
+      fullPath: '/api/auth/user';
+      preLoaderRoute: typeof ApiAuthUserRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/api/auth/set-redirect': {
-      id: '/api/auth/set-redirect'
-      path: '/api/auth/set-redirect'
-      fullPath: '/api/auth/set-redirect'
-      preLoaderRoute: typeof ApiAuthSetRedirectRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/api/auth/set-redirect';
+      path: '/api/auth/set-redirect';
+      fullPath: '/api/auth/set-redirect';
+      preLoaderRoute: typeof ApiAuthSetRedirectRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/api/ai/chat': {
-      id: '/api/ai/chat'
-      path: '/api/ai/chat'
-      fullPath: '/api/ai/chat'
-      preLoaderRoute: typeof ApiAiChatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/api/ai/chat';
+      path: '/api/ai/chat';
+      fullPath: '/api/ai/chat';
+      preLoaderRoute: typeof ApiAiChatRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/$username/settings/connections': {
-      id: '/$username/settings/connections'
-      path: '/$username/settings/connections'
-      fullPath: '/$username/settings/connections'
-      preLoaderRoute: typeof UsernameSettingsConnectionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/$username/settings/connections';
+      path: '/$username/settings/connections';
+      fullPath: '/$username/settings/connections';
+      preLoaderRoute: typeof UsernameSettingsConnectionsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/api/music/tracks/$discogsReleaseId': {
-      id: '/api/music/tracks/$discogsReleaseId'
-      path: '/$discogsReleaseId'
-      fullPath: '/api/music/tracks/$discogsReleaseId'
-      preLoaderRoute: typeof ApiMusicTracksDiscogsReleaseIdRouteImport
-      parentRoute: typeof ApiMusicTracksRoute
-    }
+      id: '/api/music/tracks/$discogsReleaseId';
+      path: '/$discogsReleaseId';
+      fullPath: '/api/music/tracks/$discogsReleaseId';
+      preLoaderRoute: typeof ApiMusicTracksDiscogsReleaseIdRouteImport;
+      parentRoute: typeof ApiMusicTracksRoute;
+    };
     '/api/music/playlists/$playlistId': {
-      id: '/api/music/playlists/$playlistId'
-      path: '/$playlistId'
-      fullPath: '/api/music/playlists/$playlistId'
-      preLoaderRoute: typeof ApiMusicPlaylistsPlaylistIdRouteImport
-      parentRoute: typeof ApiMusicPlaylistsRoute
-    }
+      id: '/api/music/playlists/$playlistId';
+      path: '/$playlistId';
+      fullPath: '/api/music/playlists/$playlistId';
+      preLoaderRoute: typeof ApiMusicPlaylistsPlaylistIdRouteImport;
+      parentRoute: typeof ApiMusicPlaylistsRoute;
+    };
     '/api/external/youtube/search': {
-      id: '/api/external/youtube/search'
-      path: '/api/external/youtube/search'
-      fullPath: '/api/external/youtube/search'
-      preLoaderRoute: typeof ApiExternalYoutubeSearchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/api/external/youtube/search';
+      path: '/api/external/youtube/search';
+      fullPath: '/api/external/youtube/search';
+      preLoaderRoute: typeof ApiExternalYoutubeSearchRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/api/external/youtube/$videoId': {
-      id: '/api/external/youtube/$videoId'
-      path: '/api/external/youtube/$videoId'
-      fullPath: '/api/external/youtube/$videoId'
-      preLoaderRoute: typeof ApiExternalYoutubeVideoIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/api/external/youtube/$videoId';
+      path: '/api/external/youtube/$videoId';
+      fullPath: '/api/external/youtube/$videoId';
+      preLoaderRoute: typeof ApiExternalYoutubeVideoIdRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/api/external/discogs/search': {
-      id: '/api/external/discogs/search'
-      path: '/api/external/discogs/search'
-      fullPath: '/api/external/discogs/search'
-      preLoaderRoute: typeof ApiExternalDiscogsSearchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/api/external/discogs/search';
+      path: '/api/external/discogs/search';
+      fullPath: '/api/external/discogs/search';
+      preLoaderRoute: typeof ApiExternalDiscogsSearchRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/api/external/discogs/collection': {
-      id: '/api/external/discogs/collection'
-      path: '/api/external/discogs/collection'
-      fullPath: '/api/external/discogs/collection'
-      preLoaderRoute: typeof ApiExternalDiscogsCollectionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/api/external/discogs/collection';
+      path: '/api/external/discogs/collection';
+      fullPath: '/api/external/discogs/collection';
+      preLoaderRoute: typeof ApiExternalDiscogsCollectionRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/api/auth/discogs/request-token': {
-      id: '/api/auth/discogs/request-token'
-      path: '/api/auth/discogs/request-token'
-      fullPath: '/api/auth/discogs/request-token'
-      preLoaderRoute: typeof ApiAuthDiscogsRequestTokenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/api/auth/discogs/request-token';
+      path: '/api/auth/discogs/request-token';
+      fullPath: '/api/auth/discogs/request-token';
+      preLoaderRoute: typeof ApiAuthDiscogsRequestTokenRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/api/auth/discogs/callback': {
-      id: '/api/auth/discogs/callback'
-      path: '/api/auth/discogs/callback'
-      fullPath: '/api/auth/discogs/callback'
-      preLoaderRoute: typeof ApiAuthDiscogsCallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/api/auth/discogs/callback';
+      path: '/api/auth/discogs/callback';
+      fullPath: '/api/auth/discogs/callback';
+      preLoaderRoute: typeof ApiAuthDiscogsCallbackRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/api/music/playlists/$playlistId/tracks': {
-      id: '/api/music/playlists/$playlistId/tracks'
-      path: '/tracks'
-      fullPath: '/api/music/playlists/$playlistId/tracks'
-      preLoaderRoute: typeof ApiMusicPlaylistsPlaylistIdTracksRouteImport
-      parentRoute: typeof ApiMusicPlaylistsPlaylistIdRoute
-    }
+      id: '/api/music/playlists/$playlistId/tracks';
+      path: '/tracks';
+      fullPath: '/api/music/playlists/$playlistId/tracks';
+      preLoaderRoute: typeof ApiMusicPlaylistsPlaylistIdTracksRouteImport;
+      parentRoute: typeof ApiMusicPlaylistsPlaylistIdRoute;
+    };
     '/api/music/playlists/$playlistId/external-tracks': {
-      id: '/api/music/playlists/$playlistId/external-tracks'
-      path: '/external-tracks'
-      fullPath: '/api/music/playlists/$playlistId/external-tracks'
-      preLoaderRoute: typeof ApiMusicPlaylistsPlaylistIdExternalTracksRouteImport
-      parentRoute: typeof ApiMusicPlaylistsPlaylistIdRoute
-    }
+      id: '/api/music/playlists/$playlistId/external-tracks';
+      path: '/external-tracks';
+      fullPath: '/api/music/playlists/$playlistId/external-tracks';
+      preLoaderRoute: typeof ApiMusicPlaylistsPlaylistIdExternalTracksRouteImport;
+      parentRoute: typeof ApiMusicPlaylistsPlaylistIdRoute;
+    };
     '/api/external/discogs/release/$id': {
-      id: '/api/external/discogs/release/$id'
-      path: '/api/external/discogs/release/$id'
-      fullPath: '/api/external/discogs/release/$id'
-      preLoaderRoute: typeof ApiExternalDiscogsReleaseIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/api/external/discogs/release/$id';
+      path: '/api/external/discogs/release/$id';
+      fullPath: '/api/external/discogs/release/$id';
+      preLoaderRoute: typeof ApiExternalDiscogsReleaseIdRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
   }
 }
 
 interface AnalyzeRouteChildren {
-  AnalyzeChatRoute: typeof AnalyzeChatRoute
+  AnalyzeChatRoute: typeof AnalyzeChatRoute;
 }
 
 const AnalyzeRouteChildren: AnalyzeRouteChildren = {
   AnalyzeChatRoute: AnalyzeChatRoute,
-}
+};
 
 const AnalyzeRouteWithChildren =
-  AnalyzeRoute._addFileChildren(AnalyzeRouteChildren)
+  AnalyzeRoute._addFileChildren(AnalyzeRouteChildren);
 
 interface ApiMusicPlaylistsPlaylistIdRouteChildren {
-  ApiMusicPlaylistsPlaylistIdExternalTracksRoute: typeof ApiMusicPlaylistsPlaylistIdExternalTracksRoute
-  ApiMusicPlaylistsPlaylistIdTracksRoute: typeof ApiMusicPlaylistsPlaylistIdTracksRoute
+  ApiMusicPlaylistsPlaylistIdExternalTracksRoute: typeof ApiMusicPlaylistsPlaylistIdExternalTracksRoute;
+  ApiMusicPlaylistsPlaylistIdTracksRoute: typeof ApiMusicPlaylistsPlaylistIdTracksRoute;
 }
 
 const ApiMusicPlaylistsPlaylistIdRouteChildren: ApiMusicPlaylistsPlaylistIdRouteChildren =
@@ -663,36 +663,36 @@ const ApiMusicPlaylistsPlaylistIdRouteChildren: ApiMusicPlaylistsPlaylistIdRoute
       ApiMusicPlaylistsPlaylistIdExternalTracksRoute,
     ApiMusicPlaylistsPlaylistIdTracksRoute:
       ApiMusicPlaylistsPlaylistIdTracksRoute,
-  }
+  };
 
 const ApiMusicPlaylistsPlaylistIdRouteWithChildren =
   ApiMusicPlaylistsPlaylistIdRoute._addFileChildren(
     ApiMusicPlaylistsPlaylistIdRouteChildren,
-  )
+  );
 
 interface ApiMusicPlaylistsRouteChildren {
-  ApiMusicPlaylistsPlaylistIdRoute: typeof ApiMusicPlaylistsPlaylistIdRouteWithChildren
+  ApiMusicPlaylistsPlaylistIdRoute: typeof ApiMusicPlaylistsPlaylistIdRouteWithChildren;
 }
 
 const ApiMusicPlaylistsRouteChildren: ApiMusicPlaylistsRouteChildren = {
   ApiMusicPlaylistsPlaylistIdRoute:
     ApiMusicPlaylistsPlaylistIdRouteWithChildren,
-}
+};
 
 const ApiMusicPlaylistsRouteWithChildren =
-  ApiMusicPlaylistsRoute._addFileChildren(ApiMusicPlaylistsRouteChildren)
+  ApiMusicPlaylistsRoute._addFileChildren(ApiMusicPlaylistsRouteChildren);
 
 interface ApiMusicTracksRouteChildren {
-  ApiMusicTracksDiscogsReleaseIdRoute: typeof ApiMusicTracksDiscogsReleaseIdRoute
+  ApiMusicTracksDiscogsReleaseIdRoute: typeof ApiMusicTracksDiscogsReleaseIdRoute;
 }
 
 const ApiMusicTracksRouteChildren: ApiMusicTracksRouteChildren = {
   ApiMusicTracksDiscogsReleaseIdRoute: ApiMusicTracksDiscogsReleaseIdRoute,
-}
+};
 
 const ApiMusicTracksRouteWithChildren = ApiMusicTracksRoute._addFileChildren(
   ApiMusicTracksRouteChildren,
-)
+);
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -720,16 +720,16 @@ const rootRouteChildren: RootRouteChildren = {
   ApiExternalYoutubeVideoIdRoute: ApiExternalYoutubeVideoIdRoute,
   ApiExternalYoutubeSearchRoute: ApiExternalYoutubeSearchRoute,
   ApiExternalDiscogsReleaseIdRoute: ApiExternalDiscogsReleaseIdRoute,
-}
+};
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+  ._addFileTypes<FileRouteTypes>();
 
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
+import type { getRouter } from './router.tsx';
+import type { createStart } from '@tanstack/react-start';
 declare module '@tanstack/react-start' {
   interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
+    ssr: true;
+    router: Awaited<ReturnType<typeof getRouter>>;
   }
 }

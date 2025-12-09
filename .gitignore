@@ -47,3 +47,6 @@ storage.json
 # convex data exports
 convex-data.zip
 .env.source
+
+# Cursor IDE rules
+.cursor/
