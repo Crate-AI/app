@@ -20,11 +20,7 @@ import { useEffect } from 'react';
 
 const convexUrl = import.meta.env.VITE_CONVEX_URL;
 
-// Debug logging - remove after fixing
-console.log('[DEBUG] VITE_CONVEX_URL:', convexUrl ? 'SET' : 'NOT SET');
-
 if (!convexUrl) {
-  console.error('[FATAL] VITE_CONVEX_URL is not set. Check GitHub secrets.');
   throw new Error('VITE_CONVEX_URL environment variable is not set');
 }
 

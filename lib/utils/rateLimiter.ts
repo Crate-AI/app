@@ -59,11 +59,25 @@ function createRateLimiter(maxRequests: number = 60, timeWindow: number = 60) {
     });
   }
 
-  // Run cleanup every minute
-  setInterval(cleanup, 60000);
+  // Note: setInterval removed - not compatible with Cloudflare Workers global scope
+  // Workers are stateless anyway, so in-memory rate limiting has limited effectiveness
+  // Consider using Cloudflare Rate Limiting or Upstash Redis for production
 
-  return { check };
+  return { check, cleanup };
 }
 
-// Create a singleton instance
-export const rateLimiter = createRateLimiter();
+// Lazy-initialize to avoid Cloudflare Workers global scope restrictions
+let _rateLimiter: ReturnType<typeof createRateLimiter> | null = null;
+
+export function getRateLimiter() {
+  if (!_rateLimiter) {
+    _rateLimiter = createRateLimiter();
+  }
+  return _rateLimiter;
+}
+
+// Keep for backwards compatibility - but prefer getRateLimiter() in handlers
+export const rateLimiter = {
+  check: (identifier: string) => getRateLimiter().check(identifier),
+  cleanup: () => getRateLimiter().cleanup(),
+};
