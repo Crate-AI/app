@@ -1,8 +1,20 @@
 import { Release, Track } from '@/types';
 
-const baseUrl = import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
+/**
+ * Get the base URL for API calls.
+ * Uses window.location.origin on client, falls back for SSR.
+ */
+function getBaseUrl(): string {
+  if (typeof window !== 'undefined') {
+    return window.location.origin;
+  }
+  // SSR fallback - this should rarely be hit for YouTube service
+  return import.meta.env.VITE_BASE_URL || 'http://localhost:1995';
+}
+
 export async function searchVideo(query: string): Promise<string | null> {
   try {
+    const baseUrl = getBaseUrl();
     const response = await fetch(
       `${baseUrl}/api/external/youtube/search?q=${encodeURIComponent(query)}`,
     );
