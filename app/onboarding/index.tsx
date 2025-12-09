@@ -27,10 +27,20 @@ function OnboardingPage() {
     username.length >= 3 && !validationError ? { username } : 'skip',
   );
 
-  // Redirect if user already has username
+  // Redirect based on onboarding state
   useEffect(() => {
-    if (user?.username && user?.onboardingComplete) {
+    if (!user) return;
+
+    // If onboarding complete, go to dashboard
+    if (user.onboardingComplete && user.username) {
       navigate({ to: `/${user.username}`, replace: true });
+      return;
+    }
+
+    // If user has username but not complete, they're on connections step
+    if (user.username && user.onboardingStep === 'connections') {
+      navigate({ to: '/onboarding/connect', replace: true });
+      return;
     }
   }, [user, navigate]);
 
@@ -91,8 +101,8 @@ function OnboardingPage() {
         displayName: displayName || username,
       });
 
-      toast.success(`Welcome, @${result.username}!`);
-      navigate({ to: `/${result.username}`, replace: true });
+      toast.success(`Great! Now let's connect your music.`);
+      navigate({ to: '/onboarding/connect', replace: true });
     } catch (error) {
       console.error('Failed to set username:', error);
       toast.error(

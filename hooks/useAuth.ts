@@ -2,6 +2,8 @@ import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { useConvexAuth } from 'convex/react';
 
+type OnboardingStep = 'username' | 'connections' | 'complete';
+
 /**
  * Custom hook to manage authentication state
  * This replaces the Zustand auth store and provides a clean interface
@@ -16,6 +18,17 @@ export function useAuth() {
 
   // Compute loading state - we're loading if auth is initializing OR if we're authenticated but user data hasn't loaded yet
   const isLoading = isAuthLoading || (isAuthenticated && user === undefined);
+
+  // Determine current onboarding step
+  const getOnboardingStep = (): OnboardingStep => {
+    if (!user) return 'username';
+    if (user.onboardingComplete) return 'complete';
+    if (user.onboardingStep) return user.onboardingStep as OnboardingStep;
+    if (user.username) return 'connections';
+    return 'username';
+  };
+
+  const onboardingStep = getOnboardingStep();
 
   return {
     // User data
@@ -34,6 +47,10 @@ export function useAuth() {
       isAuthenticated &&
       user !== undefined &&
       (!user?.username || !user?.onboardingComplete),
+    onboardingStep,
+    needsUsername: onboardingStep === 'username',
+    needsConnections: onboardingStep === 'connections',
+    onboardingComplete: onboardingStep === 'complete',
   };
 }
 

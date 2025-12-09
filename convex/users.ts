@@ -95,14 +95,60 @@ export const setUsername = mutation({
       throw new Error('Username is already taken');
     }
 
-    // Update user with username
+    // Update user with username - move to connections step (not complete yet)
     await ctx.db.patch(userId, {
       username: username.toLowerCase(),
       displayName: displayName || username,
-      onboardingComplete: true,
+      onboardingStep: 'connections',
     });
 
     return { success: true, username: username.toLowerCase() };
+  },
+});
+
+/**
+ * Update onboarding step
+ */
+export const updateOnboardingStep = mutation({
+  args: {
+    step: v.union(
+      v.literal('username'),
+      v.literal('connections'),
+      v.literal('complete'),
+    ),
+  },
+  handler: async (ctx, { step }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error('Not authenticated');
+    }
+
+    await ctx.db.patch(userId, {
+      onboardingStep: step,
+      onboardingComplete: step === 'complete',
+    });
+
+    return { success: true, step };
+  },
+});
+
+/**
+ * Complete onboarding (skip or finish connections step)
+ */
+export const completeOnboarding = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error('Not authenticated');
+    }
+
+    await ctx.db.patch(userId, {
+      onboardingStep: 'complete',
+      onboardingComplete: true,
+    });
+
+    return { success: true };
   },
 });
 
