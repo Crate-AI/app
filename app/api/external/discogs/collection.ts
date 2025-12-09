@@ -1,10 +1,18 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { DiscogsSDK } from '@crate.ai/discogs-sdk';
-import { CollectionUtils } from '@/lib/database/serverUtils/collection';
-import { createClient } from '@/lib/supabase/server';
 import { parse } from 'cookie';
 import { Release } from '@crate.ai/discogs-sdk/dist/collection/types';
 
+/**
+ * This API route fetches the user's Discogs collection.
+ * 
+ * Note: Database operations have been migrated to Convex. This route now:
+ * 1. Fetches collection directly from Discogs API
+ * 2. Returns the data (client should call Convex to persist if needed)
+ * 
+ * For cached collection data, the client should use the Convex query:
+ * api.discogsCollection.getCollection
+ */
 export const Route = createFileRoute('/api/external/discogs/collection')({
   server: {
     handlers: {
@@ -14,11 +22,6 @@ export const Route = createFileRoute('/api/external/discogs/collection')({
           const accessToken = cookies['access_token'];
           const accessTokenSecret = cookies['access_token_secret'];
           const userData = cookies['user_data'];
-
-          const supabase = await createClient({ request }); // Need to ensure this works
-          const { ingestCollection, getCollection } = CollectionUtils(
-            supabase as any,
-          );
 
           if (!accessToken || !accessTokenSecret || !userData) {
             return Response.json(
@@ -41,36 +44,12 @@ export const Route = createFileRoute('/api/external/discogs/collection')({
           await tokenManager.setAccessToken(accessToken);
           await tokenManager.setAccessTokenSecret(accessTokenSecret);
 
-          // check if collection is already in the database
-          const existingCollection = await getCollection();
-
-          if (existingCollection && existingCollection.length > 0) {
-            const collectionResponse = {
-              pagination: {
-                page: 1,
-                pages: 1,
-                per_page: existingCollection.length,
-                items: existingCollection.length,
-                urls: {
-                  next: '',
-                  last: '',
-                },
-              },
-              releases: existingCollection.map(
-                (row) => row.basic_release_data as unknown as Release,
-              ),
-            };
-            return Response.json(collectionResponse);
-          }
-
-          // fetch collection from Discogs and ingest it into the database
+          // Fetch collection from Discogs API
           const collection = await sdk.collection.getCollection({
             username,
             page: 1,
             perPage: 100,
           });
-
-          await ingestCollection(collection);
 
           return Response.json(collection);
         } catch (error) {
