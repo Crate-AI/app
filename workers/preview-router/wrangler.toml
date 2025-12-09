@@ -1,0 +1,12 @@
+name = "crate-preview-router"
+main = "index.ts"
+compatibility_date = "2024-12-16"
+compatibility_flags = ["nodejs_compat"]
+
+# This worker needs a wildcard route to catch all pr-*.crate.audio requests
+# Set this up in Cloudflare Dashboard:
+# Routes: pr-*.crate.audio/* -> crate-preview-router
+
+[observability]
+enabled = true
+
