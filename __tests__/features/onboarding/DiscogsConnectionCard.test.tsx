@@ -211,4 +211,3 @@ function getConnectionState(
   }
   return 'needs_reconnection';
 }
-

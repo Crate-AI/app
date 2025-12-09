@@ -15,11 +15,7 @@ interface ProvidersProps {
  * Wrapper component that provides all necessary context providers for testing
  */
 function AllProviders({ children }: ProvidersProps) {
-  return (
-    <ConvexProvider client={mockConvexClient}>
-      {children}
-    </ConvexProvider>
-  );
+  return <ConvexProvider client={mockConvexClient}>{children}</ConvexProvider>;
 }
 
 /**
@@ -65,4 +61,3 @@ export function createMockAuthState(overrides = {}) {
     ...overrides,
   };
 }
-
