@@ -14,7 +14,15 @@ export default defineSchema({
     username: v.optional(v.string()),
     displayName: v.optional(v.string()),
     avatarUrl: v.optional(v.string()),
+    // Onboarding tracking
     onboardingComplete: v.optional(v.boolean()),
+    onboardingStep: v.optional(
+      v.union(
+        v.literal('username'),
+        v.literal('connections'),
+        v.literal('complete'),
+      ),
+    ),
     // Legacy Supabase user ID - used to link to migrated data
     supabaseUserId: v.optional(v.string()),
   })

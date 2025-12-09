@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './app/index'
 import { Route as OnboardingIndexRouteImport } from './app/onboarding/index'
 import { Route as AuthIndexRouteImport } from './app/auth/index'
 import { Route as UsernameIndexRouteImport } from './app/$username/index'
+import { Route as OnboardingConnectRouteImport } from './app/onboarding/connect'
 import { Route as AnalyzeChatRouteImport } from './app/analyze.chat'
 import { Route as UsernameTracksRouteImport } from './app/$username/tracks'
 import { Route as UsernamePlaylistsRouteImport } from './app/$username/playlists'
@@ -62,6 +63,11 @@ const AuthIndexRoute = AuthIndexRouteImport.update({
 const UsernameIndexRoute = UsernameIndexRouteImport.update({
   id: '/$username/',
   path: '/$username/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingConnectRoute = OnboardingConnectRouteImport.update({
+  id: '/onboarding/connect',
+  path: '/onboarding/connect',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AnalyzeChatRoute = AnalyzeChatRouteImport.update({
@@ -171,6 +177,7 @@ export interface FileRoutesByFullPath {
   '/$username/playlists': typeof UsernamePlaylistsRoute
   '/$username/tracks': typeof UsernameTracksRoute
   '/analyze/chat': typeof AnalyzeChatRoute
+  '/onboarding/connect': typeof OnboardingConnectRoute
   '/$username': typeof UsernameIndexRoute
   '/auth': typeof AuthIndexRoute
   '/onboarding': typeof OnboardingIndexRoute
@@ -197,6 +204,7 @@ export interface FileRoutesByTo {
   '/$username/playlists': typeof UsernamePlaylistsRoute
   '/$username/tracks': typeof UsernameTracksRoute
   '/analyze/chat': typeof AnalyzeChatRoute
+  '/onboarding/connect': typeof OnboardingConnectRoute
   '/$username': typeof UsernameIndexRoute
   '/auth': typeof AuthIndexRoute
   '/onboarding': typeof OnboardingIndexRoute
@@ -224,6 +232,7 @@ export interface FileRoutesById {
   '/$username/playlists': typeof UsernamePlaylistsRoute
   '/$username/tracks': typeof UsernameTracksRoute
   '/analyze/chat': typeof AnalyzeChatRoute
+  '/onboarding/connect': typeof OnboardingConnectRoute
   '/$username/': typeof UsernameIndexRoute
   '/auth/': typeof AuthIndexRoute
   '/onboarding/': typeof OnboardingIndexRoute
@@ -252,6 +261,7 @@ export interface FileRouteTypes {
     | '/$username/playlists'
     | '/$username/tracks'
     | '/analyze/chat'
+    | '/onboarding/connect'
     | '/$username'
     | '/auth'
     | '/onboarding'
@@ -278,6 +288,7 @@ export interface FileRouteTypes {
     | '/$username/playlists'
     | '/$username/tracks'
     | '/analyze/chat'
+    | '/onboarding/connect'
     | '/$username'
     | '/auth'
     | '/onboarding'
@@ -304,6 +315,7 @@ export interface FileRouteTypes {
     | '/$username/playlists'
     | '/$username/tracks'
     | '/analyze/chat'
+    | '/onboarding/connect'
     | '/$username/'
     | '/auth/'
     | '/onboarding/'
@@ -330,6 +342,7 @@ export interface RootRouteChildren {
   UsernameCollectionRoute: typeof UsernameCollectionRoute
   UsernamePlaylistsRoute: typeof UsernamePlaylistsRoute
   UsernameTracksRoute: typeof UsernameTracksRoute
+  OnboardingConnectRoute: typeof OnboardingConnectRoute
   UsernameIndexRoute: typeof UsernameIndexRoute
   AuthIndexRoute: typeof AuthIndexRoute
   OnboardingIndexRoute: typeof OnboardingIndexRoute
@@ -391,6 +404,13 @@ declare module '@tanstack/react-router' {
       path: '/$username'
       fullPath: '/$username'
       preLoaderRoute: typeof UsernameIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding/connect': {
+      id: '/onboarding/connect'
+      path: '/onboarding/connect'
+      fullPath: '/onboarding/connect'
+      preLoaderRoute: typeof OnboardingConnectRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/analyze/chat': {
@@ -540,6 +560,7 @@ const rootRouteChildren: RootRouteChildren = {
   UsernameCollectionRoute: UsernameCollectionRoute,
   UsernamePlaylistsRoute: UsernamePlaylistsRoute,
   UsernameTracksRoute: UsernameTracksRoute,
+  OnboardingConnectRoute: OnboardingConnectRoute,
   UsernameIndexRoute: UsernameIndexRoute,
   AuthIndexRoute: AuthIndexRoute,
   OnboardingIndexRoute: OnboardingIndexRoute,
