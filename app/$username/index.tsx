@@ -1,8 +1,7 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
-import { Suspense, useEffect, useState } from 'react';
-import { useTracksStore, usePlayerStore } from '@/stores';
+import { Suspense, useEffect } from 'react';
+import { usePlayerStore } from '@/stores';
 import { useAuth } from '@/hooks/useAuth';
-import { useFavorites } from '@/hooks/useFavorites';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -21,7 +20,7 @@ import { CrateTrack } from '@/types';
 import { Image } from '@unpic/react';
 import { LoadingSpinner } from '@/components/ui/loading';
 import { toast } from 'sonner';
-import { useQuery } from 'convex/react';
+import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 
 export const Route = createFileRoute('/$username/')({
@@ -106,13 +105,21 @@ const FavoritesSection = ({
     isReady,
     initializePlayer,
   } = usePlayerStore();
-  const {
-    getFavoriteTracksFromAllTracks,
-    toggleFavorite,
-    isFavorite,
-    isLoading,
-  } = useFavorites();
-  const favoriteTracks = getFavoriteTracksFromAllTracks(allTracks).slice(0, 6);
+
+  // Use Convex for favorites
+  const favoritesData = useQuery(api.favorites.getFavorites);
+  const addFavoriteMutation = useMutation(api.favorites.addFavorite);
+  const removeFavoriteMutation = useMutation(api.favorites.removeFavorite);
+
+  const isLoading = favoritesData === undefined;
+  const favoriteTrackIds = favoritesData?.favoriteTrackIds || [];
+
+  // Get favorite tracks from all tracks
+  const favoriteTracks = allTracks
+    .filter((track) => favoriteTrackIds.includes(track.id))
+    .slice(0, 6);
+
+  const isFavorite = (trackId: string) => favoriteTrackIds.includes(trackId);
 
   // Initialize player when component mounts
   useEffect(() => {
@@ -145,11 +152,11 @@ const FavoritesSection = ({
     const wasFavorite = isFavorite(trackId);
 
     try {
-      await toggleFavorite(trackId);
-
       if (wasFavorite) {
+        await removeFavoriteMutation({ trackId });
         toast.success('Removed from favorites');
       } else {
+        await addFavoriteMutation({ trackId });
         toast.success('Added to favorites');
       }
     } catch (error) {
@@ -269,7 +276,13 @@ const FavoritesSection = ({
   );
 };
 
-const QuickActionsSection = ({ username }: { username: string }) => {
+const QuickActionsSection = ({
+  username,
+  allTracks,
+}: {
+  username: string;
+  allTracks: CrateTrack[];
+}) => {
   const actions = [
     {
       title: 'Explore Collection',
@@ -296,7 +309,6 @@ const QuickActionsSection = ({ username }: { username: string }) => {
   ];
 
   const { toggleShuffle, setQueue } = usePlayerStore();
-  const { allTracks } = useTracksStore();
 
   const handleAction = (action: string) => {
     if (action === 'shuffle') {
@@ -402,26 +414,11 @@ const WelcomeSection = ({ username }: { username: string }) => {
 };
 
 const DashboardContent = ({ username }: { username: string }) => {
-  const { setAllTracks } = useTracksStore();
-
-  // Use Convex queries instead of fetch
+  // Use Convex queries directly - no store needed
   const convexTracks = useQuery(api.tracks.getUserTracks);
   const convexPlaylists = useQuery(api.playlists.getUserPlaylists);
 
   const loading = convexTracks === undefined || convexPlaylists === undefined;
-
-  // Sync Convex tracks to the store for components that still use it
-  useEffect(() => {
-    if (convexTracks && convexTracks.length > 0) {
-      // Map Convex tracks to CrateTrack format
-      const mappedTracks = convexTracks.map((track) => ({
-        ...track,
-        id: track.id || track._id, // Use old id or Convex _id
-        _convexId: track._id,
-      }));
-      setAllTracks(mappedTracks as any);
-    }
-  }, [convexTracks, setAllTracks]);
 
   if (loading) {
     return (
@@ -431,7 +428,7 @@ const DashboardContent = ({ username }: { username: string }) => {
     );
   }
 
-  // Map tracks for the dashboard
+  // Map tracks for the dashboard - Convex data is used directly
   const allTracks = (convexTracks || []).map((track) => ({
     ...track,
     id: track.id || track._id,
@@ -446,7 +443,7 @@ const DashboardContent = ({ username }: { username: string }) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <FavoritesSection allTracks={allTracks} username={username} />
-        <QuickActionsSection username={username} />
+        <QuickActionsSection username={username} allTracks={allTracks} />
       </div>
     </div>
   );

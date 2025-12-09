@@ -51,8 +51,6 @@
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-switch": "^1.2.6",
     "@radix-ui/react-tooltip": "^1.1.6",
-    "@supabase/ssr": "^0.5.2",
-    "@supabase/supabase-js": "^2.44.4",
     "@tanstack/react-router": "^1.139.3",
     "@tanstack/react-start": "^1.139.3",
     "@tanstack/react-table": "^8.21.3",
@@ -76,7 +74,6 @@
     "redis": "^4.7.0",
     "resend": "^6.5.2",
     "sonner": "^1.7.2",
-    "supabase": "^2.0.0",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "youtube-dl-exec": "^3.0.7",
@@ -84,7 +81,6 @@
     "zustand": "^5.0.2"
   },
   "devDependencies": {
-    "npm-run-all": "^4.1.5",
     "@antfu/ni": "^27.0.1",
     "@tailwindcss/vite": "^4.1.17",
     "@types/cookie": "^1.0.0",
@@ -95,6 +91,7 @@
     "@typescript-eslint/parser": "^7.16.1",
     "@vitejs/plugin-react": "^5.1.1",
     "eslint": "^8",
+    "npm-run-all": "^4.1.5",
     "postcss": "^8",
     "tailwindcss": "^4.1.17",
     "typescript": "^5",

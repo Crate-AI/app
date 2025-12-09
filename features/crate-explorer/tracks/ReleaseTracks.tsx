@@ -72,10 +72,10 @@ const ReleaseTracks = ({ releaseId }: Props) => {
       setError(null);
 
       try {
-        const response = await fetch(`/api/music/tracks/${releaseId}`);
-        if (!response.ok) throw new Error('Failed to fetch release');
+        /* const response = await fetch(`/api/music/tracks/${releaseId}`); */
+        /* if (!response.ok) throw new Error('Failed to fetch release'); */
 
-        const tracksWithMetadata: CrateTrack[] = await response.json();
+        const tracksWithMetadata: CrateTrack[] = [] // await response.json();
         setTracks(tracksWithMetadata);
       } catch (err) {
         setError({

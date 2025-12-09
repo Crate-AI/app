@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { supabase } from '@/lib/supabase/client';
 
+// FIXME: deprecated, remove
 export const Route = createFileRoute('/api/waitlist')({
   server: {
     handlers: {
@@ -17,13 +17,13 @@ export const Route = createFileRoute('/api/waitlist')({
             );
           }
 
-          const { error } = await supabase
-            .from('waitlist')
-            .insert([{ email, user_type }]);
+          // const { error } = await supabase
+          //   .from('waitlist')
+          //   .insert([{ email, user_type }]);
 
-          if (error) {
-            throw error;
-          }
+          // if (error) {
+          //   throw error;
+          // }
 
           return Response.json(
             { message: 'Successfully added to waitlist!' },

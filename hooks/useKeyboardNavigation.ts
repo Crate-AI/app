@@ -113,15 +113,15 @@ function showKeyboardShortcuts() {
       <h3 class="text-lg font-semibold mb-4">Keyboard Shortcuts</h3>
       <div class="space-y-2">
         ${shortcuts
-          .map(
-            ({ key, description }) => `
+      .map(
+        ({ key, description }) => `
           <div class="flex items-center justify-between">
             <span class="text-sm text-gray-600">${description}</span>
             <kbd class="px-2 py-1 bg-gray-100 rounded text-xs font-mono">${key}</kbd>
           </div>
         `,
-          )
-          .join('')}
+      )
+      .join('')}
       </div>
       <div class="mt-6 flex justify-end">
         <button class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90">
