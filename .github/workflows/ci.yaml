@@ -3,8 +3,9 @@ name: CI
 on:
   pull_request:
     branches: [main, stage]
-  push:
-    branches: [main, stage]
+
+# Note: Push to main/stage triggers deploy-*.yaml workflows instead
+# This workflow only runs on PRs for code quality checks
 
 jobs:
   quality:
@@ -37,7 +38,4 @@ jobs:
 
       - name: Run tests
         run: pnpm test
-
-  # Note: Deployment is handled by Cloudflare Git integration
-  # This workflow only runs quality checks
 

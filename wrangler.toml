@@ -24,10 +24,8 @@ ENVIRONMENT = "production"
 [env.staging.vars]
 ENVIRONMENT = "staging"
 
-# Build configuration
-[build]
-command = "pnpm build"
-cwd = "."
+# Note: Build is handled by GitHub Actions, not wrangler
+# See .github/workflows/deploy-*.yaml
 
 # Observability
 [observability]
