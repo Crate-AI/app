@@ -51,7 +51,7 @@ function OnboardingPage() {
       setUsername(suggestedUsername);
       setDisplayName(suggestedUsername);
     }
-  }, [user?.email]);
+  }, [user?.email, username]);
 
   // Client-side validation
   useEffect(() => {
