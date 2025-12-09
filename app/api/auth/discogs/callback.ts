@@ -5,7 +5,6 @@ import { parse, serialize } from 'cookie';
 // Allowed origins for OAuth redirects (security allowlist)
 const ALLOWED_ORIGINS = [
   'http://localhost:1995',
-  'http://localhost:3000',
   'https://staging.crate.audio',
   'https://crate.audio',
 ];
