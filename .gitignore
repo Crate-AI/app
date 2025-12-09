@@ -19,6 +19,7 @@
 /.output
 /.vinxi
 /.vite
+/.wrangler
 
 # misc
 .DS_Store

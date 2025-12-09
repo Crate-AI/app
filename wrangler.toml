@@ -1,5 +1,5 @@
 name = "crate-app"
-main = "entry-worker.js"
+main = "@tanstack/react-start/server-entry"
 account_id = "32a73ac2845c6c9986379ea97030bb5d"
 assets = { directory = "dist/client" }
 compatibility_date = "2024-12-16"
