@@ -3,12 +3,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 /**
  * Tests for user mutation business logic.
  * These tests validate the logic that would be executed in the Convex mutations.
- * 
+ *
  * Since convex-test has compatibility issues, we test the validation logic directly.
  */
 
 // Username validation logic (extracted from mutation)
-function validateUsername(username: string): { valid: boolean; error?: string } {
+function validateUsername(username: string): {
+  valid: boolean;
+  error?: string;
+} {
   if (username.length < 3 || username.length > 30) {
     return { valid: false, error: 'Username must be 3-30 characters' };
   }

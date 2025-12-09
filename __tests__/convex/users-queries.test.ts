@@ -164,7 +164,10 @@ describe('User Queries - Business Logic', () => {
       });
 
       it('rejects username with invalid characters', () => {
-        const result = checkUsernameAvailability('test@user', existingUsernames);
+        const result = checkUsernameAvailability(
+          'test@user',
+          existingUsernames,
+        );
         expect(result.available).toBe(false);
         expect(result.error).toBe(
           'Username can only contain letters, numbers, underscores, and hyphens',
@@ -305,4 +308,3 @@ describe('User Queries - Business Logic', () => {
     });
   });
 });
-

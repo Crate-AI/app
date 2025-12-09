@@ -184,4 +184,3 @@ describe('OnboardingPage - Username Validation Logic', () => {
     });
   });
 });
-
