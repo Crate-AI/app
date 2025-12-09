@@ -2,15 +2,27 @@ import { createFileRoute } from '@tanstack/react-router';
 import { DiscogsSDK } from '@crate.ai/discogs-sdk';
 import { serialize } from 'cookie';
 
+// Allowed origins for OAuth redirects (security allowlist)
+const ALLOWED_ORIGINS = [
+  'http://localhost:1995',
+  'https://staging.crate.audio',
+  'https://crate.audio',
+];
+
+function getValidatedOrigin(requestUrl: string): string {
+  const origin = new URL(requestUrl).origin;
+  if (!ALLOWED_ORIGINS.includes(origin)) {
+    throw new Error(`Invalid origin: ${origin}`);
+  }
+  return origin;
+}
+
 export const Route = createFileRoute('/api/auth/discogs/request-token')({
   server: {
     handlers: {
-      GET: async () => {
+      GET: async ({ request }) => {
         try {
-          const baseUrl = import.meta.env.VITE_BASE_URL;
-          if (!baseUrl) {
-            throw new Error('VITE_BASE_URL environment variable is required');
-          }
+          const baseUrl = getValidatedOrigin(request.url);
 
           const sdk = new DiscogsSDK({
             DiscogsConsumerKey: import.meta.env.VITE_DISCOGS_CONSUMER_KEY || '',

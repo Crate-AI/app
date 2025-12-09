@@ -2,6 +2,22 @@ import { createFileRoute } from '@tanstack/react-router';
 import { DiscogsSDK } from '@crate.ai/discogs-sdk';
 import { parse, serialize } from 'cookie';
 
+// Allowed origins for OAuth redirects (security allowlist)
+const ALLOWED_ORIGINS = [
+  'http://localhost:1995',
+  'http://localhost:3000',
+  'https://staging.crate.audio',
+  'https://crate.audio',
+];
+
+function getValidatedOrigin(requestUrl: string): string {
+  const origin = new URL(requestUrl).origin;
+  if (!ALLOWED_ORIGINS.includes(origin)) {
+    throw new Error(`Invalid origin: ${origin}`);
+  }
+  return origin;
+}
+
 /**
  * Discogs OAuth Callback Handler
  *
@@ -24,10 +40,7 @@ export const Route = createFileRoute('/api/auth/discogs/callback')({
           const requestTokenSecret = cookies['request_token_secret'];
           const authRedirect = cookies['auth_redirect'];
 
-          const baseUrl = import.meta.env.VITE_BASE_URL;
-          if (!baseUrl) {
-            throw new Error('VITE_BASE_URL environment variable is required');
-          }
+          const baseUrl = getValidatedOrigin(request.url);
 
           if (
             !oauthToken ||
@@ -134,8 +147,11 @@ export const Route = createFileRoute('/api/auth/discogs/callback')({
           });
         } catch (error) {
           console.error('Error during OAuth callback:', error);
-          const baseUrl =
-            import.meta.env.VITE_BASE_URL || 'http://localhost:1995';
+          // Use request origin for error redirect, fallback to first allowed origin
+          const origin = new URL(request.url).origin;
+          const baseUrl = ALLOWED_ORIGINS.includes(origin)
+            ? origin
+            : ALLOWED_ORIGINS[0];
           return Response.redirect(new URL('/?error=auth_failed', baseUrl));
         }
       },
