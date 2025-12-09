@@ -9,6 +9,7 @@ interface UseDiscogsSearchReturn {
   isLoading: boolean;
   error: string | null;
   isQueryValid: boolean;
+  needsConnection: boolean;
 }
 
 const MIN_SEARCH_LENGTH = 3;
@@ -18,6 +19,7 @@ const useDiscogsSearch = (): UseDiscogsSearchReturn => {
   const [results, setResults] = useState<DiscogsSearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [needsConnection, setNeedsConnection] = useState(false);
 
   const debouncedQuery = useDebounce(query, 300);
   const isQueryValid = debouncedQuery.length >= MIN_SEARCH_LENGTH;
@@ -27,11 +29,13 @@ const useDiscogsSearch = (): UseDiscogsSearchReturn => {
       if (!isQueryValid) {
         setResults([]);
         setError(null);
+        setNeedsConnection(false);
         return;
       }
 
       setIsLoading(true);
       setError(null);
+      setNeedsConnection(false);
 
       try {
         const response = await fetch('/api/external/discogs/search', {
@@ -41,6 +45,13 @@ const useDiscogsSearch = (): UseDiscogsSearchReturn => {
           },
           body: JSON.stringify({ query: debouncedQuery }),
         });
+
+        if (response.status === 401) {
+          setNeedsConnection(true);
+          setError('Please connect your Discogs account to search');
+          setResults([]);
+          return;
+        }
 
         if (!response.ok) {
           throw new Error('Search request failed');
@@ -70,6 +81,7 @@ const useDiscogsSearch = (): UseDiscogsSearchReturn => {
     isLoading,
     error,
     isQueryValid,
+    needsConnection,
   };
 };
 

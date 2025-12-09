@@ -5,11 +5,11 @@ import { Release } from '@crate.ai/discogs-sdk/dist/collection/types';
 
 /**
  * This API route fetches the user's Discogs collection.
- * 
+ *
  * Note: Database operations have been migrated to Convex. This route now:
  * 1. Fetches collection directly from Discogs API
  * 2. Returns the data (client should call Convex to persist if needed)
- * 
+ *
  * For cached collection data, the client should use the Convex query:
  * api.discogsCollection.getCollection
  */

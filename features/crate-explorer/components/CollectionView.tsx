@@ -1,11 +1,15 @@
+import { Link } from '@tanstack/react-router';
 import { CollectionRelease } from '@/types';
 import TrackGrid from '@/features/crate-explorer/tracks/TrackGrid';
+import { Button } from '@/components/ui/button';
+import { Music, ExternalLink } from 'lucide-react';
 
 interface CollectionViewProps {
   isLoading: boolean;
   error: string | null;
   collection: CollectionRelease[];
   viewMode: 'grid' | 'list';
+  needsConnection?: boolean;
 }
 
 const CollectionView = ({
@@ -13,8 +17,33 @@ const CollectionView = ({
   error,
   collection,
   viewMode,
+  needsConnection,
 }: CollectionViewProps) => {
   if (isLoading) return <div>Loading collection...</div>;
+
+  if (needsConnection) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+          <Music className="w-8 h-8 text-gray-400" />
+        </div>
+        <h3 className="text-lg font-semibold mb-2">
+          Connect Your Discogs Account
+        </h3>
+        <p className="text-gray-600 mb-6 max-w-md">
+          To view your collection, you need to connect your Discogs account
+          first. This will sync your vinyl and physical music collection.
+        </p>
+        <Link to="/$username/settings/connections" params={{ username: '_' }}>
+          <Button className="bg-main hover:bg-mainAccent border-2 border-gray-800 shadow-light hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none transition-all">
+            <ExternalLink className="w-4 h-4 mr-2" />
+            Connect Discogs
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+
   if (error) return <div className="text-red-500">{error}</div>;
 
   return (

@@ -4,7 +4,7 @@ import { parse, serialize } from 'cookie';
 
 /**
  * Discogs OAuth Callback Handler
- * 
+ *
  * This handles the OAuth callback from Discogs and stores the access tokens.
  * Primary authentication is handled by Convex Auth (email OTP).
  * Discogs OAuth is only for connecting to the user's Discogs account.

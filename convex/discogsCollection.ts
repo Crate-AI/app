@@ -116,7 +116,9 @@ export const ingestCollection = mutation({
       const existingUserRelease = await ctx.db
         .query('user_releases')
         .withIndex('by_user_and_release', (q) =>
-          q.eq('user_id', storageUserId).eq('discogs_release_id', discogsReleaseId),
+          q
+            .eq('user_id', storageUserId)
+            .eq('discogs_release_id', discogsReleaseId),
         )
         .first();
 
@@ -132,4 +134,3 @@ export const ingestCollection = mutation({
     return { success: true, count: releases.length };
   },
 });
-

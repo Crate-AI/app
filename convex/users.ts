@@ -233,14 +233,134 @@ export const getDiscogsProfile = query({
     }
 
     const user = await ctx.db.get(userId);
-    if (!user?.supabaseUserId) {
+    if (!user) {
       return null;
     }
 
-    return await ctx.db
+    // Try multiple identifiers for backwards compatibility
+    // 1. By Convex user ID
+    let profile = await ctx.db
       .query('user_discogs_profile')
-      .withIndex('by_user', (q) => q.eq('user_id', user.supabaseUserId!))
+      .withIndex('by_user', (q) => q.eq('user_id', userId))
       .first();
+
+    // 2. By email
+    if (!profile && user.email) {
+      profile = await ctx.db
+        .query('user_discogs_profile')
+        .withIndex('by_user', (q) => q.eq('user_id', user.email!))
+        .first();
+    }
+
+    // 3. By supabaseUserId (legacy)
+    if (!profile && user.supabaseUserId) {
+      profile = await ctx.db
+        .query('user_discogs_profile')
+        .withIndex('by_user', (q) => q.eq('user_id', user.supabaseUserId!))
+        .first();
+    }
+
+    return profile;
+  },
+});
+
+/**
+ * Save or update Discogs profile for the current user
+ */
+export const saveDiscogsProfile = mutation({
+  args: {
+    username: v.string(),
+  },
+  handler: async (ctx, { username }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error('Not authenticated');
+    }
+
+    const user = await ctx.db.get(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Check if profile already exists
+    const existing = await ctx.db
+      .query('user_discogs_profile')
+      .withIndex('by_user', (q) => q.eq('user_id', userId))
+      .first();
+
+    if (existing) {
+      // Update existing profile
+      await ctx.db.patch(existing._id, { username });
+      return { success: true, action: 'updated' };
+    }
+
+    // Create new profile
+    await ctx.db.insert('user_discogs_profile', {
+      user_id: userId,
+      username,
+    });
+
+    return { success: true, action: 'created' };
+  },
+});
+
+/**
+ * Remove Discogs profile for the current user
+ */
+export const removeDiscogsProfile = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error('Not authenticated');
+    }
+
+    const user = await ctx.db.get(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Find and delete all matching profiles
+    let deletedCount = 0;
+
+    // By Convex user ID
+    const byUserId = await ctx.db
+      .query('user_discogs_profile')
+      .withIndex('by_user', (q) => q.eq('user_id', userId))
+      .collect();
+
+    for (const profile of byUserId) {
+      await ctx.db.delete(profile._id);
+      deletedCount++;
+    }
+
+    // By email
+    if (user.email) {
+      const byEmail = await ctx.db
+        .query('user_discogs_profile')
+        .withIndex('by_user', (q) => q.eq('user_id', user.email!))
+        .collect();
+
+      for (const profile of byEmail) {
+        await ctx.db.delete(profile._id);
+        deletedCount++;
+      }
+    }
+
+    // By supabaseUserId (legacy)
+    if (user.supabaseUserId) {
+      const bySupabase = await ctx.db
+        .query('user_discogs_profile')
+        .withIndex('by_user', (q) => q.eq('user_id', user.supabaseUserId!))
+        .collect();
+
+      for (const profile of bySupabase) {
+        await ctx.db.delete(profile._id);
+        deletedCount++;
+      }
+    }
+
+    return { success: true, deletedCount };
   },
 });
 
