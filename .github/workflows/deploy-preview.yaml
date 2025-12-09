@@ -48,14 +48,14 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: dist/server
-          command: deploy --name crate-app-pr-${{ github.event.pull_request.number }}
+          command: deploy --name crate-app-pr-${{ github.event.pull_request.number }} --route "crate-app-pr-${{ github.event.pull_request.number }}.crate.audio/*"
 
       - name: Comment PR with Preview URL
         uses: actions/github-script@v7
         with:
           script: |
             const prNumber = context.payload.pull_request.number;
-            const previewUrl = `https://crate-app-pr-${prNumber}.govi218mu.workers.dev`;
+            const previewUrl = `https://crate-app-pr-${prNumber}.crate.audio`;
             
             // Find existing comment
             const { data: comments } = await github.rest.issues.listComments({
