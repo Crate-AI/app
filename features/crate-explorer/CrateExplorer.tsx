@@ -22,12 +22,14 @@ const CrateExplorer = ({}: CrateExplorerProps) => {
     results,
     isLoading: searchLoading,
     error: searchError,
+    needsConnection: searchNeedsConnection,
   } = useDiscogsSearch();
   const {
     collection,
     pagination,
     loading: collectionLoading,
     error: collectionError,
+    needsConnection: collectionNeedsConnection,
   } = useDiscogsCollection();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [view, setView] = useState<'search' | 'collection'>('search');
@@ -71,6 +73,7 @@ const CrateExplorer = ({}: CrateExplorerProps) => {
           results={results}
           onQueryChange={setQuery}
           viewMode={viewMode}
+          needsConnection={searchNeedsConnection}
         />
       ) : (
         <CollectionView
@@ -78,6 +81,7 @@ const CrateExplorer = ({}: CrateExplorerProps) => {
           error={collectionError}
           collection={collection}
           viewMode={viewMode}
+          needsConnection={collectionNeedsConnection}
         />
       )}
     </div>

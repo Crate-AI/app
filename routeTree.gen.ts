@@ -28,7 +28,9 @@ import { Route as ApiExternalYoutubeSearchRouteImport } from './app/api/external
 import { Route as ApiExternalYoutubeVideoIdRouteImport } from './app/api/external/youtube/$videoId'
 import { Route as ApiExternalDiscogsSearchRouteImport } from './app/api/external/discogs/search'
 import { Route as ApiExternalDiscogsCollectionRouteImport } from './app/api/external/discogs/collection'
+import { Route as ApiAuthDiscogsStatusRouteImport } from './app/api/auth/discogs/status'
 import { Route as ApiAuthDiscogsRequestTokenRouteImport } from './app/api/auth/discogs/request-token'
+import { Route as ApiAuthDiscogsDisconnectRouteImport } from './app/api/auth/discogs/disconnect'
 import { Route as ApiAuthDiscogsCallbackRouteImport } from './app/api/auth/discogs/callback'
 import { Route as ApiExternalDiscogsReleaseIdRouteImport } from './app/api/external/discogs/release/$id'
 
@@ -132,10 +134,21 @@ const ApiExternalDiscogsCollectionRoute =
     path: '/api/external/discogs/collection',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiAuthDiscogsStatusRoute = ApiAuthDiscogsStatusRouteImport.update({
+  id: '/api/auth/discogs/status',
+  path: '/api/auth/discogs/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthDiscogsRequestTokenRoute =
   ApiAuthDiscogsRequestTokenRouteImport.update({
     id: '/api/auth/discogs/request-token',
     path: '/api/auth/discogs/request-token',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiAuthDiscogsDisconnectRoute =
+  ApiAuthDiscogsDisconnectRouteImport.update({
+    id: '/api/auth/discogs/disconnect',
+    path: '/api/auth/discogs/disconnect',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiAuthDiscogsCallbackRoute = ApiAuthDiscogsCallbackRouteImport.update({
@@ -167,7 +180,9 @@ export interface FileRoutesByFullPath {
   '/api/auth/user': typeof ApiAuthUserRoute
   '/$username/settings': typeof UsernameSettingsIndexRoute
   '/api/auth/discogs/callback': typeof ApiAuthDiscogsCallbackRoute
+  '/api/auth/discogs/disconnect': typeof ApiAuthDiscogsDisconnectRoute
   '/api/auth/discogs/request-token': typeof ApiAuthDiscogsRequestTokenRoute
+  '/api/auth/discogs/status': typeof ApiAuthDiscogsStatusRoute
   '/api/external/discogs/collection': typeof ApiExternalDiscogsCollectionRoute
   '/api/external/discogs/search': typeof ApiExternalDiscogsSearchRoute
   '/api/external/youtube/$videoId': typeof ApiExternalYoutubeVideoIdRoute
@@ -191,7 +206,9 @@ export interface FileRoutesByTo {
   '/api/auth/user': typeof ApiAuthUserRoute
   '/$username/settings': typeof UsernameSettingsIndexRoute
   '/api/auth/discogs/callback': typeof ApiAuthDiscogsCallbackRoute
+  '/api/auth/discogs/disconnect': typeof ApiAuthDiscogsDisconnectRoute
   '/api/auth/discogs/request-token': typeof ApiAuthDiscogsRequestTokenRoute
+  '/api/auth/discogs/status': typeof ApiAuthDiscogsStatusRoute
   '/api/external/discogs/collection': typeof ApiExternalDiscogsCollectionRoute
   '/api/external/discogs/search': typeof ApiExternalDiscogsSearchRoute
   '/api/external/youtube/$videoId': typeof ApiExternalYoutubeVideoIdRoute
@@ -216,7 +233,9 @@ export interface FileRoutesById {
   '/api/auth/user': typeof ApiAuthUserRoute
   '/$username/settings/': typeof UsernameSettingsIndexRoute
   '/api/auth/discogs/callback': typeof ApiAuthDiscogsCallbackRoute
+  '/api/auth/discogs/disconnect': typeof ApiAuthDiscogsDisconnectRoute
   '/api/auth/discogs/request-token': typeof ApiAuthDiscogsRequestTokenRoute
+  '/api/auth/discogs/status': typeof ApiAuthDiscogsStatusRoute
   '/api/external/discogs/collection': typeof ApiExternalDiscogsCollectionRoute
   '/api/external/discogs/search': typeof ApiExternalDiscogsSearchRoute
   '/api/external/youtube/$videoId': typeof ApiExternalYoutubeVideoIdRoute
@@ -242,7 +261,9 @@ export interface FileRouteTypes {
     | '/api/auth/user'
     | '/$username/settings'
     | '/api/auth/discogs/callback'
+    | '/api/auth/discogs/disconnect'
     | '/api/auth/discogs/request-token'
+    | '/api/auth/discogs/status'
     | '/api/external/discogs/collection'
     | '/api/external/discogs/search'
     | '/api/external/youtube/$videoId'
@@ -266,7 +287,9 @@ export interface FileRouteTypes {
     | '/api/auth/user'
     | '/$username/settings'
     | '/api/auth/discogs/callback'
+    | '/api/auth/discogs/disconnect'
     | '/api/auth/discogs/request-token'
+    | '/api/auth/discogs/status'
     | '/api/external/discogs/collection'
     | '/api/external/discogs/search'
     | '/api/external/youtube/$videoId'
@@ -290,7 +313,9 @@ export interface FileRouteTypes {
     | '/api/auth/user'
     | '/$username/settings/'
     | '/api/auth/discogs/callback'
+    | '/api/auth/discogs/disconnect'
     | '/api/auth/discogs/request-token'
+    | '/api/auth/discogs/status'
     | '/api/external/discogs/collection'
     | '/api/external/discogs/search'
     | '/api/external/youtube/$videoId'
@@ -314,7 +339,9 @@ export interface RootRouteChildren {
   ApiAuthUserRoute: typeof ApiAuthUserRoute
   UsernameSettingsIndexRoute: typeof UsernameSettingsIndexRoute
   ApiAuthDiscogsCallbackRoute: typeof ApiAuthDiscogsCallbackRoute
+  ApiAuthDiscogsDisconnectRoute: typeof ApiAuthDiscogsDisconnectRoute
   ApiAuthDiscogsRequestTokenRoute: typeof ApiAuthDiscogsRequestTokenRoute
+  ApiAuthDiscogsStatusRoute: typeof ApiAuthDiscogsStatusRoute
   ApiExternalDiscogsCollectionRoute: typeof ApiExternalDiscogsCollectionRoute
   ApiExternalDiscogsSearchRoute: typeof ApiExternalDiscogsSearchRoute
   ApiExternalYoutubeVideoIdRoute: typeof ApiExternalYoutubeVideoIdRoute
@@ -457,11 +484,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiExternalDiscogsCollectionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/discogs/status': {
+      id: '/api/auth/discogs/status'
+      path: '/api/auth/discogs/status'
+      fullPath: '/api/auth/discogs/status'
+      preLoaderRoute: typeof ApiAuthDiscogsStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/discogs/request-token': {
       id: '/api/auth/discogs/request-token'
       path: '/api/auth/discogs/request-token'
       fullPath: '/api/auth/discogs/request-token'
       preLoaderRoute: typeof ApiAuthDiscogsRequestTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/discogs/disconnect': {
+      id: '/api/auth/discogs/disconnect'
+      path: '/api/auth/discogs/disconnect'
+      fullPath: '/api/auth/discogs/disconnect'
+      preLoaderRoute: typeof ApiAuthDiscogsDisconnectRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/discogs/callback': {
@@ -508,7 +549,9 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAuthUserRoute: ApiAuthUserRoute,
   UsernameSettingsIndexRoute: UsernameSettingsIndexRoute,
   ApiAuthDiscogsCallbackRoute: ApiAuthDiscogsCallbackRoute,
+  ApiAuthDiscogsDisconnectRoute: ApiAuthDiscogsDisconnectRoute,
   ApiAuthDiscogsRequestTokenRoute: ApiAuthDiscogsRequestTokenRoute,
+  ApiAuthDiscogsStatusRoute: ApiAuthDiscogsStatusRoute,
   ApiExternalDiscogsCollectionRoute: ApiExternalDiscogsCollectionRoute,
   ApiExternalDiscogsSearchRoute: ApiExternalDiscogsSearchRoute,
   ApiExternalYoutubeVideoIdRoute: ApiExternalYoutubeVideoIdRoute,

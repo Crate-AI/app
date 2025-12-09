@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,8 @@ import {
   XCircle,
   Loader2,
   ExternalLink,
+  AlertCircle,
+  RefreshCw,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -17,16 +19,55 @@ export const Route = createFileRoute('/$username/settings/connections')({
   component: ConnectionsPage,
 });
 
-interface MusicConnection {
-  provider: string;
-  providerUsername?: string;
-  connectedAt: number;
+interface OAuthStatus {
+  hasOAuthTokens: boolean;
+  hasUserData: boolean;
+  isFullyConnected: boolean;
+  username: string | null;
 }
 
 function ConnectionsPage() {
   const user = useQuery(api.users.getCurrentUser);
   const discogsProfile = useQuery(api.users.getDiscogsProfile);
+  const removeDiscogsProfile = useMutation(api.users.removeDiscogsProfile);
+  const saveDiscogsProfile = useMutation(api.users.saveDiscogsProfile);
+
   const [isConnecting, setIsConnecting] = useState(false);
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
+  const [oauthStatus, setOauthStatus] = useState<OAuthStatus | null>(null);
+  const [isCheckingStatus, setIsCheckingStatus] = useState(true);
+
+  // Check OAuth status on mount and auto-save profile if needed
+  useEffect(() => {
+    const checkOAuthStatus = async () => {
+      try {
+        const response = await fetch('/api/auth/discogs/status');
+        if (response.ok) {
+          const status = await response.json();
+          setOauthStatus(status);
+
+          // If we have valid OAuth but no Convex profile, save it
+          if (status.isFullyConnected && status.username && !discogsProfile) {
+            try {
+              await saveDiscogsProfile({ username: status.username });
+              toast.success('Discogs connected successfully!');
+            } catch (error) {
+              console.error('Failed to save Discogs profile:', error);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to check OAuth status:', error);
+      } finally {
+        setIsCheckingStatus(false);
+      }
+    };
+
+    // Only check if user is logged in and we have the mutation ready
+    if (user) {
+      checkOAuthStatus();
+    }
+  }, [user, discogsProfile, saveDiscogsProfile]);
 
   const handleConnectDiscogs = async () => {
     setIsConnecting(true);
@@ -50,8 +91,44 @@ function ConnectionsPage() {
     }
   };
 
-  // Check actual connection status from database
-  const discogsConnected = !!discogsProfile;
+  const handleDisconnectDiscogs = async () => {
+    setIsDisconnecting(true);
+
+    try {
+      // Clear cookies via API
+      const response = await fetch('/api/auth/discogs/disconnect', {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to disconnect');
+      }
+
+      // Remove profile from Convex
+      await removeDiscogsProfile();
+
+      // Update local state
+      setOauthStatus({
+        hasOAuthTokens: false,
+        hasUserData: false,
+        isFullyConnected: false,
+        username: null,
+      });
+
+      toast.success('Discogs disconnected successfully');
+    } catch (error) {
+      console.error('Failed to disconnect Discogs:', error);
+      toast.error('Failed to disconnect. Please try again.');
+    } finally {
+      setIsDisconnecting(false);
+    }
+  };
+
+  // Determine connection status
+  const hasProfile = !!discogsProfile;
+  const hasValidOAuth = oauthStatus?.isFullyConnected ?? false;
+  const isFullyConnected = hasProfile && hasValidOAuth;
+  const needsReconnection = hasProfile && !hasValidOAuth;
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -74,10 +151,20 @@ function ConnectionsPage() {
               <div className="flex-1">
                 <div className="flex items-center space-x-2 mb-1">
                   <h3 className="text-lg font-semibold">Discogs</h3>
-                  {discogsConnected ? (
+                  {isCheckingStatus ? (
+                    <div className="flex items-center space-x-1 text-gray-400 text-sm">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Checking...</span>
+                    </div>
+                  ) : isFullyConnected ? (
                     <div className="flex items-center space-x-1 text-green-600 text-sm">
                       <CheckCircle className="w-4 h-4" />
                       <span>Connected</span>
+                    </div>
+                  ) : needsReconnection ? (
+                    <div className="flex items-center space-x-1 text-amber-600 text-sm">
+                      <AlertCircle className="w-4 h-4" />
+                      <span>Needs Reconnection</span>
                     </div>
                   ) : (
                     <div className="flex items-center space-x-1 text-gray-400 text-sm">
@@ -91,7 +178,13 @@ function ConnectionsPage() {
                   Browse releases, view details, and add tracks to your Crate
                   library.
                 </p>
-                {discogsConnected && discogsProfile && (
+                {needsReconnection && (
+                  <p className="text-xs text-amber-600 mb-2">
+                    Your session has expired. Please reconnect to continue using
+                    Discogs features.
+                  </p>
+                )}
+                {discogsProfile && (
                   <div className="text-xs text-gray-500">
                     <p>Username: @{discogsProfile.username}</p>
                   </div>
@@ -99,34 +192,71 @@ function ConnectionsPage() {
               </div>
             </div>
             <div className="ml-4">
-              {discogsConnected ? (
+              {isFullyConnected ? (
                 <div className="space-y-2">
                   <Button
                     variant="outline"
                     size="sm"
                     className="w-full"
-                    onClick={() =>
-                      toast.success(
-                        'Your collection is synced! Last sync was automatic.',
-                        {
-                          description:
-                            'New releases from Discogs are synced automatically.',
-                          duration: 5000,
-                        },
-                      )
-                    }
+                    onClick={handleConnectDiscogs}
+                    disabled={isConnecting}
                   >
-                    Sync Now
+                    {isConnecting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Syncing...
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="w-4 h-4 mr-2" />
+                        Refresh Connection
+                      </>
+                    )}
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
                     className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
-                    onClick={() =>
-                      toast.info('Disconnect functionality coming soon')
-                    }
+                    onClick={handleDisconnectDiscogs}
+                    disabled={isDisconnecting}
                   >
-                    Disconnect
+                    {isDisconnecting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Disconnecting...
+                      </>
+                    ) : (
+                      'Disconnect'
+                    )}
+                  </Button>
+                </div>
+              ) : needsReconnection ? (
+                <div className="space-y-2">
+                  <Button
+                    onClick={handleConnectDiscogs}
+                    disabled={isConnecting}
+                    className="bg-amber-500 hover:bg-amber-600 text-white border-2 border-gray-800 shadow-light hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none transition-all"
+                  >
+                    {isConnecting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Reconnecting...
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="w-4 h-4 mr-2" />
+                        Reconnect Discogs
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
+                    onClick={handleDisconnectDiscogs}
+                    disabled={isDisconnecting}
+                  >
+                    {isDisconnecting ? 'Disconnecting...' : 'Disconnect'}
                   </Button>
                 </div>
               ) : (

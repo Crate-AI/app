@@ -16,12 +16,21 @@ export function useDiscogsCollection() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [needsConnection, setNeedsConnection] = useState(false);
 
   const fetchCollection = async () => {
     try {
       setLoading(true);
       setError(null);
+      setNeedsConnection(false);
       const response = await fetch('/api/external/discogs/collection');
+
+      if (response.status === 401) {
+        setNeedsConnection(true);
+        setError('Please connect your Discogs account to view your collection');
+        return;
+      }
+
       if (!response.ok) throw new Error('Failed to fetch collection');
 
       const data = await response.json();
@@ -45,6 +54,7 @@ export function useDiscogsCollection() {
     pagination: collectionData.pagination,
     loading,
     error,
+    needsConnection,
     refetch: fetchCollection,
   };
 }
