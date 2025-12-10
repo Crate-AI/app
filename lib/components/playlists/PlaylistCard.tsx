@@ -1,4 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/lib/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/lib/components/ui/card';
 import { Play, Pause, Trash2, Globe, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils/tailwind';
 import { Image } from '@unpic/react';

@@ -1,5 +1,9 @@
 import { Link } from '@tanstack/react-router';
-import { Avatar, AvatarFallback, AvatarImage } from '@/lib/components/ui/avatar';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '@/lib/components/ui/avatar';
 
 interface BannerProps {
   username: string;

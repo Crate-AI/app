@@ -3,7 +3,11 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { cn } from '@/lib/utils/tailwind';
 import { Home, Music, ListMusic, Search } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/lib/components/ui/avatar';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '@/lib/components/ui/avatar';
 
 interface SidebarProps {
   collapsed?: boolean;

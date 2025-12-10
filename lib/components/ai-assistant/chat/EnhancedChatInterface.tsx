@@ -22,7 +22,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/lib/components/ui/tooltip';
-import { Avatar, AvatarFallback, AvatarImage } from '@/lib/components/ui/avatar';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '@/lib/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,

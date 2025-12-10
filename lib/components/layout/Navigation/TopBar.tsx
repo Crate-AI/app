@@ -30,7 +30,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/lib/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/lib/components/ui/avatar';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '@/lib/components/ui/avatar';
 import CommandPalette from './CommandPalette';
 
 interface TopBarProps {

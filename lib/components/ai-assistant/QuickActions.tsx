@@ -2,7 +2,12 @@
 
 import { useState } from 'react';
 import { Button } from '@/lib/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/lib/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/lib/components/ui/card';
 import {
   Zap,
   TrendingUp,

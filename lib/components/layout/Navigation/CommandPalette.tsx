@@ -206,8 +206,7 @@ export default function CommandPalette({
         title: 'Create Playlist',
         description: 'Start building a new playlist',
         icon: Plus,
-        action: () =>
-          navigate({ to: `/${user.username}/playlists/new` }),
+        action: () => navigate({ to: `/${user.username}/playlists/new` }),
         keywords: ['create', 'new', 'playlist', 'make'],
         category: 'actions',
         badge: 'Quick',

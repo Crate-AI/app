@@ -124,9 +124,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
             'transition-all duration-300 z-[60] bg-white border-r border-gray-800 flex-shrink-0',
             isMobile
               ? cn(
-                'fixed inset-y-0 left-0 h-full',
-                mobileMenuOpen ? 'translate-x-0' : '-translate-x-full',
-              )
+                  'fixed inset-y-0 left-0 h-full',
+                  mobileMenuOpen ? 'translate-x-0' : '-translate-x-full',
+                )
               : cn('relative', sidebarCollapsed ? 'w-16' : 'w-64'),
           )}
         >

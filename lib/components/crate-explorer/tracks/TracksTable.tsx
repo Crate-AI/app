@@ -102,10 +102,8 @@ export default function TracksTable() {
   );
 
   // Use Convex favorites hook
-  const {
-    isFavorite: checkIsFavorite,
-    toggleFavorite: convexToggleFavorite,
-  } = useFavorites();
+  const { isFavorite: checkIsFavorite, toggleFavorite: convexToggleFavorite } =
+    useFavorites();
 
   // Initialize player when component mounts
   useEffect(() => {
@@ -629,9 +627,9 @@ export default function TracksTable() {
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                   </th>
                 ))}
               </tr>

@@ -4,7 +4,12 @@ import { usePlayerStore } from '@/lib/stores';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useFavorites } from '@/lib/hooks/useFavorites';
 import { Button } from '@/lib/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/lib/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/lib/components/ui/card';
 import {
   Music,
   Play,
@@ -35,11 +40,11 @@ const DashboardStats = ({ tracks }: { tracks: CrateTrack[] }) => {
     avgBpm:
       tracks.filter((t) => t.bpm).length > 0
         ? Math.round(
-          tracks
-            .filter((t) => t.bpm)
-            .reduce((acc, t) => acc + (t.bpm || 0), 0) /
-          tracks.filter((t) => t.bpm).length,
-        )
+            tracks
+              .filter((t) => t.bpm)
+              .reduce((acc, t) => acc + (t.bpm || 0), 0) /
+              tracks.filter((t) => t.bpm).length,
+          )
         : 0,
     totalArtists: new Set(tracks.map((t) => t.artist)).size,
   };
