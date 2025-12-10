@@ -1,7 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { DiscogsSDK } from '@crate.ai/discogs-sdk';
 import { serialize } from 'cookie';
-import { env } from 'cloudflare:workers';
 
 // Allowed origins for OAuth redirects (security allowlist)
 const ALLOWED_ORIGINS = [
@@ -12,7 +11,10 @@ const ALLOWED_ORIGINS = [
 
 function getValidatedOrigin(requestUrl: string): string {
   const origin = new URL(requestUrl).origin;
-  if (!ALLOWED_ORIGINS.includes(origin)) {
+  // Allow preview deployments (e.g., https://131-pr.crate.audio)
+  const isPreviewOrigin = /^https:\/\/\d+-pr\.crate\.audio$/.test(origin);
+
+  if (!ALLOWED_ORIGINS.includes(origin) && !isPreviewOrigin) {
     throw new Error(`Invalid origin: ${origin}`);
   }
   return origin;
@@ -27,12 +29,12 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
 
           const sdk = new DiscogsSDK({
             DiscogsConsumerKey:
-              (env as Record<string, string>).DISCOGS_CONSUMER_KEY ||
-              (env as Record<string, string>).VITE_DISCOGS_CONSUMER_KEY ||
+              process.env.DISCOGS_CONSUMER_KEY ||
+              process.env.VITE_DISCOGS_CONSUMER_KEY ||
               '',
             DiscogsConsumerSecret:
-              (env as Record<string, string>).DISCOGS_CONSUMER_SECRET ||
-              (env as Record<string, string>).VITE_DISCOGS_CONSUMER_SECRET ||
+              process.env.DISCOGS_CONSUMER_SECRET ||
+              process.env.VITE_DISCOGS_CONSUMER_SECRET ||
               '',
             callbackUrl: `${baseUrl}/api/auth/discogs/callback`,
             userAgent: 'CrateApp/1.0 +https://crate.ai',
