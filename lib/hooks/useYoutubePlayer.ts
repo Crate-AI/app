@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { YouTubePlayer, YouTubeConfig, CrateTrack } from '@/types';
+import type { YouTubePlayer, YouTubeConfig, CrateTrack } from '@/lib/types';
 export function useYouTubePlayer() {
   const [playingTrackId, setPlayingTrackId] = useState<string | null>(null);
   const [isPlayerReady, setIsPlayerReady] = useState(false);

@@ -8,10 +8,10 @@ import {
 import { Suspense } from 'react';
 import { Toaster } from 'sonner';
 import appCss from './globals.css?url';
-import AppLayout from '@/components/layout/Navigation/AppLayout';
-import ErrorBoundary from '@/components/Error/ErrorBoundary';
-import { LoadingSpinner } from '@/components/ui/loading';
-import GlobalError from '@/components/Error/GlobalError';
+import AppLayout from '@/lib/components/layout/Navigation/AppLayout';
+import ErrorBoundary from '@/lib/components/Error/ErrorBoundary';
+import { LoadingSpinner } from '@/lib/components/ui/loading';
+import GlobalError from '@/lib/components/Error/GlobalError';
 import { ConvexReactClient } from 'convex/react';
 import { ConvexAuthProvider } from '@convex-dev/auth/react';
 import { Authenticated, Unauthenticated, AuthLoading } from 'convex/react';

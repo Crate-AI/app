@@ -2,12 +2,12 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { Button } from '@/components/ui/button';
-import { LoadingSpinner } from '@/components/ui/loading';
+import { Button } from '@/lib/components/ui/button';
+import { LoadingSpinner } from '@/lib/components/ui/loading';
 import { ArrowRight, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import { DiscogsConnectionCard } from '@/features/onboarding/components/DiscogsConnectionCard';
-import { MusicServiceCard } from '@/features/onboarding/components/MusicServiceCard';
+import { DiscogsConnectionCard } from '@/lib/components/onboarding/DiscogsConnectionCard';
+import { MusicServiceCard } from '@/lib/components/onboarding/MusicServiceCard';
 
 export const Route = createFileRoute('/onboarding/connect')({
   component: OnboardingConnectPage,

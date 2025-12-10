@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { DiscogsSDK } from '@crate.ai/discogs-sdk';
 import { parse } from 'cookie';
-import type { SearchParams, SearchResult, SearchResponse } from '@/types';
+import type { SearchParams, SearchResult, SearchResponse } from '@/lib/types';
 
 function buildSearchParams(originalQuery: string): SearchParams {
   const terms = originalQuery.trim().split(/\s+/);

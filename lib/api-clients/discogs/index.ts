@@ -1,4 +1,4 @@
-import { Release } from '@/types';
+import { Release } from '@/lib/types';
 import { DiscogsSDK } from '@crate.ai/discogs-sdk';
 import { rateLimiter } from '@/lib/utils/rateLimiter';
 

@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
-import CrateExplorer from '@/features/crate-explorer/CrateExplorer';
-import ErrorBoundary from '@/components/Error/ErrorBoundary';
-import { PageHeader } from '@/components/layout/Navigation/Breadcrumbs';
+import CrateExplorer from '@/lib/components/crate-explorer/CrateExplorer';
+import ErrorBoundary from '@/lib/components/Error/ErrorBoundary';
+import { PageHeader } from '@/lib/components/layout/Navigation/Breadcrumbs';
 
 export const Route = createFileRoute('/$username/collection')({
   component: CollectionPage,

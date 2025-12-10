@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect } from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { LoadingSpinner } from '@/components/ui/loading';
+import { LoadingSpinner } from '@/lib/components/ui/loading';
 
 export const Route = createFileRoute('/analyze')({
   component: AnalyzePage,

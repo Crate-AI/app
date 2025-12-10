@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
-import type { CrateTrack } from '@/types';
-import { OrderingConfig } from '@/types';
+import type { CrateTrack } from '@/lib/types';
+import { OrderingConfig } from '@/lib/types';
 
 export function useTrackSorting(tracks: CrateTrack[]) {
   const suggestedTrackIds = new Set<string>();

@@ -1,10 +1,10 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { Suspense, useEffect, useState } from 'react';
-import { usePlayerStore } from '@/stores';
+import { usePlayerStore } from '@/lib/stores';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useFavorites } from '@/lib/hooks/useFavorites';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/lib/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/lib/components/ui/card';
 import {
   Music,
   Play,
@@ -17,9 +17,9 @@ import {
   Headphones,
 } from 'lucide-react';
 import { cn } from '@/lib/utils/tailwind';
-import { CrateTrack } from '@/types';
+import { CrateTrack } from '@/lib/types';
 import { Image } from '@unpic/react';
-import { LoadingSpinner } from '@/components/ui/loading';
+import { LoadingSpinner } from '@/lib/components/ui/loading';
 import { toast } from 'sonner';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';

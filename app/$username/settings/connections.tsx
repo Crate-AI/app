@@ -2,8 +2,8 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Button } from '@/lib/components/ui/button';
+import { Card } from '@/lib/components/ui/card';
 import {
   Music,
   CheckCircle,
