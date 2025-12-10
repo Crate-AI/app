@@ -7,46 +7,57 @@ export const Route = createFileRoute('/api/auth/discogs/debug')({
       GET: async ({ request }) => {
         const origin = new URL(request.url).origin;
 
-        // Try to get Cloudflare env from the event context
+        // Try multiple ways to access Cloudflare env
+        let eventInfo: Record<string, unknown> = {};
         let cloudflareEnv: Record<string, unknown> | null = null;
+
         try {
           const event = getEvent();
-          // Cloudflare Workers adapter puts env in context.cloudflare.env
-          cloudflareEnv = (event?.context as any)?.cloudflare?.env || null;
-        } catch (e) {
-          // getEvent might not be available
+          // Explore the event structure
+          eventInfo = {
+            hasEvent: !!event,
+            contextKeys: event?.context ? Object.keys(event.context) : [],
+            // Check various possible locations
+            hasCloudflare: !!(event?.context as any)?.cloudflare,
+            hasCf: !!(event?.context as any)?.cf,
+            hasEnv: !!(event?.context as any)?.env,
+            hasPlatform: !!(event?.context as any)?.platform,
+            // Check nested
+            cloudflareKeys: (event?.context as any)?.cloudflare
+              ? Object.keys((event.context as any).cloudflare)
+              : [],
+          };
+
+          // Try different paths
+          cloudflareEnv =
+            (event?.context as any)?.cloudflare?.env ||
+            (event?.context as any)?.env ||
+            (event?.context as any)?.cf?.env ||
+            null;
+        } catch (e: any) {
+          eventInfo = { error: e.message };
         }
 
         // Check what environment variables are available
         const debugInfo = {
           origin,
-          // process.env (build-time only in Workers)
+          eventInfo,
           processEnv: {
             hasDiscogsKey: !!process.env.DISCOGS_CONSUMER_KEY,
-            discogsKeyLength: process.env.DISCOGS_CONSUMER_KEY?.length || 0,
             hasDiscogsSecret: !!process.env.DISCOGS_CONSUMER_SECRET,
-            discogsSecretLength:
-              process.env.DISCOGS_CONSUMER_SECRET?.length || 0,
             hasViteDiscogsKey: !!process.env.VITE_DISCOGS_CONSUMER_KEY,
-            viteDiscogsKeyLength:
-              process.env.VITE_DISCOGS_CONSUMER_KEY?.length || 0,
             hasViteDiscogsSecret: !!process.env.VITE_DISCOGS_CONSUMER_SECRET,
-            viteDiscogsSecretLength:
-              process.env.VITE_DISCOGS_CONSUMER_SECRET?.length || 0,
             nodeEnv: process.env.NODE_ENV,
+            // List all env keys (to see what's available)
+            allKeys: Object.keys(process.env).filter(
+              (k) => !k.startsWith('npm_'),
+            ),
           },
-          // Cloudflare env bindings (runtime secrets)
           cloudflareEnv: cloudflareEnv
             ? {
                 hasDiscogsKey: !!(cloudflareEnv as any).DISCOGS_CONSUMER_KEY,
-                discogsKeyLength:
-                  ((cloudflareEnv as any).DISCOGS_CONSUMER_KEY as string)
-                    ?.length || 0,
                 hasDiscogsSecret: !!(cloudflareEnv as any)
                   .DISCOGS_CONSUMER_SECRET,
-                discogsSecretLength:
-                  ((cloudflareEnv as any).DISCOGS_CONSUMER_SECRET as string)
-                    ?.length || 0,
                 availableKeys: Object.keys(cloudflareEnv),
               }
             : 'not available',

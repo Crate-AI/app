@@ -2,6 +2,16 @@ import server from './dist/server/server.js';
 
 export default {
   async fetch(req, env, ctx) {
+    // Expose Cloudflare secrets/env bindings to process.env
+    // This makes them accessible via process.env in route handlers
+    if (env) {
+      for (const [key, value] of Object.entries(env)) {
+        if (typeof value === 'string') {
+          process.env[key] = value;
+        }
+      }
+    }
+
     // Forward the request to the TanStack Start server handler
     const res = await server.fetch(req, env);
 
