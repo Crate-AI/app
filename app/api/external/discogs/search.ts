@@ -57,8 +57,14 @@ export const Route = createFileRoute('/api/external/discogs/search')({
           }
 
           const sdk = new DiscogsSDK({
-            DiscogsConsumerKey: process.env.DISCOGS_CONSUMER_KEY || '',
-            DiscogsConsumerSecret: process.env.DISCOGS_CONSUMER_SECRET || '',
+            DiscogsConsumerKey:
+              process.env.DISCOGS_CONSUMER_KEY ||
+              process.env.VITE_DISCOGS_CONSUMER_KEY ||
+              '',
+            DiscogsConsumerSecret:
+              process.env.DISCOGS_CONSUMER_SECRET ||
+              process.env.VITE_DISCOGS_CONSUMER_SECRET ||
+              '',
             userAgent: 'CrateApp/1.0 +https://crate.ai',
           });
 
