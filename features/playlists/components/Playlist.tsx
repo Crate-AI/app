@@ -5,7 +5,7 @@ import { Play, Pause, Trash2, Globe, Lock } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils/tailwind';
 import { usePlayerStore } from '@/stores';
-import { usePlaylists } from '@/hooks/usePlaylists';
+import { usePlaylists } from '@/lib/hooks/usePlaylists';
 import { formatDuration } from '@/lib/utils/format';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';

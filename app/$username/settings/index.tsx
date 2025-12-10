@@ -1,5 +1,5 @@
 import { createFileRoute, Navigate } from '@tanstack/react-router';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/lib/hooks/useAuth';
 
 export const Route = createFileRoute('/$username/settings/')({
   component: SettingsPage,

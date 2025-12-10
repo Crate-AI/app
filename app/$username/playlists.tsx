@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { PlaylistCard } from '@/features/playlists/components/PlaylistCard';
 import { Playlist } from '@/features/playlists/components/Playlist';
-import { usePlaylists } from '@/hooks/usePlaylists';
+import { usePlaylists } from '@/lib/hooks/usePlaylists';
 import { PlaylistWithTracks } from '@/types';
 import { PageHeader } from '@/components/layout/Navigation/Breadcrumbs';
 import { LoadingSpinner } from '@/components/ui/loading';

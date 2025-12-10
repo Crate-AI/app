@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import ReleaseTracks from './ReleaseTracks';
 import { useTrackContext } from './TrackDisplay';
-import { usePlaylists } from '@/hooks/usePlaylists';
+import { usePlaylists } from '@/lib/hooks/usePlaylists';
 import { convertSearchResultToTrack } from '@/lib/utils/track-conversion';
 import {
   DropdownMenu,

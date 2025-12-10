@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { usePlayerStore } from '@/stores';
-import { useFavorites } from '@/hooks/useFavorites';
+import { useFavorites } from '@/lib/hooks/useFavorites';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {

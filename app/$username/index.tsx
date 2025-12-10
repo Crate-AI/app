@@ -1,8 +1,8 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { Suspense, useEffect, useState } from 'react';
 import { usePlayerStore } from '@/stores';
-import { useAuth } from '@/hooks/useAuth';
-import { useFavorites } from '@/hooks/useFavorites';
+import { useAuth } from '@/lib/hooks/useAuth';
+import { useFavorites } from '@/lib/hooks/useFavorites';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
