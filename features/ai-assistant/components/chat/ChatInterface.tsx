@@ -15,7 +15,6 @@ import { CrateTrack } from '@/types';
 import { ChatLoader } from '@/features/ai-assistant/components/chat/ChatLoader';
 import { useChat } from 'ai/react';
 import { cn } from '@/lib/utils/utils';
-import { useTracksStore } from '@/stores';
 import { useTrackSorting } from '@/lib/hooks/useTrackSorting';
 import { toast } from 'sonner';
 import { useQuery } from 'convex/react';
@@ -67,7 +66,6 @@ export default function ChatInterface({
 }: ChatInterfaceProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const user = useQuery(api.users.getCurrentUser);
-  const { setSuggestedTracks } = useTracksStore();
   const { setOrderingConfig } = useTrackSorting(tracks);
 
   const processTrackSuggestions = useCallback(
@@ -80,8 +78,6 @@ export default function ChatInterface({
             .filter(Boolean) as CrateTrack[];
 
           if (matchedTracks.length > 0) {
-            // Update the tracks store with suggested tracks
-            setSuggestedTracks(matchedTracks);
             // Update the ordering config to show suggested tracks
             setOrderingConfig({ orderBy: 'suggested', direction: 'asc' });
             // Call the filter callback with matched tracks
@@ -96,7 +92,7 @@ export default function ChatInterface({
         toast.error('Failed to process track suggestions');
       }
     },
-    [tracks, onTracksFilter, setOrderingConfig, setSuggestedTracks],
+    [tracks, onTracksFilter, setOrderingConfig],
   );
 
   const { messages, input, handleInputChange, handleSubmit, isLoading } =

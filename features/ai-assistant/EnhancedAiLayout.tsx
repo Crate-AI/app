@@ -3,19 +3,16 @@
 import { useState, useEffect, useMemo } from 'react';
 import {
   X,
-  Sparkles,
   Bot,
   Loader2,
   MessageCircle,
-  ChevronUp,
-  ChevronDown,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils/utils';
 import EnhancedChatInterface from '@/features/ai-assistant/components/chat/EnhancedChatInterface';
 import { CrateTrack } from '@/types';
-import { useTracksStore, usePlayerStore } from '@/stores';
+import { usePlayerStore } from '@/stores';
 import ErrorBoundary from '@/components/Error/ErrorBoundary';
 import { toast } from 'sonner';
 import { useQuery } from 'convex/react';
@@ -31,7 +28,6 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
   const [chatPosition, setChatPosition] = useState<
     'sidebar' | 'overlay' | 'bottom'
   >('sidebar');
-  const { setAllTracks } = useTracksStore();
   const { initializePlayer } = usePlayerStore();
 
   // Use Convex query instead of fetch
@@ -51,13 +47,6 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
   useEffect(() => {
     initializePlayer();
   }, [initializePlayer]);
-
-  // Sync to store for other components
-  useEffect(() => {
-    if (tracks.length > 0) {
-      setAllTracks(tracks);
-    }
-  }, [tracks, setAllTracks]);
 
   // Detect mobile and set appropriate chat position
   useEffect(() => {
