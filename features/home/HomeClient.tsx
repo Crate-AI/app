@@ -5,7 +5,6 @@ import SignInButton from '@/components/signIn';
 import { useEffect } from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { useAuthStore } from '@/stores';
 
 interface HomeClientProps {}
 
@@ -33,7 +32,6 @@ const HomeClient = ({}: HomeClientProps) => {
 function AuthenticatedRedirect() {
   const navigate = useNavigate();
   const user = useQuery(api.users.getCurrentUser);
-  const { setUserIdentity } = useAuthStore();
 
   useEffect(() => {
     if (user) {
@@ -44,16 +42,10 @@ function AuthenticatedRedirect() {
         return;
       }
 
-      // Sync Convex auth to Zustand store for legacy components
-      setUserIdentity({
-        username: user.username,
-        avatarUrl: user.avatarUrl || '',
-      });
-
       // Navigate to user's dashboard
       navigate({ to: `/${user.username}`, replace: true });
     }
-  }, [user, navigate, setUserIdentity]);
+  }, [user, navigate]);
 
   return (
     <div className="flex items-center justify-center min-h-screen">

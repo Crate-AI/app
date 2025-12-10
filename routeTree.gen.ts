@@ -21,8 +21,6 @@ import { Route as UsernameTracksRouteImport } from './app/$username/tracks'
 import { Route as UsernamePlaylistsRouteImport } from './app/$username/playlists'
 import { Route as UsernameCollectionRouteImport } from './app/$username/collection'
 import { Route as UsernameSettingsIndexRouteImport } from './app/$username/settings/index'
-import { Route as ApiAuthUserRouteImport } from './app/api/auth/user'
-import { Route as ApiAuthSetRedirectRouteImport } from './app/api/auth/set-redirect'
 import { Route as ApiAiChatRouteImport } from './app/api/ai/chat'
 import { Route as UsernameSettingsConnectionsRouteImport } from './app/$username/settings/connections'
 import { Route as ApiExternalYoutubeSearchRouteImport } from './app/api/external/youtube/search'
@@ -93,16 +91,6 @@ const UsernameCollectionRoute = UsernameCollectionRouteImport.update({
 const UsernameSettingsIndexRoute = UsernameSettingsIndexRouteImport.update({
   id: '/$username/settings/',
   path: '/$username/settings/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthUserRoute = ApiAuthUserRouteImport.update({
-  id: '/api/auth/user',
-  path: '/api/auth/user',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthSetRedirectRoute = ApiAuthSetRedirectRouteImport.update({
-  id: '/api/auth/set-redirect',
-  path: '/api/auth/set-redirect',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAiChatRoute = ApiAiChatRouteImport.update({
@@ -183,8 +171,6 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingIndexRoute
   '/$username/settings/connections': typeof UsernameSettingsConnectionsRoute
   '/api/ai/chat': typeof ApiAiChatRoute
-  '/api/auth/set-redirect': typeof ApiAuthSetRedirectRoute
-  '/api/auth/user': typeof ApiAuthUserRoute
   '/$username/settings': typeof UsernameSettingsIndexRoute
   '/api/auth/discogs/callback': typeof ApiAuthDiscogsCallbackRoute
   '/api/auth/discogs/disconnect': typeof ApiAuthDiscogsDisconnectRoute
@@ -210,8 +196,6 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingIndexRoute
   '/$username/settings/connections': typeof UsernameSettingsConnectionsRoute
   '/api/ai/chat': typeof ApiAiChatRoute
-  '/api/auth/set-redirect': typeof ApiAuthSetRedirectRoute
-  '/api/auth/user': typeof ApiAuthUserRoute
   '/$username/settings': typeof UsernameSettingsIndexRoute
   '/api/auth/discogs/callback': typeof ApiAuthDiscogsCallbackRoute
   '/api/auth/discogs/disconnect': typeof ApiAuthDiscogsDisconnectRoute
@@ -238,8 +222,6 @@ export interface FileRoutesById {
   '/onboarding/': typeof OnboardingIndexRoute
   '/$username/settings/connections': typeof UsernameSettingsConnectionsRoute
   '/api/ai/chat': typeof ApiAiChatRoute
-  '/api/auth/set-redirect': typeof ApiAuthSetRedirectRoute
-  '/api/auth/user': typeof ApiAuthUserRoute
   '/$username/settings/': typeof UsernameSettingsIndexRoute
   '/api/auth/discogs/callback': typeof ApiAuthDiscogsCallbackRoute
   '/api/auth/discogs/disconnect': typeof ApiAuthDiscogsDisconnectRoute
@@ -267,8 +249,6 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/$username/settings/connections'
     | '/api/ai/chat'
-    | '/api/auth/set-redirect'
-    | '/api/auth/user'
     | '/$username/settings'
     | '/api/auth/discogs/callback'
     | '/api/auth/discogs/disconnect'
@@ -294,8 +274,6 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/$username/settings/connections'
     | '/api/ai/chat'
-    | '/api/auth/set-redirect'
-    | '/api/auth/user'
     | '/$username/settings'
     | '/api/auth/discogs/callback'
     | '/api/auth/discogs/disconnect'
@@ -321,8 +299,6 @@ export interface FileRouteTypes {
     | '/onboarding/'
     | '/$username/settings/connections'
     | '/api/ai/chat'
-    | '/api/auth/set-redirect'
-    | '/api/auth/user'
     | '/$username/settings/'
     | '/api/auth/discogs/callback'
     | '/api/auth/discogs/disconnect'
@@ -348,8 +324,6 @@ export interface RootRouteChildren {
   OnboardingIndexRoute: typeof OnboardingIndexRoute
   UsernameSettingsConnectionsRoute: typeof UsernameSettingsConnectionsRoute
   ApiAiChatRoute: typeof ApiAiChatRoute
-  ApiAuthSetRedirectRoute: typeof ApiAuthSetRedirectRoute
-  ApiAuthUserRoute: typeof ApiAuthUserRoute
   UsernameSettingsIndexRoute: typeof UsernameSettingsIndexRoute
   ApiAuthDiscogsCallbackRoute: typeof ApiAuthDiscogsCallbackRoute
   ApiAuthDiscogsDisconnectRoute: typeof ApiAuthDiscogsDisconnectRoute
@@ -446,20 +420,6 @@ declare module '@tanstack/react-router' {
       path: '/$username/settings'
       fullPath: '/$username/settings'
       preLoaderRoute: typeof UsernameSettingsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/user': {
-      id: '/api/auth/user'
-      path: '/api/auth/user'
-      fullPath: '/api/auth/user'
-      preLoaderRoute: typeof ApiAuthUserRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/set-redirect': {
-      id: '/api/auth/set-redirect'
-      path: '/api/auth/set-redirect'
-      fullPath: '/api/auth/set-redirect'
-      preLoaderRoute: typeof ApiAuthSetRedirectRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/ai/chat': {
@@ -566,8 +526,6 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingIndexRoute: OnboardingIndexRoute,
   UsernameSettingsConnectionsRoute: UsernameSettingsConnectionsRoute,
   ApiAiChatRoute: ApiAiChatRoute,
-  ApiAuthSetRedirectRoute: ApiAuthSetRedirectRoute,
-  ApiAuthUserRoute: ApiAuthUserRoute,
   UsernameSettingsIndexRoute: UsernameSettingsIndexRoute,
   ApiAuthDiscogsCallbackRoute: ApiAuthDiscogsCallbackRoute,
   ApiAuthDiscogsDisconnectRoute: ApiAuthDiscogsDisconnectRoute,

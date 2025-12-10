@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { useAuthStore } from '@/stores';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 import { cn } from '@/lib/utils/utils';
 import {
   Search,
@@ -46,7 +47,7 @@ export default function CommandPalette({
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const { userIdentity } = useAuthStore();
+  const user = useQuery(api.users.getCurrentUser);
 
   // Load recent commands from localStorage
   useEffect(() => {
@@ -144,7 +145,7 @@ export default function CommandPalette({
   };
 
   const generateCommands = (): CommandItem[] => {
-    if (!userIdentity) return [];
+    if (!user?.username) return [];
 
     const commands: CommandItem[] = [
       // Navigation
@@ -153,40 +154,40 @@ export default function CommandPalette({
         title: 'Dashboard',
         description: 'Go to your personal dashboard',
         icon: Home,
-        action: () => navigate({ to: `/${userIdentity.username}` }),
+        action: () => navigate({ to: `/${user.username}` }),
         keywords: ['dashboard', 'home', 'overview', 'profile'],
         category: 'navigation',
-        href: `/${userIdentity.username}`,
+        href: `/${user.username}`,
       },
       {
         id: 'nav-tracks',
         title: 'Tracks',
         description: 'Browse your complete track collection',
         icon: Music,
-        action: () => navigate({ to: `/${userIdentity.username}/tracks` }),
+        action: () => navigate({ to: `/${user.username}/tracks` }),
         keywords: ['tracks', 'music', 'collection', 'songs'],
         category: 'navigation',
-        href: `/${userIdentity.username}/tracks`,
+        href: `/${user.username}/tracks`,
       },
       {
         id: 'nav-playlists',
         title: 'Playlists',
         description: 'Create and manage your playlists',
         icon: ListMusic,
-        action: () => navigate({ to: `/${userIdentity.username}/playlists` }),
+        action: () => navigate({ to: `/${user.username}/playlists` }),
         keywords: ['playlists', 'lists', 'music', 'collections'],
         category: 'navigation',
-        href: `/${userIdentity.username}/playlists`,
+        href: `/${user.username}/playlists`,
       },
       {
         id: 'nav-collection',
         title: 'Collection',
         description: 'Explore your synced Discogs collection',
         icon: Search,
-        action: () => navigate({ to: `/${userIdentity.username}/collection` }),
+        action: () => navigate({ to: `/${user.username}/collection` }),
         keywords: ['collection', 'discogs', 'explore', 'vinyl', 'records'],
         category: 'navigation',
-        href: `/${userIdentity.username}/collection`,
+        href: `/${user.username}/collection`,
       },
       {
         id: 'nav-settings',
@@ -206,7 +207,7 @@ export default function CommandPalette({
         description: 'Start building a new playlist',
         icon: Plus,
         action: () =>
-          navigate({ to: `/${userIdentity.username}/playlists/new` }),
+          navigate({ to: `/${user.username}/playlists/new` }),
         keywords: ['create', 'new', 'playlist', 'make'],
         category: 'actions',
         badge: 'Quick',
@@ -216,7 +217,7 @@ export default function CommandPalette({
         title: 'Add Track',
         description: 'Add new music to your collection',
         icon: Music,
-        action: () => navigate({ to: `/${userIdentity.username}/tracks/add` }),
+        action: () => navigate({ to: `/${user.username}/tracks/add` }),
         keywords: ['add', 'track', 'music', 'upload'],
         category: 'actions',
       },

@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
 import { useRouter } from '@tanstack/react-router';
-import { useAuthStore } from '@/stores';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 
 export function useKeyboardNavigation() {
   const router = useRouter();
-  const { userIdentity } = useAuthStore();
+  const user = useQuery(api.users.getCurrentUser);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -23,26 +24,26 @@ export function useKeyboardNavigation() {
         switch (event.key) {
           case '1':
             event.preventDefault();
-            if (userIdentity) {
-              router.navigate({ to: `/${userIdentity.username}` });
+            if (user?.username) {
+              router.navigate({ to: `/${user.username}` });
             }
             break;
           case '2':
             event.preventDefault();
-            if (userIdentity) {
-              router.navigate({ to: `/${userIdentity.username}/tracks` });
+            if (user?.username) {
+              router.navigate({ to: `/${user.username}/tracks` });
             }
             break;
           case '3':
             event.preventDefault();
-            if (userIdentity) {
-              router.navigate({ to: `/${userIdentity.username}/playlists` });
+            if (user?.username) {
+              router.navigate({ to: `/${user.username}/playlists` });
             }
             break;
           case '4':
             event.preventDefault();
-            if (userIdentity) {
-              router.navigate({ to: `/${userIdentity.username}/collection` });
+            if (user?.username) {
+              router.navigate({ to: `/${user.username}/collection` });
             }
             break;
           case '5':
@@ -51,15 +52,15 @@ export function useKeyboardNavigation() {
             break;
           case 'h':
             event.preventDefault();
-            if (userIdentity) {
-              router.navigate({ to: `/${userIdentity.username}` });
+            if (user?.username) {
+              router.navigate({ to: `/${user.username}` });
             }
             break;
           case 'n':
             event.preventDefault();
-            if (userIdentity) {
+            if (user?.username) {
               router.navigate({
-                to: `/${userIdentity.username}/playlists/new`,
+                to: `/${user.username}/playlists/new`,
               });
             }
             break;
@@ -86,7 +87,7 @@ export function useKeyboardNavigation() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [router, userIdentity]);
+  }, [router, user]);
 }
 
 function showKeyboardShortcuts() {

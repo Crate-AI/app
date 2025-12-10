@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect } from 'react';
-import { useAuthStore } from '@/stores';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 import { LoadingSpinner } from '@/components/ui/loading';
 
 export const Route = createFileRoute('/analyze')({
@@ -9,15 +10,15 @@ export const Route = createFileRoute('/analyze')({
 
 function AnalyzePage() {
   const navigate = useNavigate();
-  const { userIdentity } = useAuthStore();
+  const user = useQuery(api.users.getCurrentUser);
 
   useEffect(() => {
-    if (userIdentity?.username) {
-      navigate({ to: `/${userIdentity.username}`, replace: true });
-    } else {
+    if (user?.username) {
+      navigate({ to: `/${user.username}`, replace: true });
+    } else if (user === null) {
       navigate({ to: '/', replace: true });
     }
-  }, [userIdentity, navigate]);
+  }, [user, navigate]);
 
   return (
     <div className="flex items-center justify-center min-h-screen">
