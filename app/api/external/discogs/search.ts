@@ -1,5 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { DiscogsSDK } from '@crate.ai/discogs-sdk';
 import { parse } from 'cookie';
 import type { SearchParams, SearchResult, SearchResponse } from '@/lib/types';
 import { env } from 'cloudflare:workers';
@@ -57,21 +56,7 @@ export const Route = createFileRoute('/api/external/discogs/search')({
             );
           }
 
-          // Use Cloudflare env bindings (production) or process.env (local dev)
-          const cfEnv = env as Record<string, string>;
-          const sdk = new DiscogsSDK({
-            DiscogsConsumerKey:
-              cfEnv.DISCOGS_CONSUMER_KEY ||
-              process.env.DISCOGS_CONSUMER_KEY ||
-              process.env.VITE_DISCOGS_CONSUMER_KEY ||
-              '',
-            DiscogsConsumerSecret:
-              cfEnv.DISCOGS_CONSUMER_SECRET ||
-              process.env.DISCOGS_CONSUMER_SECRET ||
-              process.env.VITE_DISCOGS_CONSUMER_SECRET ||
-              '',
-            userAgent: 'CrateApp/1.0 +https://crate.ai',
-          });
+          const sdk = createDiscogsSDK();
 
           const tokenManager = sdk.auth.base.getTokenManager();
           await tokenManager.setAccessToken(accessToken);

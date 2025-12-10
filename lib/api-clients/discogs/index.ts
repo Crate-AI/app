@@ -1,25 +1,7 @@
 import { Release } from '@/lib/types';
 import { DiscogsSDK } from '@crate.ai/discogs-sdk';
 import { rateLimiter } from '@/lib/utils/rateLimiter';
-import { env } from 'cloudflare:workers';
-
-// Create SDK instance lazily (bindings only available during request handling)
-function getDiscogsSDK() {
-  // Use Cloudflare env bindings (production) or process.env (local dev)
-  const cfEnv = env as Record<string, string>;
-  return new DiscogsSDK({
-    DiscogsConsumerKey:
-      cfEnv.DISCOGS_CONSUMER_KEY ||
-      process.env.DISCOGS_CONSUMER_KEY ||
-      process.env.VITE_DISCOGS_CONSUMER_KEY ||
-      '',
-    DiscogsConsumerSecret:
-      cfEnv.DISCOGS_CONSUMER_SECRET ||
-      process.env.DISCOGS_CONSUMER_SECRET ||
-      process.env.VITE_DISCOGS_CONSUMER_SECRET ||
-      '',
-  });
-}
+import { createDiscogsSDK } from '@/lib/config/discogs';
 
 export const fetchUserDetails = async (username: string) => {
   const resourceUrl = `https://api.discogs.com/users/${username}`;
@@ -37,7 +19,7 @@ export const fetchUserCollection = async (
   perPage = 50,
   folderId = 0,
 ) => {
-  const discogs = getDiscogsSDK();
+  const discogs = createDiscogsSDK();
   const collection = await discogs.collection.getCollection({
     username,
     page: 1, // Fetch the first page for now
