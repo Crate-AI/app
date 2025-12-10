@@ -56,10 +56,12 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: dist/server
           command: deploy
-          postCommands: |
-            echo "$DISCOGS_CONSUMER_KEY" | wrangler secret put DISCOGS_CONSUMER_KEY --name crate-app
-            echo "$DISCOGS_CONSUMER_SECRET" | wrangler secret put DISCOGS_CONSUMER_SECRET --name crate-app
+
+      - name: Set Worker Secrets
         env:
-          DISCOGS_CONSUMER_KEY: ${{ secrets.VITE_DISCOGS_CONSUMER_KEY }}
-          DISCOGS_CONSUMER_SECRET: ${{ secrets.VITE_DISCOGS_CONSUMER_SECRET }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          echo "${{ secrets.VITE_DISCOGS_CONSUMER_KEY }}" | wrangler secret put DISCOGS_CONSUMER_KEY --name crate-app
+          echo "${{ secrets.VITE_DISCOGS_CONSUMER_SECRET }}" | wrangler secret put DISCOGS_CONSUMER_SECRET --name crate-app
 
