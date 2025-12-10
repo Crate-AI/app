@@ -1,10 +1,11 @@
 /**
  * Preview Router Worker
  *
- * Routes requests from custom preview domains (pr-123.crate.audio)
+ * Routes requests from custom preview domains (123-pr.crate.audio)
  * to the actual worker deployment (crate-app-pr-123.govi218mu.workers.dev)
  *
- * This avoids needing Zone Workers Routes permissions for each preview.
+ * Uses a wildcard DNS record (*) to catch all subdomains, then only
+ * handles {number}-pr format, returning 404 for everything else.
  */
 
 export default {
@@ -16,17 +17,22 @@ export default {
     const match = hostname.match(/^(\d+)-pr\./);
 
     if (!match) {
-      return new Response(
-        'Invalid preview URL. Expected format: {number}-pr.crate.audio',
-        {
-          status: 400,
-          headers: { 'Content-Type': 'text/plain' },
-        },
-      );
+      // Not a preview URL - return 404
+      return new Response('Not found', { status: 404 });
     }
 
     const prNumber = match[1];
-    const targetHost = `crate-app-pr-${prNumber}.govi218mu.workers.dev`;
+
+    // Validate PR number is within a reasonable range (1-99999)
+    const prNumberInt = parseInt(prNumber, 10);
+    if (isNaN(prNumberInt) || prNumberInt < 1 || prNumberInt > 99999) {
+      return new Response('Invalid PR number. Must be between 1 and 99999.', {
+        status: 400,
+        headers: { 'Content-Type': 'text/plain' },
+      });
+    }
+
+    const targetHost = `crate-app-pr-${prNumberInt}.govi218mu.workers.dev`;
 
     // Build the target URL
     const targetUrl = new URL(request.url);
@@ -38,7 +44,10 @@ export default {
     const modifiedRequest = new Request(targetUrl.toString(), {
       method: request.method,
       headers: request.headers,
-      body: request.body,
+      body:
+        request.method !== 'GET' && request.method !== 'HEAD'
+          ? request.body
+          : null,
       redirect: 'manual', // Don't follow redirects, let client handle them
     });
 
@@ -66,7 +75,7 @@ export default {
     } catch (error) {
       console.error('Proxy error:', error);
       return new Response(
-        `Preview pr-${prNumber} not found or not deployed yet.`,
+        `Preview ${prNumber}-pr not found or not deployed yet.`,
         {
           status: 502,
           headers: { 'Content-Type': 'text/plain' },
