@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Play, Pause, Trash2, Globe, Lock } from 'lucide-react';
-import { cn } from '@/lib/utils/utils';
+import { cn } from '@/lib/utils/tailwind';
 import { Image } from '@unpic/react';
 import { usePlayerStore } from '@/stores';
 import { usePlaylists } from '@/hooks/usePlaylists';

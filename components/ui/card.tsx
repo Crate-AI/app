@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@/lib/utils/utils';
+import { cn } from '@/lib/utils/tailwind';
 
 const cardVariants = cva(
   'rounded-base bg-white text-text border-2 border-gray-800 transition-all',
@@ -23,8 +23,8 @@ const cardVariants = cva(
 
 export interface CardProps
   extends
-    React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof cardVariants> {}
+  React.HTMLAttributes<HTMLDivElement>,
+  VariantProps<typeof cardVariants> { }
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className, variant, ...props }, ref) => (

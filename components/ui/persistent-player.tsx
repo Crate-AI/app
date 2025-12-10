@@ -17,7 +17,7 @@ import {
   Music,
   Heart,
 } from 'lucide-react';
-import { cn } from '@/lib/utils/utils';
+import { cn } from '@/lib/utils/tailwind';
 import { CrateTrack } from '@/types';
 import { Image } from '@unpic/react';
 import { toast } from 'sonner';

@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { cn } from '@/lib/utils/utils';
+import { cn } from '@/lib/utils/tailwind';
 import EnhancedChatInterface from '@/features/ai-assistant/components/chat/EnhancedChatInterface';
 import { CrateTrack } from '@/types';
 import { usePlayerStore } from '@/stores';
@@ -121,8 +121,8 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
           className={cn(
             'transition-all duration-300 ease-in-out pb-20 min-h-screen',
             chatPosition === 'sidebar' &&
-              isChatOpen &&
-              'lg:mr-[450px] xl:mr-[500px]',
+            isChatOpen &&
+            'lg:mr-[450px] xl:mr-[500px]',
             chatPosition === 'bottom' && isChatOpen && 'pb-[420px]',
           )}
         >

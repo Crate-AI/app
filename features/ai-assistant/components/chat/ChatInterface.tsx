@@ -14,7 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { CrateTrack } from '@/types';
 import { ChatLoader } from '@/features/ai-assistant/components/chat/ChatLoader';
 import { useChat } from 'ai/react';
-import { cn } from '@/lib/utils/utils';
+import { cn } from '@/lib/utils/tailwind';
 import { useTrackSorting } from '@/lib/hooks/useTrackSorting';
 import { toast } from 'sonner';
 import { useQuery } from 'convex/react';
