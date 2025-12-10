@@ -5,6 +5,10 @@ assets = { directory = "dist/client" }
 compatibility_date = "2024-12-16"
 compatibility_flags = ["nodejs_compat"]
 
+# Default environment variables (used in local development)
+[vars]
+ENVIRONMENT = "development"
+
 [env.production]
 name = "crate-app"
 # routes = [

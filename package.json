@@ -30,6 +30,7 @@
     "---------------MAINTENANCE-----------------": "🧹",
     "clean": "rm -rf .next .output dist node_modules",
     "reinstall": "rm -rf node_modules pnpm-lock.yaml && pnpm install",
+    "cf-typegen": "wrangler types",
     "---------------CONVEX DATA SYNC-----------------": "📦",
     "convex:export:from": "npx convex export --env-file .env.source --path convex-data.zip",
     "convex:import": "npx convex import convex-data.zip",

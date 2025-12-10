@@ -1,55 +1,97 @@
 /**
- * Centralized environment configuration for Cloudflare Workers + local dev
+ * Centralized Environment Configuration for Cloudflare Workers
  *
- * In production (Cloudflare Workers): secrets come from cloudflare:workers bindings
- * In local dev: secrets come from .dev.vars (loaded by miniflare)
+ * This module provides type-safe access to environment variables/secrets.
  *
- * This module handles the fallback logic in ONE place.
+ * ## How it works:
+ *
+ * Both local development and production use the same access pattern:
+ * `import { env } from 'cloudflare:workers'`
+ *
+ * - **Production**: Secrets are set via `wrangler secret put` in CI/CD
+ * - **Local Dev**: Secrets are loaded from `.dev.vars` by Miniflare
+ *
+ * ## Required files:
+ *
+ * - `.dev.vars` - Local development secrets (DO NOT COMMIT)
+ *   ```
+ *   DISCOGS_CONSUMER_KEY=your_key
+ *   DISCOGS_CONSUMER_SECRET=your_secret
+ *   ```
+ *
+ * - `wrangler.toml` - Non-sensitive env vars in [vars] section
+ *
+ * @see https://developers.cloudflare.com/workers/configuration/secrets/
+ * @see https://developers.cloudflare.com/workers/local-development/environment-variables/
  */
 
 import { env as cloudflareEnv } from 'cloudflare:workers';
 
-type CloudflareEnv = {
+/**
+ * Type definition for Cloudflare environment bindings.
+ * Add new secrets/vars here as they are added to the project.
+ *
+ * To generate types automatically, run: `nr cf-typegen`
+ */
+export interface CloudflareEnv {
+  // Discogs OAuth credentials
   DISCOGS_CONSUMER_KEY?: string;
   DISCOGS_CONSUMER_SECRET?: string;
-  // Add other secrets here as needed
-};
 
-/**
- * Get an environment variable from Cloudflare bindings (production)
- * or process.env (local dev fallback)
- */
-function getEnvVar(key: keyof CloudflareEnv): string {
-  const cfEnv = cloudflareEnv as CloudflareEnv;
-
-  // Try Cloudflare env first (production)
-  if (cfEnv[key]) {
-    return cfEnv[key];
-  }
-
-  // Fall back to process.env (local dev)
-  // Check both non-prefixed and VITE_ prefixed versions
-  return (
-    process.env[key] ||
-    process.env[`VITE_${key}`] ||
-    ''
-  );
+  // Environment identifier (set in wrangler.toml [env.*.vars])
+  ENVIRONMENT?: 'development' | 'staging' | 'production';
 }
 
 /**
- * Discogs API credentials
+ * Get the typed Cloudflare environment object.
+ *
+ * @returns The environment bindings from Cloudflare Workers runtime
+ */
+export function getCloudflareEnv(): CloudflareEnv {
+  return cloudflareEnv as CloudflareEnv;
+}
+
+/**
+ * Get an environment variable by key.
+ *
+ * @param key - The environment variable key
+ * @returns The value or empty string if not set
+ */
+export function getEnvVar<K extends keyof CloudflareEnv>(
+  key: K,
+): NonNullable<CloudflareEnv[K]> | string {
+  const env = getCloudflareEnv();
+  return env[key] ?? '';
+}
+
+/**
+ * Get Discogs API credentials from environment.
+ *
+ * @returns Object with consumerKey and consumerSecret
  */
 export function getDiscogsCredentials() {
+  const env = getCloudflareEnv();
   return {
-    consumerKey: getEnvVar('DISCOGS_CONSUMER_KEY'),
-    consumerSecret: getEnvVar('DISCOGS_CONSUMER_SECRET'),
+    consumerKey: env.DISCOGS_CONSUMER_KEY ?? '',
+    consumerSecret: env.DISCOGS_CONSUMER_SECRET ?? '',
   };
 }
 
 /**
- * Check if Discogs credentials are configured
+ * Check if Discogs credentials are configured.
+ *
+ * @returns true if both consumer key and secret are present
  */
 export function hasDiscogsCredentials(): boolean {
   const { consumerKey, consumerSecret } = getDiscogsCredentials();
   return Boolean(consumerKey && consumerSecret);
+}
+
+/**
+ * Get the current environment name.
+ *
+ * @returns 'development', 'staging', or 'production'
+ */
+export function getEnvironment(): CloudflareEnv['ENVIRONMENT'] {
+  return getEnvVar('ENVIRONMENT') as CloudflareEnv['ENVIRONMENT'];
 }

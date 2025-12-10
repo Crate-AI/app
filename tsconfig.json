@@ -19,7 +19,12 @@
     },
     "target": "es2015"
   },
-  "include": ["vite-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": [
+    "vite-env.d.ts",
+    "worker-configuration.d.ts",
+    "**/*.ts",
+    "**/*.tsx"
+  ],
   "exclude": [
     "node_modules",
     ".output",
