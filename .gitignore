@@ -9,6 +9,9 @@
 # testing
 /coverage
 
+# tanstack
+.tanstack
+
 # next.js
 /.next/
 /out/
