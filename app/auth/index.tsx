@@ -1,7 +1,7 @@
 import { createFileRoute, Navigate } from '@tanstack/react-router';
-import SignInButton from '@/components/signIn';
+import SignInButton from '@/lib/components/signIn';
 import { Authenticated, Unauthenticated, AuthLoading } from 'convex/react';
-import { LoadingSpinner } from '@/components/ui/loading';
+import { LoadingSpinner } from '@/lib/components/ui/loading';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 

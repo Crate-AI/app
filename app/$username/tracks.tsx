@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
-import ErrorBoundary from '@/components/Error/ErrorBoundary';
-import TracksTable from '@/features/crate-explorer/tracks/TracksTable';
-import EnhancedAiLayout from '@/features/ai-assistant/EnhancedAiLayout';
-import { PageHeader } from '@/components/layout/Navigation/Breadcrumbs';
+import ErrorBoundary from '@/lib/components/Error/ErrorBoundary';
+import TracksTable from '@/lib/components/crate-explorer/tracks/TracksTable';
+import EnhancedAiLayout from '@/lib/components/ai-assistant/EnhancedAiLayout';
+import { PageHeader } from '@/lib/components/layout/Navigation/Breadcrumbs';
 
 export const Route = createFileRoute('/$username/tracks')({
   component: TracksPage,

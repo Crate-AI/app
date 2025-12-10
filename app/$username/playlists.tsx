@@ -1,11 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
-import { PlaylistCard } from '@/features/playlists/components/PlaylistCard';
-import { Playlist } from '@/features/playlists/components/Playlist';
+import { PlaylistCard } from '@/lib/components/playlists/PlaylistCard';
+import { Playlist } from '@/lib/components/playlists/Playlist';
 import { usePlaylists } from '@/lib/hooks/usePlaylists';
-import { PlaylistWithTracks } from '@/types';
-import { PageHeader } from '@/components/layout/Navigation/Breadcrumbs';
-import { LoadingSpinner } from '@/components/ui/loading';
+import { PlaylistWithTracks } from '@/lib/types';
+import { PageHeader } from '@/lib/components/layout/Navigation/Breadcrumbs';
+import { LoadingSpinner } from '@/lib/components/ui/loading';
 
 export const Route = createFileRoute('/$username/playlists')({
   component: PlaylistPage,

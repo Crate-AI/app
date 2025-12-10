@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import type { CrateTrack } from '@/types';
+import type { CrateTrack } from '@/lib/types';
 
 export default function useTrackSearch(tracks: CrateTrack[]) {
   const [searchQuery, setSearchQuery] = useState('');

@@ -1,4 +1,4 @@
-import type { ReleaseDetails, ReleaseTrack } from '@/types';
+import type { ReleaseDetails, ReleaseTrack } from '@/lib/types';
 
 export const isReleaseTrack = (track: any): track is ReleaseTrack => {
   return (

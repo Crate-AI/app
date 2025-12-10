@@ -1,4 +1,4 @@
-import { Release, Track } from '@/types';
+import { Release, Track } from '@/lib/types';
 
 /**
  * Get the base URL for API calls.

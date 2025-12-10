@@ -2,8 +2,8 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { Button } from '@/components/ui/button';
-import { LoadingSpinner } from '@/components/ui/loading';
+import { Button } from '@/lib/components/ui/button';
+import { LoadingSpinner } from '@/lib/components/ui/loading';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 

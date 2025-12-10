@@ -1,4 +1,4 @@
-import { DiscogsSearchResult, CrateTrack } from '@/types';
+import { DiscogsSearchResult, CrateTrack } from '@/lib/types';
 
 /**
  * Converts a Discogs search result to a CrateTrack format for playlist compatibility

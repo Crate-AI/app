@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import useDebounce from './useDebounce';
-import type { DiscogsSearchResult } from '@/types';
+import type { DiscogsSearchResult } from '@/lib/types';
 
 interface UseDiscogsSearchReturn {
   query: string;

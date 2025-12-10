@@ -6,7 +6,7 @@
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { useCallback, useMemo } from 'react';
-import { CrateTrack } from '@/types';
+import { CrateTrack } from '@/lib/types';
 
 export function useFavorites() {
   // Get favorites from Convex

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { CollectionRelease } from '@/types';
+import type { CollectionRelease } from '@/lib/types';
 
 interface CollectionData {
   collection: CollectionRelease[];
