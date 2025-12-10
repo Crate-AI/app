@@ -11,13 +11,25 @@ const ALLOWED_ORIGINS = [
 
 function getValidatedOrigin(requestUrl: string): string {
   const origin = new URL(requestUrl).origin;
-  // Allow preview deployments (e.g., https://131-pr.crate.audio)
-  const isPreviewOrigin = /^https:\/\/\d+-pr\.crate\.audio$/.test(origin);
+
+  // Allow preview deployments:
+  // - Custom domain: https://131-pr.crate.audio
+  // - Workers.dev: https://crate-app-pr-131.xxx.workers.dev
+  const isPreviewOrigin =
+    /^https:\/\/\d+-pr\.crate\.audio$/.test(origin) ||
+    /^https:\/\/crate-app-pr-\d+\.[a-z0-9]+\.workers\.dev$/.test(origin);
 
   if (!ALLOWED_ORIGINS.includes(origin) && !isPreviewOrigin) {
     throw new Error(`Invalid origin: ${origin}`);
   }
   return origin;
+}
+
+/**
+ * Check if cookies should use secure flag (HTTPS)
+ */
+function isSecureOrigin(origin: string): boolean {
+  return origin.startsWith('https://');
 }
 
 export const Route = createFileRoute('/api/auth/discogs/request-token')({
@@ -54,12 +66,13 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
 
           const { token, secret } = requestTokenResponse.requestTokens;
           const headers = new Headers();
+          const secureCookie = isSecureOrigin(baseUrl);
 
           headers.append(
             'Set-Cookie',
             serialize('request_token', token, {
               httpOnly: true,
-              secure: process.env.NODE_ENV === 'production',
+              secure: secureCookie,
               sameSite: 'lax',
               path: '/',
             }),
@@ -69,7 +82,7 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
             'Set-Cookie',
             serialize('request_token_secret', secret, {
               httpOnly: true,
-              secure: process.env.NODE_ENV === 'production',
+              secure: secureCookie,
               sameSite: 'lax',
               path: '/',
             }),
@@ -88,10 +101,6 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
           return Response.json(
             {
               error: error.message || 'Error getting authorization URL',
-              details:
-                process.env.NODE_ENV === 'development'
-                  ? error.stack
-                  : undefined,
             },
             { status: 500 },
           );
