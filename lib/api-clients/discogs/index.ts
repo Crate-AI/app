@@ -1,15 +1,16 @@
 import { Release } from '@/lib/types';
 import { DiscogsSDK } from '@crate.ai/discogs-sdk';
 import { rateLimiter } from '@/lib/utils/rateLimiter';
+import { env } from 'cloudflare:workers';
 
 const discogs = new DiscogsSDK({
   DiscogsConsumerKey:
-    process.env.DISCOGS_CONSUMER_KEY ||
-    process.env.VITE_DISCOGS_CONSUMER_KEY ||
+    (env as Record<string, string>).DISCOGS_CONSUMER_KEY ||
+    (env as Record<string, string>).VITE_DISCOGS_CONSUMER_KEY ||
     '',
   DiscogsConsumerSecret:
-    process.env.DISCOGS_CONSUMER_SECRET ||
-    process.env.VITE_DISCOGS_CONSUMER_SECRET ||
+    (env as Record<string, string>).DISCOGS_CONSUMER_SECRET ||
+    (env as Record<string, string>).VITE_DISCOGS_CONSUMER_SECRET ||
     '',
 });
 
