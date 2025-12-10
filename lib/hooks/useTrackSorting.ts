@@ -1,10 +1,9 @@
 import { useState, useMemo } from 'react';
 import type { CrateTrack } from '@/types';
-import { useTracksStore } from '@/stores';
 import { OrderingConfig } from '@/types';
 
 export function useTrackSorting(tracks: CrateTrack[]) {
-  const { suggestedTrackIds } = useTracksStore();
+  const suggestedTrackIds = new Set<string>();
   const [orderingConfig, setOrderingConfig] = useState<OrderingConfig>({
     orderBy: 'manual',
     direction: 'asc',

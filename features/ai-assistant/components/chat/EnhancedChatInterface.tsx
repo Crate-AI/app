@@ -10,7 +10,6 @@ import {
   Plus,
   Sparkles,
   MoreVertical,
-  Copy,
   MessageSquare,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -33,7 +32,7 @@ import {
 import { CrateTrack } from '@/types';
 import { useChat } from 'ai/react';
 import { cn } from '@/lib/utils/utils';
-import { useTracksStore, usePlayerStore } from '@/stores';
+import { usePlayerStore } from '@/stores';
 import { useTrackSorting } from '@/lib/hooks/useTrackSorting';
 import { toast } from 'sonner';
 import PlaylistCreationModal from './PlaylistCreationModal';
@@ -349,7 +348,6 @@ export default function EnhancedChatInterface({
 }: EnhancedChatInterfaceProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const user = useQuery(api.users.getCurrentUser);
-  const { setSuggestedTracks } = useTracksStore();
   const { setOrderingConfig } = useTrackSorting(tracks);
   const { togglePlayPause, initializePlayer, isReady } = usePlayerStore();
   const [showSuggestions, setShowSuggestions] = useState(true);
@@ -379,7 +377,6 @@ export default function EnhancedChatInterface({
             setMatchedTracksMap(
               (prev) => new Map(prev.set(messageId, matchedTracks)),
             );
-            setSuggestedTracks(matchedTracks);
             setOrderingConfig({ orderBy: 'suggested', direction: 'asc' });
             onTracksFilter(matchedTracks);
             toast.success(
@@ -394,7 +391,7 @@ export default function EnhancedChatInterface({
         toast.error('Failed to process track suggestions');
       }
     },
-    [tracks, onTracksFilter, setOrderingConfig, setSuggestedTracks],
+    [tracks, onTracksFilter, setOrderingConfig],
   );
 
   const { messages, input, handleInputChange, handleSubmit, isLoading } =

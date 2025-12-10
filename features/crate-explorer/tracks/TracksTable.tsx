@@ -2,13 +2,12 @@
 
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { CrateTrack } from '@/types';
-import { useTracksStore, usePlayerStore } from '@/stores';
+import { usePlayerStore } from '@/stores';
 import { useFavorites } from '@/hooks/useFavorites';
 import { usePlaylists } from '@/hooks/usePlaylists';
 import { SearchInput } from './components/SearchInput';
 import { Button } from '@/components/ui/button';
 import {
-  MoreHorizontal,
   ArrowUpDown,
   Play,
   Pause,
@@ -41,19 +40,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
-import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -62,9 +48,21 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 
 export default function TracksTable() {
-  const { allTracks, suggestedTrackIds } = useTracksStore();
+  const convexTracks = useQuery(api.tracks.getUserTracks);
+  const allTracks = useMemo(() => {
+    if (!convexTracks) return [];
+    return convexTracks.map((track) => ({
+      ...track,
+      id: track.id || track._id,
+    })) as CrateTrack[];
+  }, [convexTracks]);
+
+  const suggestedTrackIds = new Set<string>();
+
   const {
     playlists: convexPlaylists,
     createPlaylist,
@@ -99,23 +97,14 @@ export default function TracksTable() {
   const [playbackProgress, setPlaybackProgress] = useState<
     Record<string, number>
   >({});
-  const [actionHistory, setActionHistory] = useState<
-    Array<{
-      type: 'addToPlaylist' | 'createPlaylist';
-      data: any;
-      timestamp: number;
-    }>
-  >([]);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState<string | null>(
     null,
   );
 
   // Use Convex favorites hook
   const {
-    favoriteTrackIds,
     isFavorite: checkIsFavorite,
     toggleFavorite: convexToggleFavorite,
-    isLoading: favoritesLoading,
   } = useFavorites();
 
   // Initialize player when component mounts
@@ -225,33 +214,6 @@ export default function TracksTable() {
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
-
-  // Function to handle creating AI-suggested playlist
-  const handleCreateAiPlaylist = async () => {
-    try {
-      const aiPlaylistName = `AI Mix ${new Date().toLocaleDateString()}`;
-      const playlistId = await createPlaylist(aiPlaylistName);
-
-      if (!playlistId) {
-        throw new Error('Failed to create playlist');
-      }
-
-      // Add suggested tracks to the playlist
-      const tracksToAdd = table
-        .getFilteredRowModel()
-        .rows.map((row) => row.original)
-        .filter((track) => suggestedTrackIds.has(track.id))
-        .slice(0, 10);
-
-      for (const track of tracksToAdd) {
-        const trackIdToUse = (track as any)._id ?? track.id;
-        await addTrackToPlaylist(playlistId, trackIdToUse);
-      }
-    } catch (error) {
-      console.error('Error creating AI playlist:', error);
-      setError('Failed to create AI playlist');
-    }
-  };
 
   const formatArtists = (artist: string, extraArtists: string | null) => {
     if (!extraArtists) return artist;

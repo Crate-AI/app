@@ -7,7 +7,6 @@ import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils/utils';
 import ChatInterface from '@/features/ai-assistant/components/chat/ChatInterface';
 import { CrateTrack } from '@/types';
-import { useTracksStore } from '@/stores';
 import ErrorBoundary from '@/components/Error/ErrorBoundary';
 import { toast } from 'sonner';
 import { useQuery } from 'convex/react';
@@ -19,7 +18,6 @@ interface AiLayoutProps {
 
 export default function AiLayout({ children }: AiLayoutProps) {
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const { setAllTracks } = useTracksStore();
 
   // Use Convex query instead of fetch
   const convexTracks = useQuery(api.tracks.getUserTracks);
@@ -33,13 +31,6 @@ export default function AiLayout({ children }: AiLayoutProps) {
       id: track.id || track._id,
     })) as CrateTrack[];
   }, [convexTracks]);
-
-  // Sync to store for other components
-  useEffect(() => {
-    if (tracks.length > 0) {
-      setAllTracks(tracks);
-    }
-  }, [tracks, setAllTracks]);
 
   const handleTracksFilter = (filteredTracks: CrateTrack[]) => {
     if (filteredTracks.length > 0) {
