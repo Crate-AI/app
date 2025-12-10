@@ -29,6 +29,7 @@ import { Route as ApiExternalDiscogsSearchRouteImport } from './app/api/external
 import { Route as ApiAuthDiscogsStatusRouteImport } from './app/api/auth/discogs/status'
 import { Route as ApiAuthDiscogsRequestTokenRouteImport } from './app/api/auth/discogs/request-token'
 import { Route as ApiAuthDiscogsDisconnectRouteImport } from './app/api/auth/discogs/disconnect'
+import { Route as ApiAuthDiscogsDebugRouteImport } from './app/api/auth/discogs/debug'
 import { Route as ApiExternalDiscogsReleaseIdRouteImport } from './app/api/external/discogs/release/$id'
 
 const WaitlistRoute = WaitlistRouteImport.update({
@@ -137,6 +138,11 @@ const ApiAuthDiscogsDisconnectRoute =
     path: '/api/auth/discogs/disconnect',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiAuthDiscogsDebugRoute = ApiAuthDiscogsDebugRouteImport.update({
+  id: '/api/auth/discogs/debug',
+  path: '/api/auth/discogs/debug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiExternalDiscogsReleaseIdRoute =
   ApiExternalDiscogsReleaseIdRouteImport.update({
     id: '/api/external/discogs/release/$id',
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/$username/settings/connections': typeof UsernameSettingsConnectionsRoute
   '/api/ai/chat': typeof ApiAiChatRoute
   '/$username/settings': typeof UsernameSettingsIndexRoute
+  '/api/auth/discogs/debug': typeof ApiAuthDiscogsDebugRoute
   '/api/auth/discogs/disconnect': typeof ApiAuthDiscogsDisconnectRoute
   '/api/auth/discogs/request-token': typeof ApiAuthDiscogsRequestTokenRoute
   '/api/auth/discogs/status': typeof ApiAuthDiscogsStatusRoute
@@ -182,6 +189,7 @@ export interface FileRoutesByTo {
   '/$username/settings/connections': typeof UsernameSettingsConnectionsRoute
   '/api/ai/chat': typeof ApiAiChatRoute
   '/$username/settings': typeof UsernameSettingsIndexRoute
+  '/api/auth/discogs/debug': typeof ApiAuthDiscogsDebugRoute
   '/api/auth/discogs/disconnect': typeof ApiAuthDiscogsDisconnectRoute
   '/api/auth/discogs/request-token': typeof ApiAuthDiscogsRequestTokenRoute
   '/api/auth/discogs/status': typeof ApiAuthDiscogsStatusRoute
@@ -206,6 +214,7 @@ export interface FileRoutesById {
   '/$username/settings/connections': typeof UsernameSettingsConnectionsRoute
   '/api/ai/chat': typeof ApiAiChatRoute
   '/$username/settings/': typeof UsernameSettingsIndexRoute
+  '/api/auth/discogs/debug': typeof ApiAuthDiscogsDebugRoute
   '/api/auth/discogs/disconnect': typeof ApiAuthDiscogsDisconnectRoute
   '/api/auth/discogs/request-token': typeof ApiAuthDiscogsRequestTokenRoute
   '/api/auth/discogs/status': typeof ApiAuthDiscogsStatusRoute
@@ -231,6 +240,7 @@ export interface FileRouteTypes {
     | '/$username/settings/connections'
     | '/api/ai/chat'
     | '/$username/settings'
+    | '/api/auth/discogs/debug'
     | '/api/auth/discogs/disconnect'
     | '/api/auth/discogs/request-token'
     | '/api/auth/discogs/status'
@@ -254,6 +264,7 @@ export interface FileRouteTypes {
     | '/$username/settings/connections'
     | '/api/ai/chat'
     | '/$username/settings'
+    | '/api/auth/discogs/debug'
     | '/api/auth/discogs/disconnect'
     | '/api/auth/discogs/request-token'
     | '/api/auth/discogs/status'
@@ -277,6 +288,7 @@ export interface FileRouteTypes {
     | '/$username/settings/connections'
     | '/api/ai/chat'
     | '/$username/settings/'
+    | '/api/auth/discogs/debug'
     | '/api/auth/discogs/disconnect'
     | '/api/auth/discogs/request-token'
     | '/api/auth/discogs/status'
@@ -300,6 +312,7 @@ export interface RootRouteChildren {
   UsernameSettingsConnectionsRoute: typeof UsernameSettingsConnectionsRoute
   ApiAiChatRoute: typeof ApiAiChatRoute
   UsernameSettingsIndexRoute: typeof UsernameSettingsIndexRoute
+  ApiAuthDiscogsDebugRoute: typeof ApiAuthDiscogsDebugRoute
   ApiAuthDiscogsDisconnectRoute: typeof ApiAuthDiscogsDisconnectRoute
   ApiAuthDiscogsRequestTokenRoute: typeof ApiAuthDiscogsRequestTokenRoute
   ApiAuthDiscogsStatusRoute: typeof ApiAuthDiscogsStatusRoute
@@ -451,6 +464,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthDiscogsDisconnectRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/discogs/debug': {
+      id: '/api/auth/discogs/debug'
+      path: '/api/auth/discogs/debug'
+      fullPath: '/api/auth/discogs/debug'
+      preLoaderRoute: typeof ApiAuthDiscogsDebugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/external/discogs/release/$id': {
       id: '/api/external/discogs/release/$id'
       path: '/api/external/discogs/release/$id'
@@ -486,6 +506,7 @@ const rootRouteChildren: RootRouteChildren = {
   UsernameSettingsConnectionsRoute: UsernameSettingsConnectionsRoute,
   ApiAiChatRoute: ApiAiChatRoute,
   UsernameSettingsIndexRoute: UsernameSettingsIndexRoute,
+  ApiAuthDiscogsDebugRoute: ApiAuthDiscogsDebugRoute,
   ApiAuthDiscogsDisconnectRoute: ApiAuthDiscogsDisconnectRoute,
   ApiAuthDiscogsRequestTokenRoute: ApiAuthDiscogsRequestTokenRoute,
   ApiAuthDiscogsStatusRoute: ApiAuthDiscogsStatusRoute,
