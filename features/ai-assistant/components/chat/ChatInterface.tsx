@@ -15,9 +15,11 @@ import { CrateTrack } from '@/types';
 import { ChatLoader } from '@/features/ai-assistant/components/chat/ChatLoader';
 import { useChat } from 'ai/react';
 import { cn } from '@/lib/utils/utils';
-import { useAuthStore, useTracksStore } from '@/stores';
+import { useTracksStore } from '@/stores';
 import { useTrackSorting } from '@/lib/hooks/useTrackSorting';
 import { toast } from 'sonner';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 
 interface ChatInterfaceProps {
   tracks: CrateTrack[];
@@ -64,7 +66,7 @@ export default function ChatInterface({
   onTracksFilter,
 }: ChatInterfaceProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { userIdentity } = useAuthStore();
+  const user = useQuery(api.users.getCurrentUser);
   const { setSuggestedTracks } = useTracksStore();
   const { setOrderingConfig } = useTrackSorting(tracks);
 
@@ -160,9 +162,9 @@ export default function ChatInterface({
                 </div>
                 {message.role === 'user' && (
                   <Avatar>
-                    <AvatarImage src={userIdentity?.avatarUrl} alt="User" />
+                    <AvatarImage src={user?.avatarUrl} alt="User" />
                     <AvatarFallback>
-                      {userIdentity?.username?.charAt(0)}
+                      {user?.username?.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
                 )}

@@ -1,5 +1,6 @@
 import { useLocation, Link } from '@tanstack/react-router';
-import { useAuthStore } from '@/stores';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 import { cn } from '@/lib/utils/utils';
 import {
   ChevronRight,
@@ -19,9 +20,9 @@ interface BreadcrumbItem {
 
 export default function Breadcrumbs() {
   const { pathname } = useLocation();
-  const { userIdentity } = useAuthStore();
+  const user = useQuery(api.users.getCurrentUser);
 
-  if (!userIdentity) return null;
+  if (!user) return null;
 
   const generateBreadcrumbs = (): BreadcrumbItem[] => {
     const pathSegments = pathname.split('/').filter(Boolean);
@@ -30,7 +31,7 @@ export default function Breadcrumbs() {
     // Always start with Home/Dashboard
     breadcrumbs.push({
       label: 'Dashboard',
-      href: `/${userIdentity.username}`,
+      href: `/${user.username}`,
       icon: Home,
     });
 
@@ -42,7 +43,7 @@ export default function Breadcrumbs() {
         case 'tracks':
           breadcrumbs.push({
             label: 'Tracks',
-            href: `/${userIdentity.username}/tracks`,
+            href: `/${user.username}/tracks`,
             icon: Music,
           });
           break;
@@ -50,7 +51,7 @@ export default function Breadcrumbs() {
         case 'playlists':
           breadcrumbs.push({
             label: 'Playlists',
-            href: `/${userIdentity.username}/playlists`,
+            href: `/${user.username}/playlists`,
             icon: ListMusic,
           });
 
@@ -59,7 +60,7 @@ export default function Breadcrumbs() {
             const playlistId = pathSegments[2];
             breadcrumbs.push({
               label: `Playlist ${playlistId}`,
-              href: `/${userIdentity.username}/playlists/${playlistId}`,
+              href: `/${user.username}/playlists/${playlistId}`,
             });
           }
           break;
@@ -67,7 +68,7 @@ export default function Breadcrumbs() {
         case 'collection':
           breadcrumbs.push({
             label: 'Collection',
-            href: `/${userIdentity.username}/collection`,
+            href: `/${user.username}/collection`,
             icon: Search,
           });
           break;

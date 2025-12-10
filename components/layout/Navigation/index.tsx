@@ -1,17 +1,18 @@
 'use client';
 
-import { useAuthStore } from '@/stores';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 import Banner from './Banner';
 import SignInButton from '@/components/signIn';
 
 export default function Navigation() {
-  const { userIdentity } = useAuthStore();
+  const user = useQuery(api.users.getCurrentUser);
 
   return (
     <Banner
-      username={userIdentity?.username || 'Guest'}
-      avatarUrl={userIdentity?.avatarUrl || '/default-avatar.png'}
-      authElement={!userIdentity ? <SignInButton /> : null}
+      username={user?.username || 'Guest'}
+      avatarUrl={user?.avatarUrl || '/default-avatar.png'}
+      authElement={!user ? <SignInButton /> : null}
     />
   );
 }

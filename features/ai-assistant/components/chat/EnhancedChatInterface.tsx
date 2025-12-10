@@ -33,10 +33,12 @@ import {
 import { CrateTrack } from '@/types';
 import { useChat } from 'ai/react';
 import { cn } from '@/lib/utils/utils';
-import { useAuthStore, useTracksStore, usePlayerStore } from '@/stores';
+import { useTracksStore, usePlayerStore } from '@/stores';
 import { useTrackSorting } from '@/lib/hooks/useTrackSorting';
 import { toast } from 'sonner';
 import PlaylistCreationModal from './PlaylistCreationModal';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 
 interface EnhancedChatInterfaceProps {
   tracks: CrateTrack[];
@@ -346,7 +348,7 @@ export default function EnhancedChatInterface({
   onClose,
 }: EnhancedChatInterfaceProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { userIdentity } = useAuthStore();
+  const user = useQuery(api.users.getCurrentUser);
   const { setSuggestedTracks } = useTracksStore();
   const { setOrderingConfig } = useTrackSorting(tracks);
   const { togglePlayPause, initializePlayer, isReady } = usePlayerStore();
@@ -547,7 +549,7 @@ export default function EnhancedChatInterface({
             <MessageBubble
               key={message.id}
               message={message}
-              userAvatar={userIdentity?.avatarUrl}
+              userAvatar={user?.avatarUrl}
               matchedTracks={matchedTracksMap.get(message.id) || []}
               onTrackPlay={handleTrackPlay}
               onTrackAddToPlaylist={handleTrackAddToPlaylist}

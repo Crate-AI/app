@@ -2,7 +2,8 @@ import { ListPlus, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CrateTrack } from '@/types';
 import { toast } from 'sonner';
-import { useAuthStore } from '@/stores';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -36,7 +37,7 @@ export function PlaylistActions({
   const [isCreatingPlaylist, setIsCreatingPlaylist] = useState(false);
   const [newPlaylistName, setNewPlaylistName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { isAuthenticated } = useAuthStore();
+  const user = useQuery(api.users.getCurrentUser);
 
   const handleCreateNewPlaylist = async () => {
     if (!newPlaylistName.trim() || isLoading) return;
@@ -55,7 +56,7 @@ export function PlaylistActions({
   };
 
   const handleAddToPlaylist = (playlistId: string) => {
-    if (!isAuthenticated()) {
+    if (!user) {
       toast.error('Please sign in to add tracks to playlists');
       return;
     }
