@@ -57,3 +57,4 @@ context-repos/
 
 # Cursor IDE rules
 .cursor/
+.dev.vars

@@ -57,11 +57,19 @@ export const Route = createFileRoute('/api/external/discogs/search')({
             );
           }
 
+          // Use Cloudflare env bindings (production) or process.env (local dev)
+          const cfEnv = env as Record<string, string>;
           const sdk = new DiscogsSDK({
             DiscogsConsumerKey:
-              (env as Record<string, string>).DISCOGS_CONSUMER_KEY || '',
+              cfEnv.DISCOGS_CONSUMER_KEY ||
+              process.env.DISCOGS_CONSUMER_KEY ||
+              process.env.VITE_DISCOGS_CONSUMER_KEY ||
+              '',
             DiscogsConsumerSecret:
-              (env as Record<string, string>).DISCOGS_CONSUMER_SECRET || '',
+              cfEnv.DISCOGS_CONSUMER_SECRET ||
+              process.env.DISCOGS_CONSUMER_SECRET ||
+              process.env.VITE_DISCOGS_CONSUMER_SECRET ||
+              '',
             userAgent: 'CrateApp/1.0 +https://crate.ai',
           });
 

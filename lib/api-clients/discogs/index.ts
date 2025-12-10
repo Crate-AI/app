@@ -5,11 +5,19 @@ import { env } from 'cloudflare:workers';
 
 // Create SDK instance lazily (bindings only available during request handling)
 function getDiscogsSDK() {
+  // Use Cloudflare env bindings (production) or process.env (local dev)
+  const cfEnv = env as Record<string, string>;
   return new DiscogsSDK({
     DiscogsConsumerKey:
-      (env as Record<string, string>).DISCOGS_CONSUMER_KEY || '',
+      cfEnv.DISCOGS_CONSUMER_KEY ||
+      process.env.DISCOGS_CONSUMER_KEY ||
+      process.env.VITE_DISCOGS_CONSUMER_KEY ||
+      '',
     DiscogsConsumerSecret:
-      (env as Record<string, string>).DISCOGS_CONSUMER_SECRET || '',
+      cfEnv.DISCOGS_CONSUMER_SECRET ||
+      process.env.DISCOGS_CONSUMER_SECRET ||
+      process.env.VITE_DISCOGS_CONSUMER_SECRET ||
+      '',
   });
 }
 
