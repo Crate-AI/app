@@ -20,7 +20,7 @@ export async function searchVideo(query: string): Promise<string | null> {
     );
 
     if (!response.ok) throw new Error('YouTube search failed');
-    const data = await response.json();
+    const data = (await response.json()) as { videoId: string };
     return data.videoId;
   } catch (err) {
     console.error('YouTube search failed:', err);
