@@ -1,7 +1,7 @@
 import { useLocation, Link } from '@tanstack/react-router';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { cn } from '@/lib/utils/utils';
+import { cn } from '@/lib/utils/tailwind';
 import {
   ChevronRight,
   Home,

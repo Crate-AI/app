@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { Play, Pause, Trash2, Globe, Lock } from 'lucide-react';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils/utils';
+import { cn } from '@/lib/utils/tailwind';
 import { usePlayerStore } from '@/stores';
 import { usePlaylists } from '@/hooks/usePlaylists';
 import { formatDuration } from '@/lib/utils/format';

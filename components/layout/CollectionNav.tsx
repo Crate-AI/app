@@ -1,7 +1,7 @@
 'use client';
 
 import { useLocation, useNavigate } from '@tanstack/react-router';
-import { cn } from '@/lib/utils/utils';
+import { cn } from '@/lib/utils/tailwind';
 
 export function CollectionNav() {
   const { pathname } = useLocation();

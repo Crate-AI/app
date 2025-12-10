@@ -31,7 +31,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { CrateTrack } from '@/types';
 import { useChat } from 'ai/react';
-import { cn } from '@/lib/utils/utils';
+import { cn } from '@/lib/utils/tailwind';
 import { usePlayerStore } from '@/stores';
 import { useTrackSorting } from '@/lib/hooks/useTrackSorting';
 import { toast } from 'sonner';

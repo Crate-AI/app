@@ -4,7 +4,7 @@ import { useState, ReactNode, useEffect, useMemo } from 'react';
 import { X, Sparkles, Bot, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { cn } from '@/lib/utils/utils';
+import { cn } from '@/lib/utils/tailwind';
 import ChatInterface from '@/features/ai-assistant/components/chat/ChatInterface';
 import { CrateTrack } from '@/types';
 import ErrorBoundary from '@/components/Error/ErrorBoundary';

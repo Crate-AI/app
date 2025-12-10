@@ -19,7 +19,7 @@ import {
   Heart,
 } from 'lucide-react';
 import { Image } from '@unpic/react';
-import { cn } from '@/lib/utils/utils';
+import { cn } from '@/lib/utils/tailwind';
 import {
   createColumnHelper,
   flexRender,
@@ -629,9 +629,9 @@ export default function TracksTable() {
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                   </th>
                 ))}
               </tr>
