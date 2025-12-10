@@ -2,7 +2,7 @@ import { Play, Pause, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CrateTrack } from '@/types';
 import { cn } from '@/lib/utils/tailwind';
-import { usePlaylists } from '@/hooks/usePlaylists';
+import { usePlaylists } from '@/lib/hooks/usePlaylists';
 import { PlaylistActions } from './PlaylistActions';
 import { Image } from '@unpic/react';
 import { useState } from 'react';

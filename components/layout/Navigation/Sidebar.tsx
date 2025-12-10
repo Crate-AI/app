@@ -1,5 +1,5 @@
 import { useLocation, Link } from '@tanstack/react-router';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { cn } from '@/lib/utils/tailwind';
 import { Home, Music, ListMusic, Search } from 'lucide-react';
 import { useState, useEffect } from 'react';

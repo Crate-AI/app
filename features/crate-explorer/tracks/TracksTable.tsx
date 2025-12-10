@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { CrateTrack } from '@/types';
 import { usePlayerStore } from '@/stores';
-import { useFavorites } from '@/hooks/useFavorites';
-import { usePlaylists } from '@/hooks/usePlaylists';
+import { useFavorites } from '@/lib/hooks/useFavorites';
+import { usePlaylists } from '@/lib/hooks/usePlaylists';
 import { SearchInput } from './components/SearchInput';
 import { Button } from '@/components/ui/button';
 import {

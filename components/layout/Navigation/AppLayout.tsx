@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { cn } from '@/lib/utils/tailwind';
-import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
+import { useKeyboardNavigation } from '@/lib/hooks/useKeyboardNavigation';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
 import PersistentPlayer from '@/components/ui/persistent-player';

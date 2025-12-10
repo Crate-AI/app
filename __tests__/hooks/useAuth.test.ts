@@ -16,7 +16,7 @@ vi.mock('@/convex/_generated/api', () => ({
 }));
 
 import { useConvexAuth, useQuery } from 'convex/react';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/lib/hooks/useAuth';
 
 const mockUseConvexAuth = useConvexAuth as ReturnType<typeof vi.fn>;
 const mockUseQuery = useQuery as ReturnType<typeof vi.fn>;

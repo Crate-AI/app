@@ -3,7 +3,7 @@ import { Play, Pause, Trash2, Globe, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils/tailwind';
 import { Image } from '@unpic/react';
 import { usePlayerStore } from '@/stores';
-import { usePlaylists } from '@/hooks/usePlaylists';
+import { usePlaylists } from '@/lib/hooks/usePlaylists';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
