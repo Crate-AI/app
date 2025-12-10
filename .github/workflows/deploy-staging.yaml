@@ -46,6 +46,9 @@ jobs:
       - name: Clean wrangler cache
         run: rm -rf .wrangler
 
+      - name: Install Wrangler CLI
+        run: npm install -g wrangler
+
       - name: Deploy to Cloudflare Workers (Staging)
         uses: cloudflare/wrangler-action@v3
         with:
