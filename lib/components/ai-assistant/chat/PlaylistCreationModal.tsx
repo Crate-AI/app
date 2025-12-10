@@ -68,7 +68,7 @@ export default function PlaylistCreationModal({
       const playlist = await createPlaylist(
         playlistName,
         description ||
-        `AI-generated playlist with ${selectedTracks.size} tracks`,
+          `AI-generated playlist with ${selectedTracks.size} tracks`,
       );
 
       if (!playlist) {
@@ -175,8 +175,9 @@ export default function PlaylistCreationModal({
                 return (
                   <Card
                     key={track.id}
-                    className={`cursor-pointer transition-all border-2 border-black rounded-base shadow-light hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none ${isSelected ? 'bg-main' : 'bg-white hover:bg-bg'
-                      }`}
+                    className={`cursor-pointer transition-all border-2 border-black rounded-base shadow-light hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none ${
+                      isSelected ? 'bg-main' : 'bg-white hover:bg-bg'
+                    }`}
                     onClick={() => toggleTrackSelection(track.id)}
                   >
                     <CardContent className="p-3">

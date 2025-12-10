@@ -10,7 +10,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/lib/components/ui/tooltip';
-import { Avatar, AvatarFallback, AvatarImage } from '@/lib/components/ui/avatar';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '@/lib/components/ui/avatar';
 import { CrateTrack } from '@/lib/types';
 import { ChatLoader } from '@/components/ai-assistant/components/chat/ChatLoader';
 import { useChat } from 'ai/react';
@@ -159,9 +163,7 @@ export default function ChatInterface({
                 {message.role === 'user' && (
                   <Avatar>
                     <AvatarImage src={user?.avatarUrl} alt="User" />
-                    <AvatarFallback>
-                      {user?.username?.charAt(0)}
-                    </AvatarFallback>
+                    <AvatarFallback>{user?.username?.charAt(0)}</AvatarFallback>
                   </Avatar>
                 )}
               </div>

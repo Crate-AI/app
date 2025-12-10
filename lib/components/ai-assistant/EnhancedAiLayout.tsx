@@ -1,12 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import {
-  X,
-  Bot,
-  Loader2,
-  MessageCircle,
-} from 'lucide-react';
+import { X, Bot, Loader2, MessageCircle } from 'lucide-react';
 import { Button } from '@/lib/components/ui/button';
 import { Card } from '@/lib/components/ui/card';
 import { cn } from '@/lib/utils/tailwind';
@@ -121,8 +116,8 @@ export default function EnhancedAiLayout({ children }: EnhancedAiLayoutProps) {
           className={cn(
             'transition-all duration-300 ease-in-out pb-20 min-h-screen',
             chatPosition === 'sidebar' &&
-            isChatOpen &&
-            'lg:mr-[450px] xl:mr-[500px]',
+              isChatOpen &&
+              'lg:mr-[450px] xl:mr-[500px]',
             chatPosition === 'bottom' && isChatOpen && 'pb-[420px]',
           )}
         >
