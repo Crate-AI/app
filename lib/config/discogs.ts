@@ -72,7 +72,7 @@ export function createDiscogsSDK(
   }
 
   const { consumerKey, consumerSecret } = getDiscogsCredentials();
-  
+
   console.log('[createDiscogsSDK] Creating SDK with credentials:', {
     hasKey: Boolean(consumerKey),
     hasSecret: Boolean(consumerSecret),
