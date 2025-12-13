@@ -108,7 +108,8 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
             { headers },
           );
         } catch (error: unknown) {
-          const message = error instanceof Error ? error.message : String(error);
+          const message =
+            error instanceof Error ? error.message : String(error);
           console.error('Error in request token route:', error);
           return Response.json(
             {

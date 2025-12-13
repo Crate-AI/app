@@ -12,7 +12,9 @@ jobs:
   deploy:
     name: Build & Deploy Preview
     runs-on: ubuntu-latest
-
+    concurrency:
+      group: preview-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,8 +35,6 @@ jobs:
 
       - name: Build
         env:
-          VITE_DISCOGS_CONSUMER_KEY: ${{ secrets.VITE_DISCOGS_CONSUMER_KEY }}
-          VITE_DISCOGS_CONSUMER_SECRET: ${{ secrets.VITE_DISCOGS_CONSUMER_SECRET }}
           VITE_CONVEX_URL: ${{ secrets.VITE_CONVEX_URL }}
         run: pnpm build
 
