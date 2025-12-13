@@ -14,6 +14,8 @@
     "routeTree.gen.ts",
     "context-repos",
     "__tests__"
+    "__tests__",
+    "context-repos"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
