@@ -45,10 +45,21 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
 
           const requestTokenResponse = await sdk.auth
             .getRequestToken()
-            .catch(async (error) => {
-              const responseText = error.response?.text
-                ? await error.response.text()
-                : '';
+            .catch(async (error: unknown) => {
+              const response = (() => {
+                if (!error || typeof error !== 'object') return undefined;
+                if (!('response' in error)) return undefined;
+                const { response } = error as { response?: unknown };
+                return response;
+              })();
+
+              const responseText =
+                response &&
+                typeof response === 'object' &&
+                'text' in response &&
+                typeof (response as { text?: unknown }).text === 'function'
+                  ? await (response as { text: () => Promise<string> }).text()
+                  : '';
               if (responseText.includes('Authentication Required')) {
                 throw new Error(
                   'Vercel authentication is blocking the request.',
@@ -96,11 +107,12 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
             },
             { headers },
           );
-        } catch (error: any) {
+        } catch (error: unknown) {
+          const message = error instanceof Error ? error.message : String(error);
           console.error('Error in request token route:', error);
           return Response.json(
             {
-              error: error.message || 'Error getting authorization URL',
+              error: message || 'Error getting authorization URL',
             },
             { status: 500 },
           );
