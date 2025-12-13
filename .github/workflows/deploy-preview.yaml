@@ -73,8 +73,27 @@ jobs:
           set -euo pipefail
           URL="https://crate-app-pr-${PR_NUMBER}.govi218mu.workers.dev/api/auth/discogs/debug"
           echo "Checking ${URL}"
-          BODY="$(curl -fsSL --retry 10 --retry-all-errors --retry-delay 3 "${URL}")"
-          node -e 'const json = JSON.parse(process.env.BODY || "{}"); if (!json.hasCredentials) { console.error(json); process.exit(1); } console.log("hasCredentials:", json.hasCredentials); console.log("availableBindings:", json.availableBindings);'             BODY="$BODY"
+          # Give Workers a moment to apply secret updates
+          sleep 3
+
+          BODY="$(curl -fsSL --retry 15 --retry-all-errors --retry-delay 3 "${URL}")"
+          echo "Debug response: ${BODY}"
+
+          export BODY
+          node -e '
+            const json = JSON.parse(process.env.BODY || "{}");
+            const bindings = Array.isArray(json.availableBindings) ? json.availableBindings : [];
+            const ok =
+              json.hasCredentials === true &&
+              bindings.includes("DISCOGS_CONSUMER_KEY") &&
+              bindings.includes("DISCOGS_CONSUMER_SECRET");
+            if (!ok) {
+              console.error(json);
+              process.exit(1);
+            }
+            console.log("hasCredentials:", json.hasCredentials);
+            console.log("availableBindings:", bindings);
+          '
 
       - name: Comment PR with Preview URL
         uses: actions/github-script@v7
