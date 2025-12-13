@@ -13,7 +13,6 @@ export default defineConfig({
     cloudflare({ viteEnvironment: { name: 'ssr' } }),
     tailwindcss(),
     tsconfigPaths({
-      // Prevent Vite from crawling `context-repos/**/tsconfig.json` (local reference repos)
       projects: ['./tsconfig.json'],
       ignoreConfigErrors: true,
     }),
