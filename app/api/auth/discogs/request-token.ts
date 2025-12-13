@@ -47,7 +47,7 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
             .getRequestToken()
             .catch(async (error: unknown) => {
               console.error('[request-token] Raw error:', error);
-              
+
               const response = (() => {
                 if (!error || typeof error !== 'object') return undefined;
                 if (!('response' in error)) return undefined;
@@ -62,10 +62,10 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
                 typeof (response as { text?: unknown }).text === 'function'
                   ? await (response as { text: () => Promise<string> }).text()
                   : '';
-              
+
               console.error('[request-token] Response text:', responseText);
               console.error('[request-token] Response object:', response);
-              
+
               if (responseText.includes('Authentication Required')) {
                 throw new Error(
                   'Vercel authentication is blocking the request.',
