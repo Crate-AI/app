@@ -58,3 +58,6 @@ context-repos/
 # Cursor IDE rules
 .cursor/
 .dev.vars
+
+# Context repositories (local reference repos, not part of the project)
+context-repos/
