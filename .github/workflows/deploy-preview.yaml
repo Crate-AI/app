@@ -15,6 +15,10 @@ jobs:
     concurrency:
       group: preview-${{ github.event.pull_request.number }}
       cancel-in-progress: true
+
+    env:
+      WORKER_NAME: crate-app-pr-${{ github.event.pull_request.number }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,6 +48,7 @@ jobs:
       - name: Install Wrangler CLI
         run: npm install -g wrangler
 
+      # Deploy first to ensure the Worker exists, then set secrets deterministically.
       - name: Deploy Preview to Cloudflare Workers
         id: deploy
         uses: cloudflare/wrangler-action@v3
@@ -51,15 +56,25 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: dist/server
-          command: deploy --name crate-app-pr-${{ github.event.pull_request.number }}
+          command: deploy --name ${{ env.WORKER_NAME }}
 
       - name: Set Worker Secrets
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          echo "${{ secrets.VITE_DISCOGS_CONSUMER_KEY }}" | wrangler secret put DISCOGS_CONSUMER_KEY --name crate-app-pr-${{ github.event.pull_request.number }}
-          echo "${{ secrets.VITE_DISCOGS_CONSUMER_SECRET }}" | wrangler secret put DISCOGS_CONSUMER_SECRET --name crate-app-pr-${{ github.event.pull_request.number }}
+          echo "${{ secrets.VITE_DISCOGS_CONSUMER_KEY }}" | wrangler secret put DISCOGS_CONSUMER_KEY --name "$WORKER_NAME"
+          echo "${{ secrets.VITE_DISCOGS_CONSUMER_SECRET }}" | wrangler secret put DISCOGS_CONSUMER_SECRET --name "$WORKER_NAME"
+
+      - name: Smoke check Discogs runtime bindings
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          URL="https://crate-app-pr-${PR_NUMBER}.govi218mu.workers.dev/api/auth/discogs/debug"
+          echo "Checking ${URL}"
+          BODY="$(curl -fsSL --retry 10 --retry-all-errors --retry-delay 3 "${URL}")"
+          node -e 'const json = JSON.parse(process.env.BODY || "{}"); if (!json.hasCredentials) { console.error(json); process.exit(1); } console.log("hasCredentials:", json.hasCredentials); console.log("availableBindings:", json.availableBindings);'             BODY="$BODY"
 
       - name: Comment PR with Preview URL
         uses: actions/github-script@v7
@@ -68,31 +83,29 @@ jobs:
             const prNumber = context.payload.pull_request.number;
             const previewUrl = `https://${prNumber}-pr.crate.audio`;
             const fallbackUrl = `https://crate-app-pr-${prNumber}.govi218mu.workers.dev`;
-            
-            // Find existing comment
+
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: prNumber,
             });
-            
-            const botComment = comments.find(comment => 
-              comment.user.type === 'Bot' && 
-              comment.body.includes('🚀 Preview Deployment')
+
+            const botComment = comments.find((comment) =>
+              comment.user.type === 'Bot' && comment.body.includes('🚀 Preview Deployment'),
             );
-            
+
             const body = `## 🚀 Preview Deployment
-            
+
             | Environment | URL |
             |-------------|-----|
             | Preview | [${previewUrl}](${previewUrl}) |
             | Fallback | [${fallbackUrl}](${fallbackUrl}) |
-            
+
             **Commit:** \`${context.sha.substring(0, 7)}\`
             **Updated:** ${new Date().toISOString()}
-            
+
             > This preview will be automatically deleted when the PR is closed.`;
-            
+
             if (botComment) {
               await github.rest.issues.updateComment({
                 owner: context.repo.owner,
@@ -108,4 +121,3 @@ jobs:
                 body,
               });
             }
-
