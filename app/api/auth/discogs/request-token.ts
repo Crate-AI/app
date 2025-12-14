@@ -69,13 +69,15 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
           }
 
           // OAuth 1.0a PLAINTEXT:
-          // oauth_signature MUST be literal `${consumerSecret}&` (no encodeURIComponent on the signature value).
-          const oauthSignature = `${consumerSecret}&`;
+          // Send oauth_signature percent-encoded inside the Authorization header.
+          // Discogs/Workers parsing is sensitive to raw '&' in oauth_signature value.
+          const oauthSignatureRaw = `${consumerSecret}&`;
+          const oauthSignatureParam = encodeURIComponent(oauthSignatureRaw);
           const authHeader = buildOAuthHeader({
             oauth_consumer_key: consumerKey,
             oauth_nonce: oauthNonce(),
             oauth_callback: encodeURIComponent(callbackUrl),
-            oauth_signature: oauthSignature,
+            oauth_signature: oauthSignatureParam,
             oauth_signature_method: 'PLAINTEXT',
             oauth_timestamp: oauthTimestamp(),
             oauth_version: '1.0',
@@ -101,15 +103,17 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
                     callbackUrl,
                     consumerKeyPrefix: mask(consumerKey),
                     consumerSecretPrefix: mask(consumerSecret),
-                    oauthSignatureHasAmpersand: oauthSignature.includes('&'),
-                    oauthSignatureHasPercent26: oauthSignature.includes('%26'),
-                    oauthSignatureEndsWithAmpersand: oauthSignature.endsWith('&'),
+                    oauthSignatureRawEndsWithAmpersand:
+                      oauthSignatureRaw.endsWith('&'),
+                    oauthSignatureParamHasPercent26:
+                      oauthSignatureParam.includes('%26'),
                     oauthCallbackEncoded: encodeURIComponent(callbackUrl),
                     authHeaderHasOauthSignature: authHeader.includes(
                       'oauth_signature="',
                     ),
                     // Never return secrets; only structural sanity checks.
                     authHeaderContainsPercentChar: authHeader.includes('%'),
+                    authHeaderHasPercent26: authHeader.includes('%26'),
                   }
                 : undefined;
             return Response.json(
