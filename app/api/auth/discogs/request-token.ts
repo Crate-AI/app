@@ -108,9 +108,8 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
                     oauthSignatureParamHasPercent26:
                       oauthSignatureParam.includes('%26'),
                     oauthCallbackEncoded: encodeURIComponent(callbackUrl),
-                    authHeaderHasOauthSignature: authHeader.includes(
-                      'oauth_signature="',
-                    ),
+                    authHeaderHasOauthSignature:
+                      authHeader.includes('oauth_signature="'),
                     // Never return secrets; only structural sanity checks.
                     authHeaderContainsPercentChar: authHeader.includes('%'),
                     authHeaderHasPercent26: authHeader.includes('%26'),
