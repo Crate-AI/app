@@ -24,8 +24,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(convex@1.29.3(react@18.3.1))
       '@crate.ai/discogs-sdk':
-        specifier: ^2.3.0
-        version: 2.4.0
+        specifier: ^2.4.1
+        version: 2.4.1
       '@fontsource-variable/inter':
         specifier: ^5.2.8
         version: 5.2.8
@@ -612,8 +612,8 @@ packages:
     peerDependencies:
       convex: ^1.24.8
 
-  '@crate.ai/discogs-sdk@2.4.0':
-    resolution: {integrity: sha512-OD4hwfeDUO0cdWnRd6GJDwmQyxCGw3vUXQwxJH4oFtsAEckzRdzEZzu9lf2Q4lGlSce3i+juTrCFUk5dLaYzIQ==}
+  '@crate.ai/discogs-sdk@2.4.1':
+    resolution: {integrity: sha512-+Nu33eGU/ITHZA+/Tsd1Czfoe0pXoTpr+81zME+IAa2Z0Md2ntCmHy45OF0dIKe79WxpX5DL+kchOhA3TSpQoQ==}
     engines: {node: '>=18.0.0'}
 
   '@cspotcode/source-map-support@0.8.1':
@@ -7063,7 +7063,7 @@ snapshots:
     dependencies:
       convex: 1.29.3(react@18.3.1)
 
-  '@crate.ai/discogs-sdk@2.4.0': {}
+  '@crate.ai/discogs-sdk@2.4.1': {}
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
