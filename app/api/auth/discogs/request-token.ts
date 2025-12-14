@@ -46,8 +46,6 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
           const requestTokenResponse = await sdk.auth
             .getRequestToken()
             .catch(async (error: unknown) => {
-              console.error('[request-token] Raw error:', error);
-
               const response = (() => {
                 if (!error || typeof error !== 'object') return undefined;
                 if (!('response' in error)) return undefined;
@@ -62,9 +60,6 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
                 typeof (response as { text?: unknown }).text === 'function'
                   ? await (response as { text: () => Promise<string> }).text()
                   : '';
-
-              console.error('[request-token] Response text:', responseText);
-              console.error('[request-token] Response object:', response);
 
               if (responseText.includes('Authentication Required')) {
                 throw new Error(
@@ -116,15 +111,10 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
         } catch (error: unknown) {
           const message =
             error instanceof Error ? error.message : String(error);
-          console.error('[request-token] Full error details:', {
-            error,
-            message,
-            stack: error instanceof Error ? error.stack : undefined,
-          });
+          console.error('Error in request token route:', error);
           return Response.json(
             {
               error: message || 'Error getting authorization URL',
-              details: error instanceof Error ? error.stack : String(error),
             },
             { status: 500 },
           );

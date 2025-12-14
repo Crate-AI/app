@@ -71,15 +71,6 @@ export function getEnvVar<K extends keyof CloudflareEnv>(
  */
 export function getDiscogsCredentials() {
   const env = getCloudflareEnv();
-  console.log('[getDiscogsCredentials] Raw env object:', Object.keys(env));
-  console.log('[getDiscogsCredentials] Credentials check:', {
-    hasKey: Boolean(env.DISCOGS_CONSUMER_KEY),
-    hasSecret: Boolean(env.DISCOGS_CONSUMER_SECRET),
-    keyLength: env.DISCOGS_CONSUMER_KEY?.length,
-    secretLength: env.DISCOGS_CONSUMER_SECRET?.length,
-    keyValue: env.DISCOGS_CONSUMER_KEY,
-    secretValue: env.DISCOGS_CONSUMER_SECRET,
-  });
   return {
     consumerKey: env.DISCOGS_CONSUMER_KEY ?? '',
     consumerSecret: env.DISCOGS_CONSUMER_SECRET ?? '',

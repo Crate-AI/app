@@ -73,16 +73,6 @@ export function createDiscogsSDK(
 
   const { consumerKey, consumerSecret } = getDiscogsCredentials();
 
-  console.log('[createDiscogsSDK] Creating SDK with credentials:', {
-    hasKey: Boolean(consumerKey),
-    hasSecret: Boolean(consumerSecret),
-    keyLength: consumerKey?.length,
-    secretLength: consumerSecret?.length,
-    keyPrefix: consumerKey?.substring(0, 4),
-    secretPrefix: consumerSecret?.substring(0, 4),
-    callbackUrl: options.callbackUrl,
-  });
-
   return new DiscogsSDK({
     DiscogsConsumerKey: consumerKey,
     DiscogsConsumerSecret: consumerSecret,
