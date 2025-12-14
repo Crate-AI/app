@@ -110,7 +110,9 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
                     bodyHasOauthSignature: oauthParams
                       .toString()
                       .includes('oauth_signature='),
-                    bodyContainsPercentChar: oauthParams.toString().includes('%'),
+                    bodyContainsPercentChar: oauthParams
+                      .toString()
+                      .includes('%'),
                     bodyHasPercent26: oauthParams.toString().includes('%26'),
                   }
                 : undefined;
