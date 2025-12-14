@@ -43,11 +43,6 @@ function oauthTimestamp(): string {
   return Math.floor(Date.now() / 1000).toString();
 }
 
-function buildOAuthHeader(params: Record<string, string>): string {
-  const parts = Object.entries(params).map(([k, v]) => `${k}="${v}"`);
-  return `OAuth ${parts.join(',')}`;
-}
-
 function mask(value: string, visiblePrefix = 4): string {
   if (!value) return '';
   if (value.length <= visiblePrefix) return `${value.slice(0, 1)}***`;
@@ -73,11 +68,14 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
           // Discogs/Workers parsing is sensitive to raw '&' in oauth_signature value.
           const oauthSignatureRaw = `${consumerSecret}&`;
           const oauthSignatureParam = encodeURIComponent(oauthSignatureRaw);
-          const authHeader = buildOAuthHeader({
+          // IMPORTANT: Avoid Authorization header on Workers.
+          // OAuth 1.0 allows sending OAuth params in POST body for
+          // application/x-www-form-urlencoded requests.
+          const oauthParams = new URLSearchParams({
             oauth_consumer_key: consumerKey,
             oauth_nonce: oauthNonce(),
-            oauth_callback: encodeURIComponent(callbackUrl),
-            oauth_signature: oauthSignatureParam,
+            oauth_callback: callbackUrl,
+            oauth_signature: oauthSignatureRaw, // URLSearchParams will encode
             oauth_signature_method: 'PLAINTEXT',
             oauth_timestamp: oauthTimestamp(),
             oauth_version: '1.0',
@@ -86,11 +84,11 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
           const res = await fetch(`${DISCOGS_API_BASE}/oauth/request_token`, {
             method: 'POST',
             headers: {
-              Authorization: authHeader,
               'Content-Type': 'application/x-www-form-urlencoded',
               // Discogs recommends providing a UA
               'User-Agent': 'CrateApp/1.0 +https://crate.ai',
             },
+            body: oauthParams.toString(),
           });
 
           const text = await res.text();
@@ -108,11 +106,12 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
                     oauthSignatureParamHasPercent26:
                       oauthSignatureParam.includes('%26'),
                     oauthCallbackEncoded: encodeURIComponent(callbackUrl),
-                    authHeaderHasOauthSignature:
-                      authHeader.includes('oauth_signature="'),
-                    // Never return secrets; only structural sanity checks.
-                    authHeaderContainsPercentChar: authHeader.includes('%'),
-                    authHeaderHasPercent26: authHeader.includes('%26'),
+                    // Body encoding checks (safe; no secrets)
+                    bodyHasOauthSignature: oauthParams
+                      .toString()
+                      .includes('oauth_signature='),
+                    bodyContainsPercentChar: oauthParams.toString().includes('%'),
+                    bodyHasPercent26: oauthParams.toString().includes('%26'),
                   }
                 : undefined;
             return Response.json(
