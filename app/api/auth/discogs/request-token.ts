@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { serialize } from 'cookie';
-import { getDiscogsCredentials } from '@/lib/config/env';
+import { getDiscogsCredentials, getEnvironment } from '@/lib/config/env';
 
 // Allowed origins for OAuth redirects (security allowlist)
 const ALLOWED_ORIGINS = [
@@ -48,6 +48,12 @@ function buildOAuthHeader(params: Record<string, string>): string {
   return `OAuth ${parts.join(',')}`;
 }
 
+function mask(value: string, visiblePrefix = 4): string {
+  if (!value) return '';
+  if (value.length <= visiblePrefix) return `${value.slice(0, 1)}***`;
+  return `${value.slice(0, visiblePrefix)}***`;
+}
+
 export const Route = createFileRoute('/api/auth/discogs/request-token')({
   server: {
     handlers: {
@@ -56,6 +62,7 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
           const baseUrl = getValidatedOrigin(request.url);
           const callbackUrl = `${baseUrl}/api/auth/discogs/callback`;
           const { consumerKey, consumerSecret } = getDiscogsCredentials();
+          const envName = getEnvironment() ?? 'development';
 
           if (!consumerKey || !consumerSecret) {
             throw new Error('Discogs credentials are not configured');
@@ -63,11 +70,12 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
 
           // OAuth 1.0a PLAINTEXT:
           // oauth_signature MUST be literal `${consumerSecret}&` (no encodeURIComponent on the signature value).
+          const oauthSignature = `${consumerSecret}&`;
           const authHeader = buildOAuthHeader({
             oauth_consumer_key: consumerKey,
             oauth_nonce: oauthNonce(),
             oauth_callback: encodeURIComponent(callbackUrl),
-            oauth_signature: `${consumerSecret}&`,
+            oauth_signature: oauthSignature,
             oauth_signature_method: 'PLAINTEXT',
             oauth_timestamp: oauthTimestamp(),
             oauth_version: '1.0',
@@ -85,7 +93,32 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
 
           const text = await res.text();
           if (!res.ok) {
-            throw new Error(`HTTP error ${res.status}: ${text}`);
+            const debug =
+              envName !== 'production'
+                ? {
+                    env: envName,
+                    baseUrl,
+                    callbackUrl,
+                    consumerKeyPrefix: mask(consumerKey),
+                    consumerSecretPrefix: mask(consumerSecret),
+                    oauthSignatureHasAmpersand: oauthSignature.includes('&'),
+                    oauthSignatureHasPercent26: oauthSignature.includes('%26'),
+                    oauthSignatureEndsWithAmpersand: oauthSignature.endsWith('&'),
+                    oauthCallbackEncoded: encodeURIComponent(callbackUrl),
+                    authHeaderHasOauthSignature: authHeader.includes(
+                      'oauth_signature="',
+                    ),
+                    // Never return secrets; only structural sanity checks.
+                    authHeaderContainsPercentChar: authHeader.includes('%'),
+                  }
+                : undefined;
+            return Response.json(
+              {
+                error: `HTTP error ${res.status}: ${text}`,
+                debug,
+              },
+              { status: 500 },
+            );
           }
 
           const params = new URLSearchParams(text);
