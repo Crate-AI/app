@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { serialize } from 'cookie';
-import { createDiscogsSDK } from '@/lib/config/discogs';
+import { getDiscogsCredentials } from '@/lib/config/env';
 
 // Allowed origins for OAuth redirects (security allowlist)
 const ALLOWED_ORIGINS = [
@@ -32,51 +32,70 @@ function isSecureOrigin(origin: string): boolean {
   return origin.startsWith('https://');
 }
 
+const DISCOGS_API_BASE = 'https://api.discogs.com';
+const DISCOGS_AUTHORIZE_BASE = 'https://www.discogs.com/oauth/authorize';
+
+function oauthNonce(): string {
+  return `${Date.now()}${Math.random().toString().slice(2)}`;
+}
+
+function oauthTimestamp(): string {
+  return Math.floor(Date.now() / 1000).toString();
+}
+
+function buildOAuthHeader(params: Record<string, string>): string {
+  const parts = Object.entries(params).map(([k, v]) => `${k}="${v}"`);
+  return `OAuth ${parts.join(',')}`;
+}
+
 export const Route = createFileRoute('/api/auth/discogs/request-token')({
   server: {
     handlers: {
       GET: async ({ request }) => {
         try {
           const baseUrl = getValidatedOrigin(request.url);
+          const callbackUrl = `${baseUrl}/api/auth/discogs/callback`;
+          const { consumerKey, consumerSecret } = getDiscogsCredentials();
 
-          const sdk = createDiscogsSDK({
-            callbackUrl: `${baseUrl}/api/auth/discogs/callback`,
+          if (!consumerKey || !consumerSecret) {
+            throw new Error('Discogs credentials are not configured');
+          }
+
+          // OAuth 1.0a PLAINTEXT:
+          // oauth_signature MUST be literal `${consumerSecret}&` (no encodeURIComponent on the signature value).
+          const authHeader = buildOAuthHeader({
+            oauth_consumer_key: consumerKey,
+            oauth_nonce: oauthNonce(),
+            oauth_callback: encodeURIComponent(callbackUrl),
+            oauth_signature: `${consumerSecret}&`,
+            oauth_signature_method: 'PLAINTEXT',
+            oauth_timestamp: oauthTimestamp(),
+            oauth_version: '1.0',
           });
 
-          const requestTokenResponse = await sdk.auth
-            .getRequestToken()
-            .catch(async (error: unknown) => {
-              const response = (() => {
-                if (!error || typeof error !== 'object') return undefined;
-                if (!('response' in error)) return undefined;
-                const { response } = error as { response?: unknown };
-                return response;
-              })();
+          const res = await fetch(`${DISCOGS_API_BASE}/oauth/request_token`, {
+            method: 'POST',
+            headers: {
+              Authorization: authHeader,
+              'Content-Type': 'application/x-www-form-urlencoded',
+              // Discogs recommends providing a UA
+              'User-Agent': 'CrateApp/1.0 +https://crate.ai',
+            },
+          });
 
-              const responseText =
-                response &&
-                typeof response === 'object' &&
-                'text' in response &&
-                typeof (response as { text?: unknown }).text === 'function'
-                  ? await (response as { text: () => Promise<string> }).text()
-                  : '';
+          const text = await res.text();
+          if (!res.ok) {
+            throw new Error(`HTTP error ${res.status}: ${text}`);
+          }
 
-              if (responseText.includes('Authentication Required')) {
-                throw new Error(
-                  'Vercel authentication is blocking the request.',
-                );
-              }
-              throw error;
-            });
+          const params = new URLSearchParams(text);
+          const token = params.get('oauth_token');
+          const secret = params.get('oauth_token_secret');
 
-          if (
-            !requestTokenResponse?.requestTokens?.token ||
-            !requestTokenResponse?.requestTokens?.secret
-          ) {
+          if (!token || !secret) {
             throw new Error('Invalid response from Discogs');
           }
 
-          const { token, secret } = requestTokenResponse.requestTokens;
           const headers = new Headers();
           const secureCookie = isSecureOrigin(baseUrl);
 
@@ -102,7 +121,7 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
 
           return Response.json(
             {
-              authUrl: requestTokenResponse.verificationURL,
+              authUrl: `${DISCOGS_AUTHORIZE_BASE}?oauth_token=${token}`,
               requestToken: token,
               requestTokenSecret: secret,
             },
