@@ -74,45 +74,6 @@ export default function CommandPalette({
     }
   }, [isOpen]);
 
-  // Handle keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isOpen) return;
-
-      switch (e.key) {
-        case 'ArrowDown':
-          e.preventDefault();
-          setSelectedIndex((prev) => {
-            const newIndex = prev < filteredCommands.length - 1 ? prev + 1 : 0;
-            scrollToSelected(newIndex);
-            return newIndex;
-          });
-          break;
-        case 'ArrowUp':
-          e.preventDefault();
-          setSelectedIndex((prev) => {
-            const newIndex = prev > 0 ? prev - 1 : filteredCommands.length - 1;
-            scrollToSelected(newIndex);
-            return newIndex;
-          });
-          break;
-        case 'Enter':
-          e.preventDefault();
-          if (filteredCommands[selectedIndex]) {
-            executeCommand(filteredCommands[selectedIndex]);
-          }
-          break;
-        case 'Escape':
-          e.preventDefault();
-          onClose();
-          break;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, selectedIndex, query, onClose]);
-
   const scrollToSelected = (index: number) => {
     const container = containerRef.current;
     if (!container) return;
@@ -194,10 +155,10 @@ export default function CommandPalette({
         title: 'Settings',
         description: 'Manage your account and preferences',
         icon: Settings,
-        action: () => navigate({ to: '/settings' }),
+        action: () => navigate({ to: `/${user.username}/settings/connections` }),
         keywords: ['settings', 'preferences', 'config', 'account'],
         category: 'navigation',
-        href: '/settings',
+        href: `/${user.username}/settings/connections`,
       },
 
       // Quick Actions
@@ -241,15 +202,34 @@ export default function CommandPalette({
     );
   });
 
+  // Recent commands in correct recency order (only when not searching)
+  const recentCommandItems = !query
+    ? recentCommands
+        .map((id) => commands.find((cmd) => cmd.id === id))
+        .filter((cmd): cmd is CommandItem => Boolean(cmd))
+    : [];
+
+  const shouldShowRecentSection = !query && recentCommandItems.length > 0;
+
+  const nonRecentCommands = shouldShowRecentSection
+    ? filteredCommands.filter((cmd) => !recentCommands.includes(cmd.id))
+    : filteredCommands;
+
+  // This is the single source of truth for keyboard navigation + selection.
+  // It matches the DOM order of `[data-command-item]` elements.
+  const displayCommands = shouldShowRecentSection
+    ? [...recentCommandItems, ...nonRecentCommands]
+    : filteredCommands;
+
   // Maintain selected index when filtering
   useEffect(() => {
-    if (selectedIndex >= filteredCommands.length) {
-      setSelectedIndex(Math.max(0, filteredCommands.length - 1));
+    if (selectedIndex >= displayCommands.length) {
+      setSelectedIndex(Math.max(0, displayCommands.length - 1));
     }
-  }, [filteredCommands.length, selectedIndex]);
+  }, [displayCommands.length, selectedIndex]);
 
   // Group commands by category
-  const groupedCommands = filteredCommands.reduce(
+  const groupedCommands = nonRecentCommands.reduce(
     (acc, command) => {
       if (!acc[command.category]) {
         acc[command.category] = [];
@@ -259,11 +239,56 @@ export default function CommandPalette({
     },
     {} as Record<string, CommandItem[]>,
   );
+  const displayIndexById = new Map(
+    displayCommands.map((cmd, i) => [cmd.id, i]),
+  );
 
-  // Show recent commands if no query
-  const recentCommandItems = !query
-    ? commands.filter((cmd) => recentCommands.includes(cmd.id))
-    : [];
+  // Maintain selected index when filtering
+  useEffect(() => {
+    if (selectedIndex >= displayCommands.length) {
+      setSelectedIndex(Math.max(0, displayCommands.length - 1));
+    }
+  }, [displayCommands.length, selectedIndex]);
+
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isOpen) return;
+
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          setSelectedIndex((prev) => {
+            const newIndex = prev < displayCommands.length - 1 ? prev + 1 : 0;
+            scrollToSelected(newIndex);
+            return newIndex;
+          });
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          setSelectedIndex((prev) => {
+            const newIndex =
+              prev > 0 ? prev - 1 : Math.max(0, displayCommands.length - 1);
+            scrollToSelected(newIndex);
+            return newIndex;
+          });
+          break;
+        case 'Enter':
+          e.preventDefault();
+          if (displayCommands[selectedIndex]) {
+            executeCommand(displayCommands[selectedIndex]);
+          }
+          break;
+        case 'Escape':
+          e.preventDefault();
+          onClose();
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, selectedIndex, query, onClose, displayCommands, executeCommand]);
 
   if (!isOpen) return null;
 
@@ -282,16 +307,16 @@ export default function CommandPalette({
       <div className="fixed inset-0 z-50 flex items-start justify-center pt-[10vh] px-4">
         <div
           className={cn(
-            'bg-white rounded-xl shadow-xl border border-gray-200 w-full max-w-xl overflow-hidden transition-all duration-200 ease-out',
+            'bg-white rounded-base shadow-light border-2 border-gray-800 w-full max-w-xl overflow-hidden transition-all duration-200 ease-out',
             isAnimating
               ? 'opacity-100 scale-100 translate-y-0'
               : 'opacity-0 scale-95 translate-y-2',
           )}
         >
           {/* Header */}
-          <div className="flex items-center px-4 py-3 border-b border-gray-200">
+          <div className="flex items-center px-4 py-3 border-b-2 border-gray-800">
             <div className="flex items-center flex-1">
-              <div className="flex items-center justify-center w-8 h-8 bg-main rounded-lg mr-3">
+              <div className="flex items-center justify-center w-8 h-8 bg-main rounded-base mr-3">
                 <Command className="w-4 h-4 text-black" />
               </div>
               <input
@@ -305,7 +330,7 @@ export default function CommandPalette({
             </div>
             <button
               onClick={onClose}
-              className="flex items-center justify-center w-6 h-6 rounded-md hover:bg-gray-100 transition-colors"
+              className="flex items-center justify-center w-8 h-8 rounded-base border-2 border-transparent hover:border-gray-800 hover:bg-gray-100 transition-colors"
             >
               <X className="w-4 h-4 text-gray-400" />
             </button>
@@ -313,18 +338,20 @@ export default function CommandPalette({
 
           {/* Results */}
           <div ref={containerRef} className="max-h-80 overflow-y-auto">
-            {!query && recentCommandItems.length > 0 && (
+            {shouldShowRecentSection && (
               <div className="p-3">
                 <div className="flex items-center px-2 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">
                   <Clock className="w-3 h-3 mr-2" />
                   Recent
                 </div>
                 <div className="space-y-0.5">
-                  {recentCommandItems.map((command, index) => (
+                  {recentCommandItems.map((command) => (
                     <CommandButton
                       key={command.id}
                       command={command}
-                      isSelected={index === selectedIndex}
+                      isSelected={
+                        displayIndexById.get(command.id) === selectedIndex
+                      }
                       onClick={() => executeCommand(command)}
                     />
                   ))}
@@ -347,12 +374,13 @@ export default function CommandPalette({
                   </div>
                   <div className="space-y-0.5">
                     {categoryCommands.map((command) => {
-                      const globalIndex = filteredCommands.indexOf(command);
                       return (
                         <CommandButton
                           key={command.id}
                           command={command}
-                          isSelected={globalIndex === selectedIndex}
+                          isSelected={
+                            displayIndexById.get(command.id) === selectedIndex
+                          }
                           onClick={() => executeCommand(command)}
                         />
                       );
@@ -362,7 +390,7 @@ export default function CommandPalette({
               ),
             )}
 
-            {filteredCommands.length === 0 && (
+            {displayCommands.length === 0 && (
               <div className="p-8 text-center">
                 <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Search className="w-6 h-6 text-gray-400" />
@@ -378,24 +406,24 @@ export default function CommandPalette({
           </div>
 
           {/* Footer */}
-          <div className="px-4 py-3 bg-gray-50 border-t border-gray-200">
+          <div className="px-4 py-3 bg-bg border-t-2 border-gray-800">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4 text-xs text-gray-500">
                 <div className="flex items-center">
-                  <kbd className="px-1.5 py-0.5 bg-white rounded border border-gray-200 text-xs font-mono mr-1">
+                  <kbd className="px-1.5 py-0.5 bg-white rounded-base border-2 border-gray-800 text-xs font-mono mr-1">
                     ↵
                   </kbd>
                   <span>to select</span>
                 </div>
                 <div className="flex items-center">
-                  <kbd className="px-1.5 py-0.5 bg-white rounded border border-gray-200 text-xs font-mono mr-1">
+                  <kbd className="px-1.5 py-0.5 bg-white rounded-base border-2 border-gray-800 text-xs font-mono mr-1">
                     ↑↓
                   </kbd>
                   <span>to navigate</span>
                 </div>
               </div>
               <div className="flex items-center text-xs text-gray-500">
-                <kbd className="px-1.5 py-0.5 bg-white rounded border border-gray-200 text-xs font-mono mr-1">
+                <kbd className="px-1.5 py-0.5 bg-white rounded-base border-2 border-gray-800 text-xs font-mono mr-1">
                   esc
                 </kbd>
                 <span>to close</span>
@@ -422,13 +450,13 @@ function CommandButton({ command, isSelected, onClick }: CommandButtonProps) {
       data-command-item
       onClick={onClick}
       className={cn(
-        'w-full flex items-center p-2 rounded-lg text-left transition-all duration-150 group',
+        'w-full flex items-center p-2 rounded-base text-left transition-all duration-150 group',
         isSelected ? 'bg-main text-black' : 'hover:bg-gray-100',
       )}
     >
       <div
         className={cn(
-          'flex items-center justify-center w-8 h-8 rounded-md mr-3 transition-colors',
+          'flex items-center justify-center w-8 h-8 rounded-base mr-3 transition-colors',
           isSelected ? 'bg-black/10' : 'bg-gray-100 group-hover:bg-gray-200',
         )}
       >
@@ -454,9 +482,7 @@ function CommandButton({ command, isSelected, onClick }: CommandButtonProps) {
             <span
               className={cn(
                 'ml-2 px-1.5 py-0.5 text-xs font-medium rounded-full',
-                isSelected
-                  ? 'bg-black/10 text-black'
-                  : 'bg-main/20 text-yellow-800',
+                isSelected ? 'bg-black/10 text-black' : 'bg-main/20 text-black',
               )}
             >
               {command.badge}
