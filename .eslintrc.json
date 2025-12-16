@@ -12,6 +12,7 @@
     ".output",
     "convex/_generated",
     "routeTree.gen.ts",
+    "context-repos",
     "__tests__"
   ],
   "parser": "@typescript-eslint/parser",

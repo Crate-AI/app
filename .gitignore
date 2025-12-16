@@ -47,10 +47,13 @@ next-env.d.ts
 storage.json
 .aider*
 .env
+.dev.vars
 
 # convex data exports
 convex-data.zip
 .env.source
+# Local, non-repo context
+context-repos/
 
 # Cursor IDE rules
 .cursor/
