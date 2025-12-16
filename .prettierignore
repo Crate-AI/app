@@ -12,3 +12,5 @@ dist/
 node_modules/
 pnpm-lock.yaml
 
+# Context repos
+context-repos/

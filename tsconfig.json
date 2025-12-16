@@ -19,5 +19,13 @@
     "target": "es2015"
   },
   "include": ["vite-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", ".output"]
+  "exclude": [
+    "node_modules",
+    ".output",
+    "dist",
+    ".vinxi",
+    ".tanstack",
+    "coverage",
+    "context-repos"
+  ]
 }
