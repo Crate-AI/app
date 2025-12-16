@@ -400,7 +400,7 @@ export default function TopBar({
 
           {/* Search Dropdown */}
           {searchDropdownOpen && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 max-h-80 overflow-y-auto z-50">
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-base shadow-light border-2 border-gray-800 max-h-80 overflow-y-auto z-50">
               {!searchQuery && recentCommandItems.length > 0 && (
                 <div className="p-2">
                   <div className="flex items-center px-2 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -550,13 +550,13 @@ function SearchCommandButton({
     <button
       onClick={onClick}
       className={cn(
-        'w-full flex items-center p-2 rounded-lg text-left transition-all duration-150 group',
+        'w-full flex items-center p-2 rounded-base text-left transition-all duration-150 group',
         isSelected ? 'bg-main text-black' : 'hover:bg-gray-100',
       )}
     >
       <div
         className={cn(
-          'flex items-center justify-center w-8 h-8 rounded-md mr-3 transition-colors',
+          'flex items-center justify-center w-8 h-8 rounded-base mr-3 transition-colors',
           isSelected ? 'bg-black/10' : 'bg-gray-100 group-hover:bg-gray-200',
         )}
       >
@@ -582,9 +582,7 @@ function SearchCommandButton({
             <span
               className={cn(
                 'ml-2 px-1.5 py-0.5 text-xs font-medium rounded-full',
-                isSelected
-                  ? 'bg-black/10 text-black'
-                  : 'bg-main/20 text-yellow-800',
+                isSelected ? 'bg-black/10 text-black' : 'bg-main/20 text-black',
               )}
             >
               {command.badge}

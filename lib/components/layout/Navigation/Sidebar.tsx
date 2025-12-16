@@ -109,7 +109,7 @@ export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
                 'group flex items-center space-x-3 px-4 py-3 rounded-base transition-all duration-200 relative border-2',
                 isActive
                   ? 'bg-main border-gray-800 shadow-light'
-                  : 'bg-transparent border-transparent hover:bg-gray-100 hover:border-gray-200 text-gray-600 hover:text-black',
+                  : 'bg-transparent border-transparent hover:bg-gray-100 hover:border-gray-800 text-gray-600 hover:text-black',
                 isCollapsed && 'justify-center px-2',
               )}
             >
