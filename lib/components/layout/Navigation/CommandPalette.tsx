@@ -155,7 +155,8 @@ export default function CommandPalette({
         title: 'Settings',
         description: 'Manage your account and preferences',
         icon: Settings,
-        action: () => navigate({ to: `/${user.username}/settings/connections` }),
+        action: () =>
+          navigate({ to: `/${user.username}/settings/connections` }),
         keywords: ['settings', 'preferences', 'config', 'account'],
         category: 'navigation',
         href: `/${user.username}/settings/connections`,
