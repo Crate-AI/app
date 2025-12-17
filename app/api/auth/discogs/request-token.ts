@@ -53,11 +53,16 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
   server: {
     handlers: {
       GET: async ({ request }) => {
+        const envName = getEnvironment() ?? 'development';
+        let stage = 'init';
+
         try {
+          stage = 'validation';
           const baseUrl = getValidatedOrigin(request.url);
           const callbackUrl = `${baseUrl}/api/auth/discogs/callback`;
+
+          stage = 'configuration';
           const { consumerKey, consumerSecret } = getDiscogsCredentials();
-          const envName = getEnvironment() ?? 'development';
 
           if (!consumerKey || !consumerSecret) {
             throw new Error('Discogs credentials are not configured');
@@ -81,6 +86,11 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
             oauth_version: '1.0',
           });
 
+          stage = 'upstream_request';
+          console.log(
+            `[Discogs Auth] Requesting token from ${DISCOGS_API_BASE}`,
+          );
+
           const res = await fetch(`${DISCOGS_API_BASE}/oauth/request_token`, {
             method: 'POST',
             headers: {
@@ -92,7 +102,15 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
           });
 
           const text = await res.text();
+
           if (!res.ok) {
+            stage = 'upstream_error';
+            console.error('[Discogs Auth] Upstream error:', {
+              status: res.status,
+              statusText: res.statusText,
+              body: text,
+            });
+
             const debug =
               envName !== 'production'
                 ? {
@@ -116,21 +134,25 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
                     bodyHasPercent26: oauthParams.toString().includes('%26'),
                   }
                 : undefined;
+
             return Response.json(
               {
-                error: `HTTP error ${res.status}: ${text}`,
+                error: `Upstream error ${res.status}: ${text}`,
+                stage,
                 debug,
               },
-              { status: 500 },
+              { status: 502 },
             );
           }
 
+          stage = 'response_parsing';
           const params = new URLSearchParams(text);
           const token = params.get('oauth_token');
           const secret = params.get('oauth_token_secret');
 
           if (!token || !secret) {
-            throw new Error('Invalid response from Discogs');
+            console.error('[Discogs Auth] Invalid response format:', text);
+            throw new Error('Invalid response from Discogs: missing tokens');
           }
 
           const headers = new Headers();
@@ -165,14 +187,25 @@ export const Route = createFileRoute('/api/auth/discogs/request-token')({
             { headers },
           );
         } catch (error: unknown) {
+          console.error(`[Discogs Auth] Error during ${stage}:`, error);
+
           const message =
             error instanceof Error ? error.message : String(error);
-          console.error('Error in request token route:', error);
+
+          let status = 500;
+          if (stage === 'validation') status = 403;
+          if (stage === 'configuration') status = 503;
+
           return Response.json(
             {
               error: message || 'Error getting authorization URL',
+              stage,
+              details:
+                envName !== 'production' && error instanceof Error
+                  ? error.stack
+                  : undefined,
             },
-            { status: 500 },
+            { status },
           );
         }
       },
