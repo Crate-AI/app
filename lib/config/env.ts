@@ -1,54 +1,29 @@
 /**
- * Centralized Environment Configuration for Cloudflare Workers
+ * Centralized Environment Configuration
  *
  * This module provides type-safe access to environment variables/secrets.
  *
- * ## How it works:
- *
- * Both local development and production use the same access pattern:
- * `import { env } from 'cloudflare:workers'`
- *
- * - **Production**: Secrets are set via `wrangler secret put` in CI/CD
- * - **Local Dev**: Secrets are loaded from `.dev.vars` by Miniflare
- *
- * ## Required files:
- *
- * - `.dev.vars` - Local development secrets (DO NOT COMMIT)
- *   ```
- *   DISCOGS_CONSUMER_KEY=your_key
- *   DISCOGS_CONSUMER_SECRET=your_secret
- *   ```
- *
- * - `wrangler.toml` - Non-sensitive env vars in [vars] section
- *
- * @see https://developers.cloudflare.com/workers/configuration/secrets/
- * @see https://developers.cloudflare.com/workers/local-development/environment-variables/
+ * Adapted for Netlify/Node.js environment.
  */
 
-import { env as cloudflareEnv } from 'cloudflare:workers';
-
 /**
- * Type definition for Cloudflare environment bindings.
- * Add new secrets/vars here as they are added to the project.
- *
- * To generate types automatically, run: `nr cf-typegen`
+ * Type definition for Environment variables.
  */
 export interface CloudflareEnv {
   // Discogs OAuth credentials
   DISCOGS_CONSUMER_KEY?: string;
   DISCOGS_CONSUMER_SECRET?: string;
 
-  // Environment identifier (set in wrangler.toml [env.*.vars])
+  // Environment identifier
   ENVIRONMENT?: 'development' | 'staging' | 'production';
 }
 
 /**
- * Get the typed Cloudflare environment object.
- *
- * @returns The environment bindings from Cloudflare Workers runtime
+ * Get the environment object.
+ * In Node.js/Netlify, this comes from process.env
  */
 export function getCloudflareEnv(): CloudflareEnv {
-  return cloudflareEnv as CloudflareEnv;
+  return (typeof process !== 'undefined' ? process.env : {}) as unknown as CloudflareEnv;
 }
 
 /**
@@ -93,5 +68,5 @@ export function hasDiscogsCredentials(): boolean {
  * @returns 'development', 'staging', or 'production'
  */
 export function getEnvironment(): CloudflareEnv['ENVIRONMENT'] {
-  return getEnvVar('ENVIRONMENT') as CloudflareEnv['ENVIRONMENT'];
+  return (getEnvVar('ENVIRONMENT') as CloudflareEnv['ENVIRONMENT']) || 'development';
 }
