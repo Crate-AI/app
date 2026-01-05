@@ -35,6 +35,9 @@ importers:
       '@netlify/vite-plugin':
         specifier: ^2.7.19
         version: 2.7.19(@netlify/api@14.0.12)(@upstash/redis@1.35.7)(db0@0.3.4)(ioredis@5.8.2)(rollup@4.53.3)(vite@7.2.4(@types/node@20.19.25)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.6)(yaml@2.8.2))
+      '@netlify/vite-plugin-tanstack-start':
+        specifier: ^1.2.6
+        version: 1.2.6(@netlify/api@14.0.12)(@tanstack/react-start@1.139.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(vite@7.2.4(@types/node@20.19.25)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.6)(yaml@2.8.2)))(@upstash/redis@1.35.7)(db0@0.3.4)(ioredis@5.8.2)(rollup@4.53.3)(vite@7.2.4(@types/node@20.19.25)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.6)(yaml@2.8.2))
       '@opentelemetry/api':
         specifier: ^1.9.0
         version: 1.9.0
@@ -1918,6 +1921,19 @@ packages:
   '@netlify/types@2.3.0':
     resolution: {integrity: sha512-5gxMWh/S7wr0uHKSTbMv4bjWmWSpwpeLYvErWeVNAPll5/QNFo9aWimMAUuh8ReLY3/fg92XAroVVu7+z27Snw==}
     engines: {node: ^18.14.0 || >=20}
+
+  '@netlify/vite-plugin-tanstack-start@1.2.6':
+    resolution: {integrity: sha512-/96ALjfuvkxJDF+9Xg5cx69oavS5Umwb9yKqPcKPH89nHhQUBS4Z7y0QpvMJIznHFE6EHUg/GYf4bS/nUtNmVQ==}
+    engines: {node: ^22.12.0 || >=24.0.0}
+    peerDependencies:
+      '@tanstack/react-start': '>=1.132.0'
+      '@tanstack/solid-start': '>=1.132.0'
+      vite: '>=7.0.0'
+    peerDependenciesMeta:
+      '@tanstack/react-start':
+        optional: true
+      '@tanstack/solid-start':
+        optional: true
 
   '@netlify/vite-plugin@2.7.19':
     resolution: {integrity: sha512-2EFGOqm3tThLTnPqOlPIt8BebP5pZVAAJtpW+eyPQixnyKZKXOd90U8sDowEKykXANMW9s49/5jcJBI+oXcSdA==}
@@ -9282,6 +9298,39 @@ snapshots:
       mime-types: 3.0.2
 
   '@netlify/types@2.3.0': {}
+
+  '@netlify/vite-plugin-tanstack-start@1.2.6(@netlify/api@14.0.12)(@tanstack/react-start@1.139.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(vite@7.2.4(@types/node@20.19.25)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.6)(yaml@2.8.2)))(@upstash/redis@1.35.7)(db0@0.3.4)(ioredis@5.8.2)(rollup@4.53.3)(vite@7.2.4(@types/node@20.19.25)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.6)(yaml@2.8.2))':
+    dependencies:
+      '@netlify/vite-plugin': 2.7.19(@netlify/api@14.0.12)(@upstash/redis@1.35.7)(db0@0.3.4)(ioredis@5.8.2)(rollup@4.53.3)(vite@7.2.4(@types/node@20.19.25)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.6)(yaml@2.8.2))
+      vite: 7.2.4(@types/node@20.19.25)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.6)(yaml@2.8.2)
+    optionalDependencies:
+      '@tanstack/react-start': 1.139.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(vite@7.2.4(@types/node@20.19.25)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.6)(yaml@2.8.2))
+    transitivePeerDependencies:
+      - '@azure/app-configuration'
+      - '@azure/cosmos'
+      - '@azure/data-tables'
+      - '@azure/identity'
+      - '@azure/keyvault-secrets'
+      - '@azure/storage-blob'
+      - '@capacitor/preferences'
+      - '@deno/kv'
+      - '@netlify/api'
+      - '@planetscale/database'
+      - '@upstash/redis'
+      - '@vercel/blob'
+      - '@vercel/functions'
+      - '@vercel/kv'
+      - aws4fetch
+      - babel-plugin-macros
+      - bare-abort-controller
+      - db0
+      - encoding
+      - idb-keyval
+      - ioredis
+      - react-native-b4a
+      - rollup
+      - supports-color
+      - uploadthing
 
   '@netlify/vite-plugin@2.7.19(@netlify/api@14.0.12)(@upstash/redis@1.35.7)(db0@0.3.4)(ioredis@5.8.2)(rollup@4.53.3)(vite@7.2.4(@types/node@20.19.25)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.6)(yaml@2.8.2))':
     dependencies:
