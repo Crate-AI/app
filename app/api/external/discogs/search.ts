@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { DiscogsSDK } from '@crate.ai/discogs-sdk';
 import { parse } from 'cookie';
 import type { SearchParams, SearchResult, SearchResponse } from '@/lib/types';
+import { env } from 'cloudflare:workers';
 
 function buildSearchParams(originalQuery: string): SearchParams {
   const terms = originalQuery.trim().split(/\s+/);
@@ -56,12 +56,7 @@ export const Route = createFileRoute('/api/external/discogs/search')({
             );
           }
 
-          const sdk = new DiscogsSDK({
-            DiscogsConsumerKey: import.meta.env.VITE_DISCOGS_CONSUMER_KEY || '',
-            DiscogsConsumerSecret:
-              import.meta.env.VITE_DISCOGS_CONSUMER_SECRET || '',
-            userAgent: 'CrateApp/1.0 +https://crate.ai',
-          });
+          const sdk = createDiscogsSDK();
 
           const tokenManager = sdk.auth.base.getTokenManager();
           await tokenManager.setAccessToken(accessToken);

@@ -1,11 +1,7 @@
 import { Release } from '@/lib/types';
 import { DiscogsSDK } from '@crate.ai/discogs-sdk';
 import { rateLimiter } from '@/lib/utils/rateLimiter';
-
-const discogs = new DiscogsSDK({
-  DiscogsConsumerKey: import.meta.env.VITE_DISCOGS_CONSUMER_KEY || '',
-  DiscogsConsumerSecret: import.meta.env.VITE_DISCOGS_CONSUMER_SECRET || '',
-});
+import { createDiscogsSDK } from '@/lib/config/discogs';
 
 export const fetchUserDetails = async (username: string) => {
   const resourceUrl = `https://api.discogs.com/users/${username}`;
@@ -23,6 +19,7 @@ export const fetchUserCollection = async (
   perPage = 50,
   folderId = 0,
 ) => {
+  const discogs = createDiscogsSDK();
   const collection = await discogs.collection.getCollection({
     username,
     page: 1, // Fetch the first page for now

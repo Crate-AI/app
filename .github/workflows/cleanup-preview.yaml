@@ -8,6 +8,9 @@ jobs:
   cleanup:
     name: Delete Preview Worker
     runs-on: ubuntu-latest
+    concurrency:
+      group: preview-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
 
     steps:
       - name: Delete Preview Worker
@@ -16,4 +19,3 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: delete --name crate-app-pr-${{ github.event.pull_request.number }} --force
-

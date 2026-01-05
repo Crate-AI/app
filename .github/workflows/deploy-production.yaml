@@ -39,12 +39,13 @@ jobs:
       - name: Build
         env:
           VITE_CONVEX_URL: ${{ secrets.VITE_CONVEX_URL }}
-          VITE_DISCOGS_CONSUMER_KEY: ${{ secrets.VITE_DISCOGS_CONSUMER_KEY }}
-          VITE_DISCOGS_CONSUMER_SECRET: ${{ secrets.VITE_DISCOGS_CONSUMER_SECRET }}
         run: pnpm build
 
       - name: Clean wrangler cache
         run: rm -rf .wrangler
+
+      - name: Install Wrangler CLI
+        run: npm install -g wrangler
 
       - name: Deploy to Cloudflare Workers (Production)
         uses: cloudflare/wrangler-action@v3
@@ -53,4 +54,12 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: dist/server
           command: deploy
+
+      - name: Set Worker Secrets
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          echo "${{ secrets.VITE_DISCOGS_CONSUMER_KEY }}" | wrangler secret put DISCOGS_CONSUMER_KEY --name crate-app
+          echo "${{ secrets.VITE_DISCOGS_CONSUMER_SECRET }}" | wrangler secret put DISCOGS_CONSUMER_SECRET --name crate-app
 
