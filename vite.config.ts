@@ -9,12 +9,6 @@ export default defineConfig({
   server: {
     port: 1995,
   },
-  build: {
-    manifest: true,
-    rollupOptions: {
-      input: './app/index.tsx',
-    },
-  },
   plugins: [
     tanstackStart({
       srcDirectory: '.',
