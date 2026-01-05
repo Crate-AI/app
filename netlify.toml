@@ -1,0 +1,6 @@
+[build]
+  command = "pnpm build"
+  publish = "dist/client"
+
+[functions]
+  directory = "dist/server"
