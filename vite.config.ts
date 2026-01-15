@@ -20,12 +20,16 @@ export default defineConfig({
         routesDirectory: 'app',
       },
       server: {
-        preset: 'netlify',
+        preset: 'vercel',
       },
     }),
     viteReact(),
   ],
   ssr: {
     noExternal: ['@tanstack/router-core'],
+  },
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true,
   },
 });
