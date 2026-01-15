@@ -27,7 +27,7 @@ export default defineSchema({
     supabaseUserId: v.optional(v.string()),
   })
     .index('by_username', ['username'])
-    .index('by_email', ['email'])
+    .index('email', ['email'])
     .index('by_supabase_id', ['supabaseUserId']),
 
   // Music service connections (for Discogs, Spotify, etc.)

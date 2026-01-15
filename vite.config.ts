@@ -1,21 +1,20 @@
 import { defineConfig } from 'vite';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
-import { cloudflare } from '@cloudflare/vite-plugin';
+import { devtools } from '@tanstack/devtools-vite'
 import viteReact from '@vitejs/plugin-react';
-import tsconfigPaths from 'vite-tsconfig-paths';
+import viteTsconfigPaths from 'vite-tsconfig-paths';
 import tailwindcss from '@tailwindcss/vite';
+import netlify from '@netlify/vite-plugin-tanstack-start'
 
 export default defineConfig({
-  server: {
-    port: 1995,
-  },
   plugins: [
-    cloudflare({ viteEnvironment: { name: 'ssr' } }),
-    tailwindcss(),
-    tsconfigPaths({
+    devtools(),
+    netlify(),
+    viteTsconfigPaths({
       projects: ['./tsconfig.json'],
       ignoreConfigErrors: true,
     }),
+    tailwindcss(),
     tanstackStart({
       srcDirectory: '.',
       router: {
@@ -24,7 +23,4 @@ export default defineConfig({
     }),
     viteReact(),
   ],
-  ssr: {
-    noExternal: ['@tanstack/router-core'],
-  },
 });

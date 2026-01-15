@@ -57,3 +57,6 @@ context-repos/
 
 # Cursor IDE rules
 .cursor/
+
+# Local Netlify folder
+.netlify

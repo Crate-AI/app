@@ -13,7 +13,6 @@
     "dev:frontend": "vite dev",
     "dev:backend": "convex dev",
     "build": "vite build",
-    "start": "wrangler dev",
     "preview": "vite preview",
     "---------------TESTING-----------------": "🧪",
     "test": "vitest run",
@@ -28,7 +27,7 @@
     "format:check": "prettier --check '**/*.{js,jsx,ts,tsx,json,css,scss,md}'",
     "pre-pr": "npm-run-all --sequential format:check lint:warn test",
     "---------------MAINTENANCE-----------------": "🧹",
-    "clean": "rm -rf .next .output dist node_modules",
+    "clean": "rm -rf .next .output dist node_modules .vercel",
     "reinstall": "rm -rf node_modules pnpm-lock.yaml && pnpm install",
     "---------------CONVEX DATA SYNC-----------------": "📦",
     "convex:export:from": "npx convex export --env-file .env.source --path convex-data.zip",
@@ -44,6 +43,7 @@
     "@crate.ai/discogs-sdk": "^2.3.0",
     "@fontsource-variable/inter": "^5.2.8",
     "@hookform/resolvers": "^3.9.0",
+    "@netlify/vite-plugin-tanstack-start": "^1.2.6",
     "@opentelemetry/api": "^1.9.0",
     "@oslojs/crypto": "^1.0.1",
     "@radix-ui/react-avatar": "^1.1.2",
@@ -57,6 +57,7 @@
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-switch": "^1.2.6",
     "@radix-ui/react-tooltip": "^1.1.6",
+    "@tanstack/devtools-vite": "^0.4.1",
     "@tanstack/react-router": "^1.139.3",
     "@tanstack/react-start": "^1.139.3",
     "@tanstack/react-table": "^8.21.3",
@@ -88,7 +89,6 @@
   },
   "devDependencies": {
     "@antfu/ni": "^27.0.1",
-    "@cloudflare/vite-plugin": "^1.17.0",
     "@tailwindcss/vite": "^4.1.17",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
@@ -107,12 +107,12 @@
     "jsdom": "^27.3.0",
     "npm-run-all": "^4.1.5",
     "postcss": "^8",
+    "serve": "^14.2.4",
     "tailwindcss": "^4.1.17",
     "typescript": "^5",
     "vinxi": "^0.5.8",
     "vite": "^7.2.4",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^4.0.15",
-    "wrangler": "^4.53.0"
+    "vitest": "^4.0.15"
   }
 }
