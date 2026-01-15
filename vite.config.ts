@@ -1,35 +1,26 @@
 import { defineConfig } from 'vite';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
+import { devtools } from '@tanstack/devtools-vite'
 import viteReact from '@vitejs/plugin-react';
-import tsconfigPaths from 'vite-tsconfig-paths';
+import viteTsconfigPaths from 'vite-tsconfig-paths';
 import tailwindcss from '@tailwindcss/vite';
+import netlify from '@netlify/vite-plugin-tanstack-start'
 
 export default defineConfig({
-  server: {
-    port: 1995,
-  },
   plugins: [
-    tailwindcss(),
-    tsconfigPaths({
+    devtools(),
+    netlify(),
+    viteTsconfigPaths({
       projects: ['./tsconfig.json'],
       ignoreConfigErrors: true,
     }),
+    tailwindcss(),
     tanstackStart({
       srcDirectory: '.',
       router: {
         routesDirectory: 'app',
       },
-      server: {
-        preset: 'vercel',
-      },
     }),
     viteReact(),
   ],
-  ssr: {
-    noExternal: ['@tanstack/router-core'],
-  },
-  build: {
-    outDir: 'dist',
-    emptyOutDir: true,
-  },
 });
